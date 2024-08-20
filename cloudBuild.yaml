@@ -1,0 +1,19 @@
+steps:
+  # Étape 1: Compiler le projet avec Maven
+  - name: 'gcr.io/cloud-builders/mvn'
+    args: ['clean', 'package']
+
+  # Étape 2: Construire l'image Docker
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/trustisend', '.']
+
+  # Étape 3: Pousser l'image Docker dans Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/trustisend']
+
+  # Étape 4: Déployer sur Google App Engine
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['app', 'deploy']
+
+images:
+  - 'gcr.io/$PROJECT_ID/trustisend'
