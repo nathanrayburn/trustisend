@@ -14,6 +14,7 @@ steps:
   # Étape 4: Déployer sur Google App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
-
+options:
+  logging: CLOUD_LOGGING_ONLY
 images:
   - 'gcr.io/$PROJECT_ID/trustisend'
