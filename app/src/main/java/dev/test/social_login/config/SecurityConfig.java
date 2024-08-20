@@ -17,10 +17,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests( auth -> {
                     auth.requestMatchers("/").permitAll();  // set root access to everyone
-                    auth.anyRequest().authenticated();        // any other requests has to be authenticated
                 })
-                .oauth2Login(withDefaults())                  // set oauth 2 login if we don't want to use a form login
-                .formLogin(withDefaults())                    // Login Form Option
                 .build();
     }
 }
