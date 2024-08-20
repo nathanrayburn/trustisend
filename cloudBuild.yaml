@@ -8,3 +8,5 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
     dir: 'dev/test-login/social-login'  # Chemin vers le répertoire contenant le fichier app.yaml
+options:
+  logging: NONE
