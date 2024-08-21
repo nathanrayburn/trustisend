@@ -1,11 +1,11 @@
 steps:
   # Step 1: Build the Docker image
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - build
-      - '-t'
-      - '$_SERVICE_NAME:$COMMIT_SHA'
-      - '.'
+#  - name: gcr.io/cloud-builders/docker
+#    args:
+#      - build
+#      - '-t'
+#      - '$_SERVICE_NAME:$COMMIT_SHA'
+#      - '.'
 
   # Step 2: Log in to Docker using secrets
   - name: gcr.io/cloud-builders/docker
@@ -15,15 +15,18 @@ steps:
       - |
         echo "Logging into Docker with username: $$USERNAME"
         echo "$$PASSWORD" | docker login -u $$USERNAME --password-stdin
-    secretEnv:
+        docker build -t $_SERVICE_NAME:$COMMIT_SHA .
+        docker push $_SERVICE_NAME:$COMMIT_SHA 
+   secretEnv:
       - 'USERNAME'
       - 'PASSWORD'
 
-  # Step 3: Push the Docker image to GCR
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - push
-      - '$_SERVICE_NAME:$COMMIT_SHA'
+
+ # Step 3: Push the Docker image to GCR
+ # - name: gcr.io/cloud-builders/docker
+ #   args:
+ #     - push
+ #     - '$_SERVICE_NAME:$COMMIT_SHA'
 
   # Step 4: Deploy the application to Cloud Run
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
