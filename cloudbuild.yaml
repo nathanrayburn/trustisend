@@ -14,7 +14,8 @@ steps:
       - '-c'
       - |
         echo "Logging into Docker with username: $USERNAME"
-
+   secretEnv:
+      - 'USERNAME'
   # Step 3: Log in to Docker
   - name: gcr.io/cloud-builders/docker
     args:
