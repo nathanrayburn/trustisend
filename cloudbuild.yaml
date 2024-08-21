@@ -61,4 +61,3 @@ timeout: 1200s
 
 images:
   - '$_SERVICE_NAME:$COMMIT_SHA'
-
