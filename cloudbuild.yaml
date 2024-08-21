@@ -10,13 +10,16 @@ steps:
   # Step 2: Log in to Docker
   - name: gcr.io/cloud-builders/docker
     args:
-      - '-c'
-      - 'docker login --username=$$USERNAME --password=$$PASSWORD'
-    secretEnv: 
+      - login
+      - '--username'
+      - '$$USERNAME'
+      - '--password'
+      - '$$PASSWORD'
+    secretEnv:
       - 'USERNAME'
       - 'PASSWORD'
 
-  # Step 3: Push the Docker image to the (GCR)
+  # Step 3: Push the Docker image to GCR
   - name: gcr.io/cloud-builders/docker
     args:
       - push
@@ -50,4 +53,3 @@ timeout: 1200s
 
 images:
   - '$_SERVICE_NAME:$COMMIT_SHA'
-
