@@ -4,8 +4,8 @@ steps:
     args:
       - build
       - '-t'
-      - '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
-      - .
+      - '$_SERVICE_NAME:$COMMIT_SHA'
+      - '.'
 
   # Step 2: Push the Docker image to the Google Container Registry (GCR)
   - name: gcr.io/cloud-builders/docker
