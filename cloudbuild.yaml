@@ -15,8 +15,8 @@ steps:
       - |
         echo "Logging into Docker with username: $$USERNAME"
         echo "$$PASSWORD" | docker login -u $$USERNAME --password-stdin
-        docker build -t $_SERVICE_NAME:$COMMIT_SHA .
-        docker push $_SERVICE_NAME:$COMMIT_SHA 
+        docker build -t "$_SERVICE_NAME:$COMMIT_SHA" .
+        docker push "$_SERVICE_NAME:$COMMIT_SHA"
    secretEnv:
       - 'USERNAME'
       - 'PASSWORD'
