@@ -11,7 +11,7 @@ steps:
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
+      - '$_SERVICE_NAME:$COMMIT_SHA'
 
   # Step 3: Deploy the application to Cloud Run
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
@@ -20,7 +20,7 @@ steps:
       - deploy
       - $_SERVICE_NAME
       - '--image'
-      - '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
+      - '$_SERVICE_NAME:$COMMIT_SHA'
       - '--region'
       - $_DEPLOY_REGION
       - '--platform'
@@ -31,4 +31,4 @@ options:
 timeout: 1200s
 
 images:
-  - '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
+  - '$_SERVICE_NAME:$COMMIT_SHA'
