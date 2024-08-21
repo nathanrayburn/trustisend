@@ -7,23 +7,22 @@ steps:
       - '$_SERVICE_NAME:$COMMIT_SHA'
       - '.'
 
-  # Step 2: Echo the Docker username (Avoid echoing password for security reasons)
+  # Step 2: Echo the Docker username (avoid echoing password)
   - name: gcr.io/cloud-builders/gcloud
     entrypoint: /bin/sh
     args:
       - '-c'
       - |
         echo "Logging into Docker with username: $USERNAME"
-   secretEnv:
-      - 'USERNAME'
+
   # Step 3: Log in to Docker
   - name: gcr.io/cloud-builders/docker
     args:
       - login
       - '--username'
-      - '$$USERNAME'
+      - "$USERNAME"  # Access the username via secretEnv
       - '--password'
-      - '$$PASSWORD'
+      - "$PASSWORD"  # Access the password via secretEnv
     secretEnv:
       - 'USERNAME'
       - 'PASSWORD'
