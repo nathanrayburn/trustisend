@@ -8,12 +8,12 @@ steps:
 #      - '.'
 
   # Step 2: Log in to Docker using secrets
-  - name: gcr.io/cloud-builders/docker
+  - name: eu.gcr.io/cloud-builders/docker
     entrypoint: /bin/bash
     args:
       - '-c'
       - |
-        docker build -t "trustisend:latest" .
+        docker build -t "trustisend:latest" . &&
         docker push "trustisend:latest"
 
 
@@ -24,7 +24,7 @@ steps:
  #     - '$_SERVICE_NAME:$COMMIT_SHA'
 
   # Step 4: Deploy the application to Cloud Run
-  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  - name: eu.gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - run
       - deploy
