@@ -26,7 +26,8 @@ steps:
       - '--platform'
       - $_PLATFORM
     entrypoint: gcloud
-
+options:
+    logging: NONE
 timeout: 1200s
 
 images:
