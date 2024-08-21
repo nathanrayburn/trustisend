@@ -1,5 +1,5 @@
 # Step 1: Use the official Maven image to build the Spring Boot app with Java 21
-FROM maven:3.8.6-eclipse-temurin-21 AS build
+FROM maven:3.9.4-eclipse-temurin-21 AS build
 
 # Set the working directory inside the container
 WORKDIR /app
