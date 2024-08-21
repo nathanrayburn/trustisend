@@ -49,4 +49,4 @@
 ## Licence
 
 ## NB
-le README évoluera en fonction du projet.
+le README évoluera en fonction du projet!
