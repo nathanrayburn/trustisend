@@ -25,7 +25,7 @@ steps:
       - push
       - '$_SERVICE_NAME:$COMMIT_SHA'
 
-  # Step 4: Deploy the application to Cloud Run
+  # Step 4: Deploy the application to Cloud Run.
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - run
