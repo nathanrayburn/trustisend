@@ -33,8 +33,6 @@ steps:
       - '$_SERVICE_NAME:$COMMIT_SHA'
       - '--region'
       - $_DEPLOY_REGION
-      - '--platform'
-      - $_PLATFORM
     entrypoint: gcloud
 options:
   logging: CLOUD_LOGGING_ONLY
