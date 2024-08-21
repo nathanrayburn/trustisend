@@ -7,7 +7,15 @@ steps:
       - '$_SERVICE_NAME:$COMMIT_SHA'
       - '.'
 
-  # Step 2: Log in to Docker
+  # Step 2: Echo the Docker username (Avoid echoing password for security reasons)
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: /bin/sh
+    args:
+      - '-c'
+      - |
+        echo "Logging into Docker with username: $USERNAME"
+
+  # Step 3: Log in to Docker
   - name: gcr.io/cloud-builders/docker
     args:
       - login
@@ -19,13 +27,13 @@ steps:
       - 'USERNAME'
       - 'PASSWORD'
 
-  # Step 3: Push the Docker image to GCR
+  # Step 4: Push the Docker image to GCR
   - name: gcr.io/cloud-builders/docker
     args:
       - push
       - '$_SERVICE_NAME:$COMMIT_SHA'
 
-  # Step 4: Deploy the application to Cloud Run.
+  # Step 5: Deploy the application to Cloud Run
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - run
@@ -53,3 +61,4 @@ timeout: 1200s
 
 images:
   - '$_SERVICE_NAME:$COMMIT_SHA'
+
