@@ -27,7 +27,7 @@ steps:
       - $_PLATFORM
     entrypoint: gcloud
 options:
-    logging: NONE
+    logging: CLOUD_LOGGING_ONLY
 timeout: 1200s
 
 images:
