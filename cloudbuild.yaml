@@ -30,7 +30,7 @@ steps:
       - deploy
       - $_SERVICE_NAME
       - '--image'
-      - '$_SERVICE_NAME:$COMMIT_SHA'
+      - 'trustisend:latest'
       - '--region'
       - $_DEPLOY_REGION
     entrypoint: gcloud
@@ -40,4 +40,4 @@ options:
 timeout: 1200s
 
 images:
-  - '$_SERVICE_NAME:$COMMIT_SHA'
+  - 'trustisend:latest'
