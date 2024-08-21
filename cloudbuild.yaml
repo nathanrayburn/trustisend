@@ -13,8 +13,8 @@ steps:
     args:
       - '-c'
       - |
-        docker build -t "$_SERVICE_NAME:$COMMIT_SHA" .
-        docker push "$_SERVICE_NAME:$COMMIT_SHA"
+        docker build -t "trustisend:$COMMIT_SHA" .
+        docker push "trustisend:$COMMIT_SHA"
 
 
  # Step 3: Push the Docker image to GCR
