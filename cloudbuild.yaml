@@ -1,43 +1,35 @@
 steps:
-  # Step 1: Build the Docker image
-#  - name: gcr.io/cloud-builders/docker
-#    args:
-#      - build
-#      - '-t'
-#      - '$_SERVICE_NAME:$COMMIT_SHA'
-#      - '.'
-
-  # Step 2: Log in to Docker using secrets
-  - name: eu.gcr.io/cloud-builders/docker
-    entrypoint: /bin/bash
+  # Step 1: Build the Docker image and tag it with the commit SHA
+  - name: gcr.io/cloud-builders/docker
     args:
-      - '-c'
-      - |
-        docker build -t "trustisend:latest" . &&
-        docker push "trustisend:latest"
+      - build
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+      - '.'
 
+  # Step 2: Push the Docker image to the Google Container Registry (GCR)
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
 
- # Step 3: Push the Docker image to GCR
- # - name: gcr.io/cloud-builders/docker
- #   args:
- #     - push
- #     - '$_SERVICE_NAME:$COMMIT_SHA'
-
-  # Step 4: Deploy the application to Cloud Run
-  - name: eu.gcr.io/google.com/cloudsdktool/cloud-sdk
+  # Step 3: Deploy the application to Cloud Run using the built image
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - run
       - deploy
-      - $_SERVICE_NAME
+      - trustisend
       - '--image'
-      - 'trustisend:latest'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
       - '--region'
-      - $_DEPLOY_REGION
+      - europe-west1
     entrypoint: gcloud
+
+# Specify the images that will be pushed by Cloud Build
+images:
+  - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+
 options:
   logging: CLOUD_LOGGING_ONLY
 
 timeout: 1200s
-
-images:
-  - 'trustisend:latest'
