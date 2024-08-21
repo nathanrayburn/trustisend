@@ -13,13 +13,8 @@ steps:
     args:
       - '-c'
       - |
-        echo "Logging into Docker with username: $$USERNAME"
-        echo "$$PASSWORD" | docker login -u $$USERNAME --password-stdin
         docker build -t "$_SERVICE_NAME:$COMMIT_SHA" .
         docker push "$_SERVICE_NAME:$COMMIT_SHA"
-    secretEnv:
-      - 'USERNAME'
-      - 'PASSWORD'
 
 
  # Step 3: Push the Docker image to GCR
@@ -41,14 +36,6 @@ steps:
       - '--platform'
       - $_PLATFORM
     entrypoint: gcloud
-
-availableSecrets:
-  secretManager:
-    - versionName: projects/$_PROJECT_ID/secrets/docker-username/versions/1
-      env: 'USERNAME'
-    - versionName: projects/$_PROJECT_ID/secrets/docker-password/versions/1
-      env: 'PASSWORD'
-
 options:
   logging: CLOUD_LOGGING_ONLY
 
