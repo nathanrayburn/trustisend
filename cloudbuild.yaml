@@ -4,14 +4,14 @@ steps:
     args:
       - build
       - '-t'
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
       - '.'
 
   # Step 1: Push the Docker image of your application to Artifact Registry
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
 
   # Step 2: Build the Docker image for Casdoor and tag it with the commit SHA
   - name: gcr.io/cloud-builders/git
@@ -34,22 +34,6 @@ steps:
       - push
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
 
-  # Step 4: Deploy the application to Cloud Run using the built image
-  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    args:
-      - run
-      - deploy
-      - trustisend  # Cloud Run service name
-      - '--image'
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
-      - '--region'
-      - 'europe-west1'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
-      - '--quiet'
-    entrypoint: gcloud
-
   # Step 5: Deploy Casdoor to Cloud Run
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
@@ -68,7 +52,6 @@ steps:
 
 # Specify the images that will be pushed by Cloud Build
 images:
-  - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
   - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
 
 options:
