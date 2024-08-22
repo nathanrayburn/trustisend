@@ -1,5 +1,6 @@
 package dev.test.social_login.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class  HomeController {
     @GetMapping("/")
     public String home(){
-        return "Hello, Home";
+        return "This will be the landing page.";
     }
     @GetMapping("/secured")
     public String secured(){
