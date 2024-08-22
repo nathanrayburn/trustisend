@@ -11,18 +11,28 @@ L'objectif de la première semaine est de poser les bases solides du projet Trus
 #### 1. **Description du Projet**
 
 - **Objectif** : Définir clairement l'objectif de TrustiSend, qui est de permettre un transfert sécurisé de fichiers, incluant une analyse de malware avant l'envoi.
-- **Requirements fonctionnels** :
-  - Transfert sécurisé de fichiers entre utilisateurs.
-  - Analyse au préalable des fichiers pour détecter et éliminer les malwares.
-  - Interface utilisateur intuitive pour uploader et télécharger des fichiers.
-  - Authentification avec 2FA pour renforcer la sécurité.
-  - Limitations techniques pour les types de fichiers et les tailles.
-  - Limitation du nombre d'upload en fonction du temps.
-- **Requirements non-fonctionnels** :
-  - Sécurité des données pendant le transfert (chiffrement de bout en bout).
-  - Scalabilité pour gérer un grand nombre de fichiers et utilisateurs.
-  - Rapidité d'exécution pour l'analyse de malware.
-  - Haute disponibilité et tolérance aux pannes grâce aux services de Google App Engine.
+- 
+# Description du projet:
+Website de filesharing sécurisé qui scanne automatiquement les fichiers
+
+
+## Exigences fonctionnelles:
+- Un utilisateur pourra se connecter avec son compte google/github ou avec un compte du site
+- Un utilisateur pourra uploader des fichiers et les chiffrer en toute confidentialité
+- Un utilisateur pourra partager les fichiers qu'il a uploadé à l'aide d'une clé unique à chaque fichier
+- Un utilisateur ou invité (personne pas connectée avec un compte) pourra télécharger un fichier grâce à la clé correspondante
+- Les fichiers uploadés sont automatiquement scannés par un antivirus et les utilisateurs ne pourront pas partager les fichiers considérés commes dangereux
+- Les fichiers qui ne sont pas téléchargés pendant 30 jours sont supprimés
+
+## Exigences non-fonctionnelles:
+- Le site doit être intuitif et utilisable sans connaissances préalable
+- Le système ne stocke aucun fichier sous forme non-chiffrée
+- Le système doit pouvoir être scalé pour supporter un grand nombre de fichiers/utilisateurs
+- L'analyse de malware doit être rapide (moins de 5 minutes par fichier)
+- Le système doit pouvoir gérer des fichiers de 1Go ou moins
+- Le système doit être robuste face aux pannes et se relancer automatiquement
+- Le système ne doit pas corrompre les fichiers stockés en cas de panne
+- Le système limite le nombre d'uploads par utilisateur à 10 par jour
 
    **Responsables** : Toute l'équipe contribue à cette tâche pour s'assurer que chacun comprend les objectifs et les exigences.
 
