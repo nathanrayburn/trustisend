@@ -34,7 +34,7 @@ steps:
       - push
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
 
-  # Step 5: Deploy Casdoor to Cloud Run
+  # Step 4: Deploy Casdoor to Cloud Run
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - run
@@ -44,7 +44,6 @@ steps:
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
       - '--region'
       - 'europe-west1'
-      - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
       - '--quiet'
