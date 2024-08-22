@@ -16,7 +16,7 @@ class SocialLoginApplicationTests {
 	@Test
 	void exampleTest() {
 		// Example simple test
-		int sum = 2 + 3;
+		int sum = 3 + 3;
 		assertEquals(5, sum);
 	}
 }
