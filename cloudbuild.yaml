@@ -2,6 +2,7 @@ steps:
   # Step 1: Execute tests using Maven
   - name: gcr.io/cloud-builders/mvn
     args:
+      - clean
       - test
 
   # Step 2: Build the Docker image and tag it with the commit SHA
