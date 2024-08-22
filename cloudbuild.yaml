@@ -1,5 +1,10 @@
 steps:
   # Step 1: Execute tests using Maven
+    # Step 1: Execute tests using Maven
+  - name: gcr.io/cloud-builders/mvn
+    args:
+      - clean
+      - install
   - name: gcr.io/cloud-builders/mvn
     args:
       - clean
