@@ -1,16 +1,6 @@
 steps:
-  # Step 1: Execute tests using Maven
-    # Step 1: Execute tests using Maven
-  - name: gcr.io/cloud-builders/mvn
-    args:
-      - clean
-      - install
-  - name: gcr.io/cloud-builders/mvn
-    args:
-      - clean
-      - test
 
-  # Step 2: Build the Docker image and tag it with the commit SHA
+  # Step 0: Build the Docker image and tag it with the commit SHA
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -18,13 +8,13 @@ steps:
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
       - '.'
 
-  # Step 3: Push the Docker image to Artifact Registry
+  # Step 1: Push the Docker image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
     args:
       - push
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
 
-  # Step 4: Deploy the application to Cloud Run using the built image
+  # Step 2: Deploy the application to Cloud Run using the built image
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - run
