@@ -1,49 +1,30 @@
 steps:
-  # Step 0: Build the Docker image for your application and tag it with the commit SHA
+
+  # Step 0: Build the Docker image and tag it with the commit SHA
   - name: gcr.io/cloud-builders/docker
     args:
       - build
       - '-t'
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
       - '.'
 
-  # Step 1: Push the Docker image of your application to Artifact Registry
+  # Step 1: Push the Docker image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
 
-  # Step 2: Build the Docker image for Casdoor and tag it with the commit SHA
-  - name: gcr.io/cloud-builders/git
-    args: 
-      - clone
-      - https://github.com/casdoor/casdoor.git
-      - .
-    dir: /workspace/casdoor
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - build
-      - '-t'
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
-      - .
-    dir: /workspace/casdoor
-
-  # Step 3: Push the Casdoor Docker image to Artifact Registry
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - push
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
-
-  # Step 4: Deploy Casdoor to Cloud Run
+  # Step 2: Deploy the application to Cloud Run using the built image
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - run
       - deploy
-      - casdoor  # Cloud Run service name for Casdoor
+      - trustisend  # Cloud Run service name
       - '--image'
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
       - '--region'
       - 'europe-west1'
+      - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
       - '--quiet'
@@ -51,7 +32,7 @@ steps:
 
 # Specify the images that will be pushed by Cloud Build
 images:
-  - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
+  - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY
