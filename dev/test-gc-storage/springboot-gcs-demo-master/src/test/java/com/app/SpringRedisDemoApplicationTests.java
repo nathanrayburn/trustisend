@@ -1,10 +1,10 @@
-package demo_storage.gc_storage;
+package com.app;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GcStorageApplicationTests {
+class SpringRedisDemoApplicationTests {
 
 	@Test
 	void contextLoads() {

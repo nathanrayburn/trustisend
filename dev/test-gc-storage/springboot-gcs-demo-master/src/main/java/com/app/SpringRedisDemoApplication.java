@@ -1,13 +1,13 @@
-package demo_storage.gc_storage;
+package com.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GcStorageApplication {
+public class SpringRedisDemoApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GcStorageApplication.class, args);
+		SpringApplication.run(SpringRedisDemoApplication.class, args);
 	}
 
 }
