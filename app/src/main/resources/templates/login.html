@@ -1,29 +1,84 @@
-<!-- trustisend/app/src/main/resources/templates/login.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="fr">
+
 <head>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustiSend Landing Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h2>Login</h2>
-    <form th:action="@{/perform_login}" method="post">
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username">
-        </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password">
-        </div>
-        <div>
-            <button type="submit">Login</button>
-        </div>
-    </form>
-    <div th:if="${param.error}">
-        Invalid username or password.
+
+<body class="bg-teal-900 text-white">
+<!-- Section 1: Home -->
+<section class="min-h-screen flex flex-col items-center justify-center">
+    <h1 class="text-yellow-400 text-4xl font-bold">TrustiSend </h1>
+
+    <p class="text-xl mt-4">Partagez vos fichiers manière simple et sécurisée</p>
+
+    <div class="flex items-center justify-center mt-8 space-x-8">
+        <div class="flex flex-col items-center">
+            <!-- Login button -->
+    <div class="login-button">
+        <a href="/login.html">
+            <button type="button">Login</button>
+        </a>
     </div>
-    <div th:if="${param.logout}">
-        You have been logged out.
+            <?xml version="1.0" ?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+            <svg class="h-16 w-16 text-white" fill="#ffffff" width="800px" height="800px" viewBox="0 0 64 64" data-name="Material Expand" id="Material_Expand" xmlns="http://www.w3.org/2000/svg"><path d="M56,2H8A6.006,6.006,0,0,0,2,8V42a6.006,6.006,0,0,0,6,6H21.764l-3,6H14a2,2,0,0,0-2,2v6h4V58H48v4h4V56a2,2,0,0,0-2-2H45.236l-3-6H56a6.006,6.006,0,0,0,6-6V8A6.006,6.006,0,0,0,56,2ZM8,6H56a2,2,0,0,1,2,2V36H6V8A2,2,0,0,1,8,6ZM40.764,54H23.236l3-6H37.764ZM56,44H8a2,2,0,0,1-2-2V40H58v2A2,2,0,0,1,56,44Z"/><path d="M14,14H26V10H12a2,2,0,0,0-2,2v7h4Z"/><rect height="4" width="4" x="30" y="10"/></svg>
+            <p class="mt-2">Ordinateur 1</p>
+        </div>
+        <div class="flex flex-col items-center">
+            <?xml version="1.0" ?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+            <svg class="h-16 w-16 text-white" fill="#ffffff" width="800px" height="800px" viewBox="0 0 64 64" data-name="Material Expand" id="Material_Expand" xmlns="http://www.w3.org/2000/svg"><path d="M50,16a11.9,11.9,0,0,0-4.149.74,16.992,16.992,0,0,0-33.59-.614A11.992,11.992,0,0,0,11,39.6V44a2,2,0,0,0,2,2H24v4H10v4H24v4H10v4H26a2,2,0,0,0,2-2V46h8V60a2,2,0,0,0,2,2H54V58H40V54H54V50H40V46H51a2,2,0,0,0,2-2V39.6A11.992,11.992,0,0,0,50,16ZM49,42H15V30H49Zm4-6.589V28a2,2,0,0,0-2-2H13a2,2,0,0,0-2,2v7.411A8,8,0,0,1,13.948,20l.1,0a2,2,0,0,0,2-1.868A12.991,12.991,0,0,1,42,19c0,.261-.02.517-.038.772l-.01.142a2,2,0,0,0,3.208,1.73A7.914,7.914,0,0,1,50,20a8,8,0,0,1,3,15.411Z"/><rect height="4" width="4" x="2" y="58"/><rect height="4" width="4" x="2" y="50"/><rect height="4" width="4" x="19" y="34"/><rect height="4" width="18" x="27" y="34"/><rect height="4" width="4" x="58" y="58"/><rect height="4" width="4" x="58" y="50"/></svg>
+            <p class="mt-2">Fichier Sécurisé</p>
+        </div>
+        <div class="flex flex-col items-center">
+            <?xml version="1.0" ?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+            <svg class="h-16 w-16 text-white" fill="#ffffff" width="800px" height="800px" viewBox="0 0 64 64" data-name="Material Expand" id="Material_Expand" xmlns="http://www.w3.org/2000/svg"><path d="M58,49.5V15a6.006,6.006,0,0,0-6-6H12a6.006,6.006,0,0,0-6,6V49.5A6.5,6.5,0,0,0,8.5,62h47A6.5,6.5,0,0,0,58,49.5ZM38,49a2,2,0,0,0-1.109.336L34.4,51h-4.79l-2.5-1.664A2,2,0,0,0,26,49H10V45H54v4ZM12,13H52a2,2,0,0,1,2,2V41H10V15A2,2,0,0,1,12,13ZM55.5,58H8.5a2.5,2.5,0,0,1,0-5H25.4l2.5,1.664A2,2,0,0,0,29,55h6a2,2,0,0,0,1.109-.336L38.6,53H55.5a2.5,2.5,0,0,1,0,5Z"/><path d="M18,21H30V17H16a2,2,0,0,0-2,2v7h4Z"/><rect height="4" width="4" x="34" y="17"/></svg>
+            <p class="mt-2">Ordinateur 2</p>
+        </div>
     </div>
+    <button class="mt-8 bg-white text-teal-900 font-semibold px-6 py-2 rounded-md">En savoir plus</button>
+</section>
+
+<!-- Section 3: Who We Are -->
+<section class="bg-white text-teal-900 py-20">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-4xl font-bold mb-4">Qui sommes-nous ?</h2>
+        <p class="text-lg">blabla</p>
+    </div>
+</section>
+
+<!-- Section 2: What We Do -->
+<section class="bg-teal-800 py-20">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-4xl font-bold mb-10">TrustiSend</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="bg-white text-teal-900 p-6 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold mb-4">PARTAGE DE FICHIER</h3>
+                <ul class="text-left">
+                    <li>Partagez facilement vos fichiers jusqu’à 1Gb</li>
+                    <li>Les fichiers sont automatiquement supprimés après 30 jours d’inactivité</li>
+                </ul>
+            </div>
+            <div class="bg-white text-teal-900 p-6 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold mb-4">DOWNLOAD SÛR</h3>
+                <ul class="text-left">
+                    <li>Tous les fichiers sont automatiquement scannés par un antivirus</li>
+                    <li>Aucun fichier détecté comme dangereux n’est partageable</li>
+                </ul>
+            </div>
+            <div class="bg-white text-teal-900 p-6 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold mb-4">PRISE EN MAIN RAPIDE ET FACILE</h3>
+                <ul class="text-left">
+                    <li>Connectez-vous et partagez vos fichiers rapidement avec votre compte Google ou GitHub</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
 </body>
+
 </html>
