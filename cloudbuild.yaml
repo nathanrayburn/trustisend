@@ -9,8 +9,6 @@ steps:
       - '--build-arg'
       - 'GC_STORAGE_KEY=$GC_STORAGE_KEY'
       - '.'
-    volumes:
-      - name: 'workspace'
     secretEnv:
       - 'GC_STORAGE_KEY'
   # Step 1: Push the Docker image to Artifact Registry
