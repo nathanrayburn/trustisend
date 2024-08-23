@@ -48,7 +48,7 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login.html") // Custom login page
                 .loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/", true)
+                .defaultSuccessUrl("/secured.html", true)
                 .failureUrl("/login.html?error=true")
                 .permitAll() // Ensure form login is permitted for all
             )
@@ -63,9 +63,16 @@ public class SecurityConfig {
 
     // Custom AuthenticationFailureHandler bean
     @Bean
-    public AuthenticationFailureHandler authenticationFailureHandler() {
-        return new SimpleUrlAuthenticationFailureHandler("/login.html?error=true");
-    }
+public AuthenticationFailureHandler authenticationFailureHandler() {
+    return (request, response, exception) -> {
+        if (exception.getMessage().equalsIgnoreCase("Bad credentials")) {
+            response.sendRedirect("/login.html?error=password");
+        } else {
+            response.sendRedirect("/login.html?error=true");
+        }
+    };
+}
+
 
     // Custom LogoutSuccessHandler bean
     @Bean
