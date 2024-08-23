@@ -6,7 +6,7 @@ steps:
       - '-t'
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA'
       - '--build-arg'
-      - 'GC_STORAGE_KEY=$GCSTORAGEKEY'  # Use the environment variable directly
+      - 'GC_STORAGE_KEY=$$GCSTORAGEKEY'  # Use the environment variable directly
       - '.'
     secretEnv:
       - 'GCSTORAGEKEY'
