@@ -5,9 +5,9 @@ steps:
   args:
     - '-c'
     - |
-      docker build -t europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA .
-  secretEnv:
-    - 'KEY'
+      docker build --build-arg GC_STORAGE_KEY=$$KEY -t europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA .
+    secretEnv:
+      - 'KEY'
 
 
   # Step 1: Push the Docker image to Artifact Registry
