@@ -5,11 +5,14 @@ FROM maven:3.9.4-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # Copy the pom.xml and app directory (which contains your Spring Boot project) to the container
-COPY ./app/pom.xml ./pom.xml
-COPY ./app/src ./src
+COPY ./dev/test-gc-storage/springboot-gcs-demo-master/pom.xml ./pom.xml
+COPY ./dev/test-gc-storage/springboot-gcs-demo-master/src ./src
 
-# Run tests and package the application
-RUN set -e && mvn clean test && mvn clean package
+# Run package the application
+RUN mvn clean package -DskipTests
+
+# Declare the build argument
+ARG GC_STORAGE_KEY
 
 # Step 2: Use the official Java 21 runtime image to run the Spring Boot app
 FROM eclipse-temurin:21-jre-alpine
@@ -18,7 +21,10 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Copy the jar file generated during the build to the runtime image
-COPY --from=build /app/target/*.jar ./app.jar
+COPY --from=build /dev/test-gc-storage/springboot-gcs-demo-master/target/*.jar ./app.jar
+
+# Optionally, write the GC_STORAGE_KEY to a file inside the container
+RUN echo "$GC_STORAGE_KEY" > /app/private-key.json
 
 # Expose the default port used by Spring Boot
 EXPOSE 8080

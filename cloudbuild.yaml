@@ -5,23 +5,28 @@ steps:
     args:
       - build
       - '-t'
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA'
+      - '--build-arg'
+      - 'GC_STORAGE_KEY=$GC_STORAGE_KEY'
       - '.'
-
+    volumes:
+      - name: 'workspace'
+    secretEnv:
+      - 'GC_STORAGE_KEY'
   # Step 1: Push the Docker image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA'
 
   # Step 2: Deploy the application to Cloud Run using the built image
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - run
       - deploy
-      - trustisend  # Cloud Run service name
+      - gc-storage  # Cloud Run service name
       - '--image'
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA'
       - '--region'
       - 'europe-west1'
       - '--platform'
@@ -30,9 +35,13 @@ steps:
       - '--quiet'
     entrypoint: gcloud
 
+availableSecrets:
+  secretManager:
+    - versionName: projects/579596661856/secrets/gc-storage-key/versions/1
+      env: 'GC_STORAGE_KEY'
 # Specify the images that will be pushed by Cloud Build
 images:
-  - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+  - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY
