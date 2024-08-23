@@ -24,7 +24,7 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar ./app.jar
 
 # Optionally, write the GC_STORAGE_KEY to a file inside the container
-RUN echo "$GC_STORAGE_KEY" > /app/private-key.json
+RUN echo "$GC_STORAGE_KEY" > /app/src/main//private-key.json
 
 # Expose the default port used by Spring Boot
 EXPOSE 8080
