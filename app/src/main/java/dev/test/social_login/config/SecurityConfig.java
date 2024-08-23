@@ -41,12 +41,12 @@ public class SecurityConfig {
         http.csrf()
             .disable()
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/login*").permitAll() // Allow access to home page and login page without authentication
+                .requestMatchers("/", "/login.html", "/login", "/perform_login", "/css/**", "/js/**").permitAll() // Allow access to home page, login page, and static resources without authentication
                 .requestMatchers("/admin/**").hasRole("ADMIN") // Protect admin endpoints
                 .anyRequest().authenticated() // Require authentication for any other request
             )
             .formLogin(form -> form
-                .loginPage("/login.html")
+                .loginPage("/login.html") // Custom login page
                 .loginProcessingUrl("/perform_login")
                 .defaultSuccessUrl("/homepage.html", true)
                 .failureUrl("/login.html?error=true")
