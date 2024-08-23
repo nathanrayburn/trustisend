@@ -48,18 +48,14 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login.html") // Custom login page
                 .loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/homepage.html", true)
+                .defaultSuccessUrl("/", true)
                 .failureUrl("/login.html?error=true")
-                .failureHandler(authenticationFailureHandler())
                 .permitAll() // Ensure form login is permitted for all
             )
             .logout(logout -> logout
                 .logoutUrl("/perform_logout")
                 .deleteCookies("JSESSIONID")
                 .logoutSuccessHandler(logoutSuccessHandler())
-            )
-            .sessionManagement(session -> session
-                .invalidSessionUrl("/login.html?session=invalid") // Redirect to login on session timeout
             );
 
         return http.build();
