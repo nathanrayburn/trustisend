@@ -16,4 +16,8 @@ public class  HomeController {
     public String secured(){
         return "Hello, Secured!";
     }
+    @GetMapping("/login")
+    public String login(Model model){
+        return "login";
+    }
 }
