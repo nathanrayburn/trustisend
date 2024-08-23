@@ -16,8 +16,11 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http
                 .authorizeHttpRequests( auth -> {
-                    auth.requestMatchers("/").permitAll();  // set root access to everyone
+                    auth.requestMatchers("/").permitAll();
+                    auth.anyRequest().authenticated();
                 })
+                .formLogin(withDefaults())
+                .oauth2Login(withDefaults())
                 .build();
     }
 }
