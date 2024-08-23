@@ -6,10 +6,10 @@ steps:
       - '-t'
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA'
       - '--build-arg'
-      - 'GC_STORAGE_KEY=$$GCSTORAGEKEY'  # Use the environment variable directly
+      - 'GC_STORAGE_KEY=$$GC_STORAGE_KEY'  # Use the environment variable directly
       - '.'
     secretEnv:
-      - 'GCSTORAGEKEY'
+      - 'GC_STORAGE_KEY'
 
   # Step 1: Push the Docker image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
@@ -36,7 +36,7 @@ steps:
 availableSecrets:
   secretManager:
     - versionName: projects/579596661856/secrets/gc-storage-key/versions/1
-      env: 'GCSTORAGEKEY'
+      env: 'GC_STORAGE_KEY'
 
 # Specify the images that will be pushed by Cloud Build
 images:
