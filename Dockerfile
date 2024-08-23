@@ -4,11 +4,11 @@ FROM maven:3.9.4-eclipse-temurin-21 AS build
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the pom.xml and app directory (which contains your Spring Boot project) to the container
+# Copy the pom.xml and the src directory from the GCS demo directory to the container
 COPY ./dev/test-gc-storage/springboot-gcs-demo-master/pom.xml ./pom.xml
 COPY ./dev/test-gc-storage/springboot-gcs-demo-master/src ./src
 
-# Run package the application
+# Package the application
 RUN mvn clean package -DskipTests
 
 # Declare the build argument
@@ -21,7 +21,7 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Copy the jar file generated during the build to the runtime image
-COPY --from=build /dev/test-gc-storage/springboot-gcs-demo-master/target/*.jar ./app.jar
+COPY --from=build /app/target/*.jar ./app.jar
 
 # Optionally, write the GC_STORAGE_KEY to a file inside the container
 RUN echo "$GC_STORAGE_KEY" > /app/private-key.json
