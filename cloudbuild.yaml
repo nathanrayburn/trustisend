@@ -1,15 +1,17 @@
 steps:
   # Step 0: Build the Docker image and tag it with the commit SHA
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - build
-      - '-t'
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA'
-      - '--build-arg'
-      - 'GC_STORAGE_KEY=$$GC_STORAGE_KEY'  # Use the environment variable directly
-      - '.'
-    secretEnv:
-      - 'GC_STORAGE_KEY'
+- name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+    - '-c'
+    - |
+      docker build \
+        --build-arg GC_STORAGE_KEY=$$GC_STORAGE_KEY \
+        -t europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA \
+        .
+  secretEnv:
+    - 'GC_STORAGE_KEY'
+
 
   # Step 1: Push the Docker image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
