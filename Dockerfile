@@ -11,9 +11,6 @@ COPY ./dev/test-gc-storage/springboot-gcs-demo-master/src ./src
 # Package the application
 RUN mvn clean package -DskipTests
 
-# Declare the build argument
-ARG GC_STORAGE_KEY
-
 # Step 2: Use the official Java 21 runtime image to run the Spring Boot app
 FROM eclipse-temurin:21-jre-alpine
 
@@ -22,9 +19,6 @@ WORKDIR /app
 
 # Copy the jar file generated during the build to the runtime image
 COPY --from=build /app/target/*.jar ./app.jar
-
-# Optionally, write the GC_STORAGE_KEY to a file inside the container
-RUN echo "$GC_STORAGE_KEY" > /app/src/main//private-key.json
 
 # Expose the default port used by Spring Boot
 EXPOSE 8080
