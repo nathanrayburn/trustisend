@@ -41,7 +41,7 @@ public class SecurityConfig {
         http.csrf()
             .disable()
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/login.html", "/login", "/perform_login", "/css/**", "/js/**").permitAll() // Allow access to home page, login page, and static resources without authentication
+                .requestMatchers("/", "/login", "/login.html", "/perform_login", "/css/**", "/js/**").permitAll() // Ensure login page and static resources are accessible
                 .requestMatchers("/admin/**").hasRole("ADMIN") // Protect admin endpoints
                 .anyRequest().authenticated() // Require authentication for any other request
             )
@@ -51,11 +51,15 @@ public class SecurityConfig {
                 .defaultSuccessUrl("/homepage.html", true)
                 .failureUrl("/login.html?error=true")
                 .failureHandler(authenticationFailureHandler())
+                .permitAll() // Ensure form login is permitted for all
             )
             .logout(logout -> logout
                 .logoutUrl("/perform_logout")
                 .deleteCookies("JSESSIONID")
                 .logoutSuccessHandler(logoutSuccessHandler())
+            )
+            .sessionManagement(session -> session
+                .invalidSessionUrl("/login.html?session=invalid") // Redirect to login on session timeout
             );
 
         return http.build();
