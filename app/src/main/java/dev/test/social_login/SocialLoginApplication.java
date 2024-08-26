@@ -28,7 +28,7 @@ class SecretReader implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		String secret = new String(Files.readAllBytes(Paths.get(secretFilePath)));
+	//	String secret = new String(Files.readAllBytes(Paths.get(secretFilePath)));
 		System.out.println("Secret: " + secretFilePath);
 	}
 }
