@@ -19,16 +19,3 @@ public class SocialLoginApplication {
 	}
 
 }
-
-@Component
-class SecretReader implements CommandLineRunner {
-
-	@Value("${secret.filepath}")
-	private String secretFilePath;
-
-	@Override
-	public void run(String... args) throws Exception {
-	//	String secret = new String(Files.readAllBytes(Paths.get(secretFilePath)));
-		System.out.println("Secret: " + secretFilePath);
-	}
-}
