@@ -1,16 +1,11 @@
 steps:
   # Step 0: Build the Docker image and tag it with the commit SHA
   - name: gcr.io/cloud-builders/docker
-    entrypoint: /bin/bash
     args:
-      - '-c'
-      - |
-        docker build \
-          -t europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA \
-          --build-arg GC_STORAGE_KEY="$$KEY" \
-          --no-cache .
-    secretEnv:
-      - 'KEY'
+      - build
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA'
+      - '.'
 
   # Step 1: Push the Docker image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
@@ -18,13 +13,12 @@ steps:
       - push
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA'
 
-  # Step 2: Deploy the application to Cloud Run using the built image
+  # Step 2: Deploy the application to Cloud Run using the built image and mount the secret volume
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    entrypoint: gcloud
     args:
       - run
       - deploy
-      - gc-storage  # Cloud Run service name
+      - storage-test  # Cloud Run service name
       - '--image'
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/gc-storage:$COMMIT_SHA'
       - '--region'
@@ -33,11 +27,9 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--quiet'
-
-availableSecrets:
-  secretManager:
-    - versionName: projects/579596661856/secrets/gc-storage-key/versions/1
-      env: 'KEY'
+      - '--update-secrets'  # Mount the secret as a volume
+      - '/secret-mnt/gc-storage-key=projects/trustisend-433213/secrets/gc-storage-key:latest'
+    entrypoint: gcloud
 
 # Specify the images that will be pushed by Cloud Build
 images:
