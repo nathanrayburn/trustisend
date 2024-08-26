@@ -28,7 +28,7 @@ steps:
       - '--allow-unauthenticated'
       - '--quiet'
       - '--update-secrets'  # Mount the secret as a volume
-      - '/secret-mnt/gc-storage-key=projects/trustisend-433213/secrets/gc-storage-key:latest'
+      - '/secret-mnt/gc-storage-key=projects/579596661856/secrets/gc-storage-key:latest'
     entrypoint: gcloud
 
 # Specify the images that will be pushed by Cloud Build
