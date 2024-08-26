@@ -5,8 +5,8 @@ FROM maven:3.9.4-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # Copy the pom.xml and the src directory from the GCS demo directory to the container
-COPY ./dev/test-gc-storage/springboot-gcs-demo-master/pom.xml ./pom.xml
-COPY ./dev/test-gc-storage/springboot-gcs-demo-master/src ./src
+COPY ./app/pom.xml ./pom.xml
+COPY ./app/src ./src
 
 # Package the application
 RUN mvn clean package -DskipTests
