@@ -28,6 +28,8 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--quiet'
+      - '--update-secrets'
+      - '/firestore-mnt/firestore=projects/579596661856/secrets/firestore:latest'
     entrypoint: gcloud
 
 # Specify the images that will be pushed by Cloud Build

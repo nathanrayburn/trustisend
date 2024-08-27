@@ -24,7 +24,8 @@ public class FirestoreUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         try {
-            DocumentSnapshot document = firestore.collection("users").document(email).get().get();
+            DocumentSnapshot document = firestore.collection("/users").whereArrayContains("email", email).get().get().getDocuments().get(0);
+           
             if (!document.exists()) {
                 throw new UsernameNotFoundException("User not found");
             }

@@ -27,7 +27,8 @@ import java.nio.file.Paths;
 public class SecurityConfig {
 
     @Value("${secret.filepath}")
-    private String secretFilePath;
+    private String secretFilePath = "";
+    
 
     @Bean
     public Firestore firestore() throws IOException {
