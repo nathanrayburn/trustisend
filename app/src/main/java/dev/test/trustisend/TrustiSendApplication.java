@@ -1,13 +1,13 @@
-package dev.test.social_login;
+package dev.test.trustisend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SocialLoginApplication {
+public class TrustiSendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SocialLoginApplication.class, args);
+		SpringApplication.run(TrustiSendApplication.class, args);
 	}
 
 }
