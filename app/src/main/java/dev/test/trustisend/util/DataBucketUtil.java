@@ -29,7 +29,7 @@ public class DataBucketUtil {
     @Value("${gcp.file.path}")
     private String gcpConfigFile;
 
-    @Value("${gc.project.id}")
+    @Value("${gcp.project.id}")
     private String gcpProjectId;
 
     @Value("${gcp.bucket.id}")
