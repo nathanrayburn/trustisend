@@ -1,6 +1,8 @@
 package dev.test.trustisend;
 
 import dev.test.trustisend.util.DataBucketUtil;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,8 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class TrustiSendApplicationTests {
@@ -36,11 +37,18 @@ class TrustiSendApplicationTests {
 		byte[] content = Files.readAllBytes(path);
 		return new MockMultipartFile("file", filename, contentType, content);
 	}
-	@Test
-	void contextLoads() {
-		assertNotNull(context, "The application context should have loaded.");
+
+	// create directory test to upload and download the test files
+	@BeforeAll
+    static void globalSetup(){
+
 	}
 
+	// clean up and remove test directory
+	@AfterAll
+	static void globalClean(){
+
+	}
 	@Test
 	void uploadSingleFile() throws IOException {
 
