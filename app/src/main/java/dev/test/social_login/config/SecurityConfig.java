@@ -1,88 +1,86 @@
 package dev.test.social_login.config;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.FirestoreOptions;
+import dev.test.social_login.service.FirestoreUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Value("${secret.filepath}")
+    private String secretFilePath;
+
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user1 = User.withUsername("user1")
-            .password(passwordEncoder().encode("user1Pass"))
-            .roles("USER")
-            .build();
-        UserDetails user2 = User.withUsername("user2")
-            .password(passwordEncoder().encode("user2Pass"))
-            .roles("USER")
-            .build();
-        UserDetails admin = User.withUsername("admin")
-            .password(passwordEncoder().encode("adminPass"))
-            .roles("ADMIN")
-            .build();
-        return new InMemoryUserDetailsManager(user1, user2, admin);
+    public Firestore firestore() throws IOException {
+        String credentialsJson = new String(Files.readAllBytes(Paths.get(secretFilePath)));
+        GoogleCredentials credentials = GoogleCredentials.fromStream(
+            new ByteArrayInputStream(credentialsJson.getBytes())
+        );
+        FirestoreOptions firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
+                .setCredentials(credentials)
+                .build();
+        return firestoreOptions.getService();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
         http.csrf()
             .disable()
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/login", "/login.html", "/perform_login", "/css/**", "/js/**").permitAll() // Ensure login page and static resources are accessible
-                .requestMatchers("/admin/**").hasRole("ADMIN") // Protect admin endpoints
-                .anyRequest().authenticated() // Require authentication for any other request
+                .requestMatchers("/", "/login", "/login.html", "/perform_login", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login.html") // Custom login page
+                .loginPage("/login.html")
                 .loginProcessingUrl("/perform_login")
                 .defaultSuccessUrl("/secured.html", true)
                 .failureUrl("/login.html?error=true")
-                .permitAll() // Ensure form login is permitted for all
+                .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/perform_logout")
                 .deleteCookies("JSESSIONID")
                 .logoutSuccessHandler(logoutSuccessHandler())
             );
-
         return http.build();
     }
 
-    // Custom AuthenticationFailureHandler bean
     @Bean
-public AuthenticationFailureHandler authenticationFailureHandler() {
-    return (request, response, exception) -> {
-        if (exception.getMessage().equalsIgnoreCase("Bad credentials")) {
-            response.sendRedirect("/login.html?error=password");
-        } else {
-            response.sendRedirect("/login.html?error=true");
-        }
-    };
-}
-
-
-    // Custom LogoutSuccessHandler bean
-    @Bean
-    public LogoutSuccessHandler logoutSuccessHandler() {
-        return new SimpleUrlLogoutSuccessHandler();
+    public AuthenticationManager authManager(HttpSecurity http, FirestoreUserDetailsService firestoreUserDetailsService, PasswordEncoder passwordEncoder) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .userDetailsService(firestoreUserDetailsService)
+                .passwordEncoder(passwordEncoder)
+                .and()
+                .build();
     }
 
-    // Password encoder bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public LogoutSuccessHandler logoutSuccessHandler() {
+        return new SimpleUrlLogoutSuccessHandler();
     }
 }
