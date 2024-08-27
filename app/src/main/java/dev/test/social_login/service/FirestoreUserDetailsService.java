@@ -1,6 +1,6 @@
 package dev.test.social_login.service;
-
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.DocumentSnapshot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -24,20 +24,24 @@ public class FirestoreUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         try {
-            DocumentSnapshot document = firestore.collection("/users").whereArrayContains("email", email).get().get().getDocuments().get(0);
-           
-            if (!document.exists()) {
+            Query query = firestore.collection("users").whereEqualTo("email", email);
+            DocumentSnapshot document = query.get().get().getDocuments().get(0);
+            if (document.exists()) {
+                System.out.println(document.getData());
+                return User.withUsername(document.getString("email"))
+                        .password(document.getString("hash"))
+                        .roles("USER")
+                        .build();
+
+            } else {
                 throw new UsernameNotFoundException("User not found");
             }
 
-            String hash = document.getString("hash");
-            return User.withUsername(email)
-                    .password(hash)
-                    .roles("USER")  // Assign roles as needed
-                    .build();
-
-        } catch (InterruptedException | ExecutionException e) {
-            throw new UsernameNotFoundException("Error fetching user", e);
         }
+        catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
+        
     }
 }
