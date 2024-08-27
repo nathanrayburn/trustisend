@@ -26,22 +26,6 @@ import java.nio.file.Paths;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${secret.filepath}")
-    private String secretFilePath = "";
-    
-
-    @Bean
-    public Firestore firestore() throws IOException {
-        String credentialsJson = new String(Files.readAllBytes(Paths.get(secretFilePath)));
-        GoogleCredentials credentials = GoogleCredentials.fromStream(
-            new ByteArrayInputStream(credentialsJson.getBytes())
-        );
-        FirestoreOptions firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
-                .setCredentials(credentials)
-                .build();
-        return firestoreOptions.getService();
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
         http.csrf()

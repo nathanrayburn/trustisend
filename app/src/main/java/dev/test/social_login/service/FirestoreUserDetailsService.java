@@ -1,7 +1,5 @@
 package dev.test.social_login.service;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Query;
-import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +22,7 @@ public class FirestoreUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         try {
+            
             Query query = firestore.collection("users").whereEqualTo("email", email);
             DocumentSnapshot document = query.get().get().getDocuments().get(0);
             if (document.exists()) {
