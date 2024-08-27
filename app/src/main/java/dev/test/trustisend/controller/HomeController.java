@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 public class  HomeController {
     @GetMapping("/")
     public String home(Model model){
+
         model.addAttribute("test","Test value message");
         return "index";
     }

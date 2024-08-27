@@ -8,6 +8,7 @@ public class TrustiSendApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TrustiSendApplication.class, args);
+
 	}
 
 }

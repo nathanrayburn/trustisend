@@ -26,10 +26,10 @@ import java.util.concurrent.ThreadLocalRandom;
 @Component
 public class DataBucketUtil {
 
-    @Value("${gcp.config.file}")
+    @Value("${gcp.file.path}")
     private String gcpConfigFile;
 
-    @Value("${gcp.project.id}")
+    @Value("${gc.project.id}")
     private String gcpProjectId;
 
     @Value("${gcp.bucket.id}")
