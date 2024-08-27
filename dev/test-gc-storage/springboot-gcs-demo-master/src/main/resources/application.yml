@@ -2,24 +2,8 @@ server:
   port: 8090
 
 spring:
-  datasource:
-    url: jdbc:h2:mem:projectDB;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
   main:
     allow-bean-definition-overriding: true
-  jpa:
-    show-sql: true
-    generate-ddl: true
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-      use-new-id-generator-mappings: false
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
 
 gcp:
   config:
@@ -30,13 +14,3 @@ gcp:
     id: spring-boot-gcp-bucket-test
   dir:
     name:
-
-logging:
-  level:
-    org.springframework: ERROR
-    com.app: DEBUG
-  pattern:
-    console: "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
-    file: "%d %p %c{1.} [%t] %m%n"
-  file:
-    name: app.log

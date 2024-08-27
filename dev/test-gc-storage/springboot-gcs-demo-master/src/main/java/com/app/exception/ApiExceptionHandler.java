@@ -15,7 +15,7 @@ public class ApiExceptionHandler {
     public ApiException handleInvalidFileException(InvalidFileTypeException e) {
         ApiException exception = new ApiException();
         exception.setErrorMessage(e.toString());
-        exception.setStatusCode(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
+        exception.setStatusCode(HttpStatus.BAD_REQUEST.value());
         exception.setZonedDateTime(ZonedDateTime.now());
         return exception;
     }
