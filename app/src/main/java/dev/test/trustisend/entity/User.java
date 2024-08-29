@@ -1,4 +1,4 @@
-package dev.test.trustisend.bean;
+package dev.test.trustisend.entity;
 
 import java.util.Arrays;
 import java.util.Collection;

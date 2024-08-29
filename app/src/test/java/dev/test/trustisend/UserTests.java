@@ -1,25 +1,14 @@
 package dev.test.trustisend;
 
-import dev.test.trustisend.bean.User;
-import dev.test.trustisend.util.DataBucketUtil;
 import dev.test.trustisend.util.FirestoreUtil;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import dev.test.trustisend.entity.User;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class UserTests {
@@ -33,14 +22,10 @@ class UserTests {
     @Test
     @Order(1)
     void createFirestoreUser() {
-        // Create a test user object
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("email", "testuser@heig-vd.ch");
-        userData.put("hash", "testpassword");  // Replace with hashed password in production
-
+        User user = new User("testuser@heig-vd.ch", "testpassword");
         try {
             // Create a user and get the returned ID
-            userId = firestoreUtil.createUser(userData);
+            userId = firestoreUtil.createUser(user);
 
             // Assert that the ID is not null or empty, meaning user creation was successful
             Assertions.assertNotNull(userId, "The returned ID should not be null.");

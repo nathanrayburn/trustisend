@@ -4,6 +4,7 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import dev.test.trustisend.entity.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,13 +25,24 @@ public class FirestoreUtil {
     public FirestoreUtil(Firestore firestore) {
         this.firestore = firestore;
     }
-    public static Map<String, Object> prepareUserData(dev.test.trustisend.bean.User user){
+
+    private static Map<String, Object> prepareUserData(dev.test.trustisend.entity.User user){
         return Map.of(
                 "email", user.getEmail(),
                 "hash", user.getHash()
         );
     }
-    public String createUser(Map<String, Object> userData) throws Exception {
+
+    private static Map<String, Object> prepareGroupData(Group group){
+        return Map.of(
+                "userEmail", group.getUserEmail(),
+                "timestamp", group.getTimestamp(),
+                "numberDownloads", group.getNumberDownloads()
+        );
+    }
+
+    public String createUser(dev.test.trustisend.entity.User user) throws Exception {
+        Map<String, Object> userData = prepareUserData(user);
         CollectionReference users = firestore.collection("users");
         ApiFuture<DocumentReference> result = users.add(userData);
         String userId = result.get().getId();
@@ -106,6 +118,77 @@ public class FirestoreUtil {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             throw new Exception("Error deleting user data", e);
+        }
+    }
+
+    // Create a new group and return the Group object
+    public Group createGroup(Group group) throws Exception {
+        Map<String, Object> groupData = prepareGroupData(group);
+        try {
+            CollectionReference groups = firestore.collection("groups");
+            ApiFuture<DocumentReference> result = groups.add(groupData);
+            String groupId = result.get().getId();
+            System.out.println("Group created with ID: " + groupId);
+
+            // Construct the Group object using the returned group ID and input data
+            return new Group(
+                    groupId,
+                    (String) groupData.get("userEmail"),
+                    (String) groupData.get("timestamp"),
+                    (Integer) groupData.get("numberDownloads")
+            );
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error creating group", e);
+        }
+    }
+    public Group readGroupByUUID(String groupUUID) throws Exception {
+        try {
+            System.out.println("Looking for group with ID: " + groupUUID);
+
+            // Retrieve the document reference for the given group ID
+            DocumentReference docRef = firestore.collection("groups").document(groupUUID);
+            ApiFuture<DocumentSnapshot> future = docRef.get();
+            DocumentSnapshot document = future.get();
+
+            // Check if the document exists
+            if (!document.exists()) {
+                System.out.println("No group found with ID: " + groupUUID);
+                return null;
+            }
+
+            // Create and return the Group object
+            return new Group(
+                    groupUUID,
+                    document.getString("userEmail"),
+                    document.getString("timestamp"),
+                    document.getLong("numberDownloads").intValue()
+            );
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error fetching group data", e);
+        }
+    }
+    public void deleteGroup(String groupId) throws Exception {
+        try {
+            System.out.println("Attempting to delete group with ID: " + groupId);
+
+            // Retrieve the document reference for the given group ID
+            DocumentReference docRef = firestore.collection("groups").document(groupId);
+
+            // Execute the delete operation
+            ApiFuture<WriteResult> writeResult = docRef.delete();
+
+            // Wait for the delete operation to complete and get the result
+            WriteResult result = writeResult.get();
+
+            System.out.println("Group with ID: " + groupId + " deleted at: " + result.getUpdateTime());
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error deleting group data", e);
         }
     }
 }
