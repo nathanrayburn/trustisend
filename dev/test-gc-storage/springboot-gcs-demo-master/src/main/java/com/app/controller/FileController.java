@@ -6,6 +6,7 @@ import com.app.util.DataBucketUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +44,17 @@ public class FileController {
                 .contentLength(file.length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+    }
+
+    @DeleteMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    ResponseEntity<?> deleteFile(@RequestParam("uid")String uID, @RequestParam("filename")String fileName) throws IOException{
+        if(fileService.deleteFile(uID, fileName)){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
     }
 }
 

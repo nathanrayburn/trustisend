@@ -95,6 +95,35 @@ public class DataBucketUtil {
         throw new BadRequestException("download failed");
     }
 
+    public boolean deleteFile(String uID, String fileName){
+        try{
+            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
+
+            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
+                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
+
+            Storage storage = options.getService();
+            Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
+
+            String name = fileName;
+            if(!uID.isEmpty()){
+                name = uID + "/" + fileName;
+            }
+
+            //search the right blob
+            Page<Blob> blobs = bucket.list();
+            for (Blob blob: blobs.getValues()) {
+                if (name.equals(blob.getName())) {
+                    return blob.delete();
+                }
+            }
+
+        }catch(Exception e){
+            throw new BadRequestException("error while deleting");
+        }
+        throw new BadRequestException("error while deleting");
+    }
+
     /**
      * converts MultipartFile object into a file object
      * @param file
