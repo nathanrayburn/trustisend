@@ -5,6 +5,7 @@ import com.app.exception.BadRequestException;
 import com.app.exception.FileWriteException;
 import com.app.exception.GCPFileUploadException;
 import com.app.exception.InvalidFileTypeException;
+import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
@@ -60,6 +61,38 @@ public class DataBucketUtil {
             throw new GCPFileUploadException("An error occurred while storing data to GCS");
         }
         throw new GCPFileUploadException("An error occurred while storing data to GCS");
+    }
+
+    public File downloadFile(String uID, String fileName){
+        try{
+            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
+
+            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
+                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
+
+            Storage storage = options.getService();
+            Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
+
+            String name = fileName;
+            if(!uID.isEmpty()){
+                name = uID + "/" + fileName;
+            }
+
+            //search the right blob
+            Page<Blob> blobs = bucket.list();
+            for (Blob blob: blobs.getValues()) {
+                if (name.equals(blob.getName())) {
+                    File downloadedFile = new File(fileName);
+                    FileOutputStream outputStream = new FileOutputStream(downloadedFile);
+                    outputStream.write(blob.getContent());
+                    outputStream.close();
+                    return downloadedFile;
+                }
+            }
+        }catch(Exception e){
+
+        }
+        throw new BadRequestException("download failed");
     }
 
     /**
