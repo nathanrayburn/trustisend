@@ -1,6 +1,5 @@
 {
     "configurations": [
-    
         {
             "type": "java",
             "name": "Spring Boot-SocialLoginApplication<dev.test-social-login>",
@@ -8,6 +7,16 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "dev.test.social_login.SocialLoginApplication",
             "projectName": "dev.test-social-login",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-SocialLoginApplication<social-login>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "dev.test.social_login.SocialLoginApplication",
+            "projectName": "social-login",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
