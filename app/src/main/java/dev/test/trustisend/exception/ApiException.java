@@ -1,7 +1,6 @@
 package dev.test.trustisend.exception;
 
 import lombok.Data;
-
 import java.time.ZonedDateTime;
 
 @Data
