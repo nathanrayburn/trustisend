@@ -219,6 +219,34 @@ public class FirestoreUtil {
 
     }
 
+    public ActiveFile readActiveFileByUUID(String activeFileId) throws Exception {
+        try {
+            System.out.println("Looking for active file with ID: " + activeFileId);
+
+            // Retrieve the document reference for the given activeFile ID
+            DocumentReference docRef = firestore.collection("files").document(activeFileId);
+            ApiFuture<DocumentSnapshot> future = docRef.get();
+            DocumentSnapshot document = future.get();
+
+            // Check if the document exists
+            if (!document.exists()) {
+                System.out.println("No active file found with ID: " + activeFileId);
+                return null;
+            }
+            Group group = readGroupByUUID(document.getString("groupUUID"));
+            // Create and return the ActiveFile object
+            return new ActiveFile(
+                    group,
+                    activeFileId,
+                    document.getString("path")
+            );
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error fetching active file data", e);
+        }
+    }
+
     public LinkedList<ActiveFile> readActiveFilesByGroupUUID(String groupUUID) throws Exception {
         try {
             System.out.println("Looking for active files with group ID: " + groupUUID);

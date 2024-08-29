@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
-import java.util.List;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -24,15 +23,12 @@ public class GroupAndFileTests {
     @Order(1)
     void createFirestoreGroup() {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        Group tmp = new Group("test@heig-vd.ch", timestamp , 0);
+        Group tmp = new Group("test@heig-vd.ch", timestamp, 0);
 
         try {
-
-             group = firestoreUtil.createGroup(tmp);
-
+            group = firestoreUtil.createGroup(tmp);
             Assertions.assertNotNull(group.getGroupUUID(), "The returned ID should not be null.");
             Assertions.assertFalse(group.getGroupUUID().isEmpty(), "The returned ID should not be empty.");
-
             System.out.println("User created successfully with ID: " + group.getGroupUUID());
         } catch (Exception e) {
             e.printStackTrace();
@@ -44,38 +40,49 @@ public class GroupAndFileTests {
     @Order(2)
     void createActiveFile() {
         ActiveFile activeFile = new ActiveFile(group, "file1.txt");
-        activeFiles.add(activeFile);
+
         try {
-
-            ActiveFile activeFile1 = firestoreUtil.createActiveFile(activeFile);
-
-            Assertions.assertNotNull(activeFile1.getFileUUID(), "The returned ID should not be null.");
-            Assertions.assertFalse(activeFile1.getFileUUID().isEmpty(), "The returned ID should not be empty.");
-
-            System.out.println("User created successfully with ID: " + activeFile1.getPath());
+            activeFiles.add(firestoreUtil.createActiveFile(activeFile));
+            Assertions.assertNotNull(activeFiles.getFirst().getFileUUID(), "The returned ID should not be null.");
+            Assertions.assertFalse(activeFiles.getFirst().getFileUUID().isEmpty(), "The returned ID should not be empty.");
+            System.out.println("User created successfully with ID: " + activeFiles.getFirst().getPath());
         } catch (Exception e) {
             e.printStackTrace();
             Assertions.fail("Exception occurred during user creation: " + e.getMessage());
         }
     }
 
-
     @Test
     @Order(3)
+    void deleteActiveFile() {
+        try {
+            Assertions.assertNotNull(activeFiles.getFirst().getFileUUID(), "File ID should not be null before deletion");
+            ActiveFile tmp = activeFiles.getFirst();
+            firestoreUtil.deleteActiveFile(tmp.getFileUUID());
+            try {
+                ActiveFile activeFile = firestoreUtil.readActiveFileByUUID(tmp.getFileUUID());
+                Assertions.assertNull(activeFile, "File should not exist after deletion.");
+            } catch (Exception e) {
+                System.out.println("File successfully deleted and not found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assertions.fail("Exception occurred during File deletion: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @Order(4)
     void deleteFirestoreGroup() {
         try {
-            // Ensure a user ID is available for deletion
             Assertions.assertNotNull(group.getGroupUUID(), "Group ID should not be null before deletion");
             Group tmp = group;
-            // Attempt to delete the user
             firestoreUtil.deleteGroup(group.getGroupUUID());
-
-            // Verify user has been deleted by trying to read it (should throw an exception or return null)
+            activeFiles.removeFirst();
             try {
                 Group group = firestoreUtil.readGroupByUUID(tmp.getGroupUUID());
                 Assertions.assertNull(group, "Group should not exist after deletion.");
             } catch (Exception e) {
-                // Expected behavior: user should not be found after deletion
                 System.out.println("Group successfully deleted and not found.");
             }
         } catch (Exception e) {
@@ -84,38 +91,31 @@ public class GroupAndFileTests {
         }
     }
 
-    // create test to read active files by group uuid
-    // todo: implement this test
-
     @Test
-    @Order(4)
+    @Order(5)
     void createMultipleActiveFiles() {
-        group = new Group("test@heig-vd.ch", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) , 0);
-
-        try{
+        group = new Group("test@heig-vd.ch", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), 0);
+        try {
             group = firestoreUtil.createGroup(group);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             Assertions.fail("Exception occurred during group creation: " + e.getMessage());
         }
 
         ActiveFile activeFile = new ActiveFile(group, "file1.txt");
         ActiveFile activeFile2 = new ActiveFile(group, "file2.txt");
-
         activeFiles.add(activeFile);
         activeFiles.add(activeFile2);
 
-        try{
+        try {
             activeFile = firestoreUtil.createActiveFile(activeFile);
             activeFile2 = firestoreUtil.createActiveFile(activeFile2);
             firestoreUtil.deleteGroupWithDependecies(group.getGroupUUID());
             LinkedList<ActiveFile> activeFiles = firestoreUtil.readActiveFilesByGroupUUID(group.getGroupUUID());
             Assertions.assertNull(activeFiles, "Files should not exist after deletion");
-
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             Assertions.fail("Exception occurred during active file creation: " + e.getMessage());
         }
     }
-
 }
