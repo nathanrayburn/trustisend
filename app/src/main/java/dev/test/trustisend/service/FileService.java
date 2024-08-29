@@ -6,10 +6,11 @@ import dev.test.trustisend.entity.InputFile;
 import dev.test.trustisend.exception.BadRequestException;
 import dev.test.trustisend.exception.GCPFileUploadException;
 import dev.test.trustisend.util.DataBucketUtil;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.File;
 import java.nio.file.Files;
@@ -49,5 +50,26 @@ public class FileService{
         });
 
         return inputFiles;
+    }
+
+    public File downloadFile(String uID, String fileName){
+
+        if(fileName == null){
+            throw new BadRequestException("filename is null");
+        }
+        if(uID == null){
+            uID = "";
+        }
+        return dataBucketUtil.downloadFile(uID, fileName);
+    }
+
+    public boolean deleteFile(String uID, String fileName){
+        if(fileName == null){
+            throw new BadRequestException("filename is null");
+        }
+        if(uID == null){
+            uID = "";
+        }
+        return dataBucketUtil.deleteFile(uID, fileName);
     }
 }
