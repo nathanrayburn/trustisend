@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserTests {
 
 

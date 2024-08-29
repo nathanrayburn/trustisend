@@ -4,6 +4,7 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import dev.test.trustisend.entity.ActiveFile;
 import dev.test.trustisend.entity.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import com.google.cloud.firestore.*;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -38,6 +40,12 @@ public class FirestoreUtil {
                 "userEmail", group.getUserEmail(),
                 "timestamp", group.getTimestamp(),
                 "numberDownloads", group.getNumberDownloads()
+        );
+    }
+    private static Map<String, Object> prepareActiveFileData(ActiveFile activeFile){
+        return Map.of(
+                "groupUUID", activeFile.getGroupUUID(),
+                "path", activeFile.getPath()
         );
     }
 
@@ -189,6 +197,108 @@ public class FirestoreUtil {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             throw new Exception("Error deleting group data", e);
+        }
+    }
+
+    public void deleteGroupWithDependecies(String groupUUID) throws Exception {
+        try {
+            System.out.println("Attempting to delete group with ID: " + groupUUID);
+            // retrieve all files which contain the groupUUID
+            LinkedList<ActiveFile> activeFiles = readActiveFilesByGroupUUID(groupUUID);
+            // for each file delete the file
+            for(ActiveFile activeFile : activeFiles){
+                deleteActiveFile(activeFile.getFileUUID());
+            }
+            // delete the group
+            deleteGroup(groupUUID);
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error deleting group data", e);
+        }
+
+    }
+
+    public LinkedList<ActiveFile> readActiveFilesByGroupUUID(String groupUUID) throws Exception {
+        try {
+            System.out.println("Looking for active files with group ID: " + groupUUID);
+
+            Query query = firestore.collection("files").whereEqualTo("groupUUID", groupUUID);
+            ApiFuture<QuerySnapshot> future = query.get();
+            QuerySnapshot querySnapshot = future.get();
+            List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+            if (documents.isEmpty()) {
+                System.out.println("No file found with groupUUID: " + groupUUID);
+                return null;
+            }
+            DocumentSnapshot document = documents.get(0);
+
+            // Check if the document exists
+            if (!document.exists()) {
+                System.out.println("No active files found with group ID: " + groupUUID);
+                return null;
+            }
+
+            LinkedList<ActiveFile> activeFiles = new LinkedList<ActiveFile>();
+
+            // for each Document create active file and add to list
+            Group group = readGroupByUUID(groupUUID);
+            for (DocumentSnapshot doc : documents) {
+                activeFiles.add(new ActiveFile(
+                    group,
+                    doc.getId(),
+                    doc.getString("path")
+                ));
+            }
+            return activeFiles;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error fetching group data", e);
+        }
+    }
+
+    public ActiveFile createActiveFile(ActiveFile activeFile) throws Exception {
+        Map<String, Object> activeFileData = prepareActiveFileData(activeFile);
+        try {
+            CollectionReference activeFiles = firestore.collection("files");
+            ApiFuture<DocumentReference> result = activeFiles.add(activeFileData);
+            String activeFileId = result.get().getId();
+            System.out.println("ActiveFile created with ID: " + activeFileId);
+
+            // Construct the ActiveFile object using the returned activeFile ID and input data
+
+            return new ActiveFile(
+                    activeFile.getGroupUUID(),
+                    activeFile.getUserEmail(),
+                    activeFile.getTimestamp(),
+                    activeFile.getNumberDownloads(),
+                    activeFileId,
+                    (String) activeFileData.get("path")
+            );
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error creating activeFile", e);
+        }
+    }
+    public void deleteActiveFile(String activeFileId) throws Exception {
+        try {
+            System.out.println("Attempting to delete activeFile with ID: " + activeFileId);
+
+            // Retrieve the document reference for the given activeFile ID
+            DocumentReference docRef = firestore.collection("files").document(activeFileId);
+
+            // Execute the delete operation
+            ApiFuture<WriteResult> writeResult = docRef.delete();
+
+            // Wait for the delete operation to complete and get the result
+            WriteResult result = writeResult.get();
+
+            System.out.println("ActiveFile with ID: " + activeFileId + " deleted at: " + result.getUpdateTime());
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error deleting activeFile data", e);
         }
     }
 }
