@@ -21,8 +21,8 @@ public class FirestoreConfig {
     @Value("${firebase.project.id}")
     private String projectId;
 
-    @Value("${firebase.database.url}")
-    private String databaseUrl;
+    @Value("${firebase.database.id}")
+    private String databaseID;
 
     @Bean
     public Firestore firestore() throws IOException {
@@ -35,7 +35,7 @@ public class FirestoreConfig {
         FirestoreOptions firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
                 .setCredentials(credentials)
                 .setProjectId(projectId)
-                .setDatabaseId(databaseUrl)
+                .setDatabaseId(databaseID)
                 .build();
 
 

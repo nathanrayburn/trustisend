@@ -51,4 +51,25 @@ public class FileService{
 
         return inputFiles;
     }
+
+    public File downloadFile(String uID, String fileName){
+
+        if(fileName == null){
+            throw new BadRequestException("filename is null");
+        }
+        if(uID == null){
+            uID = "";
+        }
+        return dataBucketUtil.downloadFile(uID, fileName);
+    }
+
+    public boolean deleteFile(String uID, String fileName){
+        if(fileName == null){
+            throw new BadRequestException("filename is null");
+        }
+        if(uID == null){
+            uID = "";
+        }
+        return dataBucketUtil.deleteFile(uID, fileName);
+    }
 }
