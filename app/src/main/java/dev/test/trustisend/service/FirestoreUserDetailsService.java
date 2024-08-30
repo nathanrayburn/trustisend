@@ -1,4 +1,4 @@
-package dev.test.social_login.service;
+package dev.test.trustisend.service;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;

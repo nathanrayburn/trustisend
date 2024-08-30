@@ -1,9 +1,9 @@
-package dev.test.social_login.config;
+package dev.test.trustisend.config;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
-import dev.test.social_login.service.FirestoreUserDetailsService;
+import dev.test.trustisend.service.FirestoreUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

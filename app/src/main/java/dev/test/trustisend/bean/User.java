@@ -1,4 +1,4 @@
-package dev.test.social_login.bean;
+package dev.test.trustisend.bean;
 import java.util.Arrays;
 import java.util.Collection;
 
