@@ -73,6 +73,20 @@ public class GroupAndFileTests {
 
     @Test
     @Order(4)
+    void updateDownloadsByGroupUUID(){
+        try {
+            Group tmp = group;
+
+            firestoreUtil.updateDownloadByGroupUUID(group.getGroupUUID(), group.getNumberDownloads() + 1);
+            Group updatedGroup = firestoreUtil.readGroupByUUID(tmp.getGroupUUID());
+            Assertions.assertEquals(1, updatedGroup.getNumberDownloads(), "Downloads should be updated to 1");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assertions.fail("Exception occurred during Group update: " + e.getMessage());
+        }
+    }
+    @Test
+    @Order(5)
     void deleteFirestoreGroup() {
         try {
             Assertions.assertNotNull(group.getGroupUUID(), "Group ID should not be null before deletion");
@@ -92,7 +106,7 @@ public class GroupAndFileTests {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void createMultipleActiveFiles() {
         group = new Group("test@heig-vd.ch", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), 0);
         try {

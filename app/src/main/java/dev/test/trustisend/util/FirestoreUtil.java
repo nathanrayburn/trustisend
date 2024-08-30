@@ -339,4 +339,25 @@ public class FirestoreUtil {
             throw new Exception("Error deleting activeFile data", e);
         }
     }
+    public void updateDownloadByGroupUUID(String groupUUID, Integer numberDownloads) throws Exception {
+        try {
+            System.out.println("Attempting to update numberDownloads for group with ID: " + groupUUID);
+
+            // Retrieve the document reference for the given group ID
+            DocumentReference docRef = firestore.collection("groups").document(groupUUID);
+
+            // Execute the update operation
+            ApiFuture<WriteResult> writeResult = docRef.update("numberDownloads", numberDownloads);
+
+            // Wait for the update operation to complete and get the result
+            WriteResult result = writeResult.get();
+
+            System.out.println("Group with ID: " + groupUUID + " updated at: " + result.getUpdateTime());
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error updating group data", e);
+        }
+
+    }
 }
