@@ -5,34 +5,36 @@ steps:
     args:
       - build
       - '-t'
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
       - '.'
 
   # Step 1: Push the Docker image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
 
   # Step 2: Deploy the application to Cloud Run using the built image
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - run
       - deploy
-      - trustisend  # Cloud Run service name
+      - casdoor  # Cloud Run service name
       - '--image'
-      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
       - '--region'
       - 'europe-west1'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
       - '--quiet'
+      - '--update-secrets'
+      - '/firestore-mnt/firestore=projects/579596661856/secrets/firestore:latest'
     entrypoint: gcloud
 
 # Specify the images that will be pushed by Cloud Build
 images:
-  - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/trustisend:$COMMIT_SHA'
+  - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/casdoor:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY
