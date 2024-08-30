@@ -84,25 +84,47 @@
     </div>
     <hr class="border-b border-gray-100 opacity-25 my-0 py-0" />
 </nav>
-<!--Hero-->
+
+<!-- WHAT Text: Indépendant et centré -->
+<div id="what-popup" class="what-text hidden">WHAT</div>
+
+<!-- Hero Container -->
 <div class="pt-24">
-    <div class="container px-3 mx-auto flex flex-wrap flex-col md:flex-row items-center">
-        <!--Left Col-->
-        <div class="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left">
-            <p class="uppercase tracking-loose w-full">Secured file transfer</p>
-            <h1 class="my-4 text-5xl font-bold leading-tight">
-                Partagez vos fichiers manière simple et sécurisée
-            </h1>
-            <p class="leading-normal text-2xl mb-8">
-                Transmettez vos fichiers en seulement quelques clics à vos collaborateurs.
-            </p>
+    <div class="container mx-auto grid grid-cols-2 gap-4">
+        <!-- Left Col: Trust I Send Text + Branding Section (1/2) -->
+        <div class="flex flex-col h-full">
+            <!-- Subgrid to split Trust I Send and Branding Section -->
+            <div class="grid grid-cols-2 h-full">
+                <!-- Trust I Send Text Container (Left Half) -->
+                <div class="threed-text-container relative flex flex-col justify-start items-start">
+                    <div class="threed-text">
+                        <span class="trigger-hover">Trust</span>
+                        <div class="falling-text delay-2 hidden"><span>I</span></div>
+                        <div class="falling-text delay-3 hidden"><span>Send</span></div>
+                    </div>
+                </div>
+
+                <!-- Branding Section (Right Half of Left Column) -->
+                <div class="flex flex-col justify-center items-start p-4">
+                    <h2 class="text-3xl font-bold text-white">Branding Section</h2>
+                    <p class="mt-4 text-lg text-gray-200">Ajoutez ici le contenu de votre branding.</p>
+                </div>
+            </div>
         </div>
-        <!--Right Col-->
-        <div class="w-full md:w-3/5 py-6 text-center">
-            <img class="w-full md:w-4/5 z-50" src="/images/hero.png">
+
+        <!-- Right Col: Image (1/2) -->
+        <div class="py-6 text-center flex items-center justify-center">
+            <img class="w-full md:w-4/5 z-50" src="/images/hero.png" alt="Image de sécurité">
         </div>
     </div>
 </div>
+
+
+
+
+
+
+
 <div class="relative -mt-12 lg:-mt-24">
     <svg viewBox="0 0 1428 174" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -449,6 +471,43 @@
 
 
 </script>
+
+<script>
+    document.querySelector('.trigger-hover').addEventListener('mouseover', function() {
+        // Animer le changement de couleur de Trust
+        this.classList.add('color-animate');
+
+        // Attendre que le changement de couleur de "Trust" soit visible
+        setTimeout(() => {
+            // Animer "WHAT" au centre de l'écran
+            const whatElement = document.getElementById('what-popup');
+            whatElement.classList.remove('hidden');
+            whatElement.classList.add('animate');
+
+            // Attendre que l'animation de "WHAT" se termine avant de continuer
+            setTimeout(() => {
+                // Afficher et animer "I" après un court délai
+                const iElement = document.querySelector('.falling-text.delay-2');
+                const sendElement = document.querySelector('.falling-text.delay-3');
+
+                // Afficher et animer "I"
+                iElement.classList.remove('hidden');
+                iElement.classList.add('animate');
+
+                // Afficher et animer "Send" après un délai supplémentaire
+                setTimeout(() => {
+                    sendElement.classList.remove('hidden');
+                    sendElement.classList.add('animate');
+                }, 400); // Ajustez le délai pour que Send tombe après I
+            }, 1200); // Temps de l'animation de "WHAT" (1.2 secondes)
+        }, 400); // Délai pour voir la couleur verte de Trust avant l'apparition de WHAT
+    });
+</script>
+
+
+
+
+
 
 </body>
 </html>
