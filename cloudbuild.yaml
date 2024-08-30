@@ -30,6 +30,7 @@ steps:
       - '--quiet'
       - '--update-secrets'
       - '/firestore-mnt/firestore=projects/579596661856/secrets/firestore:latest'
+      - '--update-secrets'
       - '/gc-storage-mnt/storage=projects/579596661856/secrets/gc-storage-key:latest'
     entrypoint: gcloud
 
