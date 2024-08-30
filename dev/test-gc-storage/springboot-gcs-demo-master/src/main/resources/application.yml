@@ -1,0 +1,16 @@
+server:
+  port: 8090
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+gcp:
+  config:
+    file: gcp-account-file.json
+  project:
+    id: trustisend-433213
+  bucket:
+    id: spring-boot-gcp-bucket-test
+  dir:
+    name:

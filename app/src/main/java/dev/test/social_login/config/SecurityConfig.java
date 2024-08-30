@@ -69,3 +69,4 @@ public class SecurityConfig {
         return new SimpleUrlLogoutSuccessHandler();
     }
 }
+
