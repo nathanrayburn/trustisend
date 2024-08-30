@@ -1,4 +1,4 @@
-package dev.test.trustisend.config;
+package dev.test.trustisend.controller;
 
 
 import dev.test.trustisend.entity.InputFile;
