@@ -5,6 +5,7 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import dev.test.trustisend.entity.ActiveFile;
+import dev.test.trustisend.entity.FileScanStatus;
 import dev.test.trustisend.entity.Group;
 import dev.test.trustisend.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,8 @@ public class FirestoreUtil {
     private static Map<String, Object> prepareActiveFileData(ActiveFile activeFile){
         return Map.of(
                 "groupUUID", activeFile.getGroupUUID(),
-                "path", activeFile.getPath()
+                "path", activeFile.getPath(),
+                "scanStatus", activeFile.getScanStatus().toString()
         );
     }
 
@@ -248,7 +250,8 @@ public class FirestoreUtil {
             return new ActiveFile(
                     group,
                     activeFileId,
-                    document.getString("path")
+                    document.getString("path"),
+                    FileScanStatus.valueOf(document.getString("scanStatus"))
             );
 
         } catch (InterruptedException | ExecutionException e) {
@@ -285,7 +288,9 @@ public class FirestoreUtil {
                 activeFiles.add(new ActiveFile(
                     group,
                     doc.getId(),
-                    doc.getString("path")
+                    doc.getString("path"),
+                    FileScanStatus.valueOf(doc.getString("scanStatus"))
+
                 ));
             }
             return activeFiles;
@@ -311,7 +316,8 @@ public class FirestoreUtil {
                     activeFile.getTimestamp(),
                     activeFile.getNumberDownloads(),
                     activeFileId,
-                    (String) activeFileData.get("path")
+                    (String) activeFileData.get("path"),
+                    FileScanStatus.valueOf((String) activeFileData.get("scanStatus"))
             );
 
         } catch (InterruptedException | ExecutionException e) {

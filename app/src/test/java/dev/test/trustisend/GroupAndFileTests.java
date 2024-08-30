@@ -1,6 +1,7 @@
 package dev.test.trustisend;
 
 import dev.test.trustisend.entity.ActiveFile;
+import dev.test.trustisend.entity.FileScanStatus;
 import dev.test.trustisend.entity.Group;
 import dev.test.trustisend.util.FirestoreUtil;
 import org.junit.jupiter.api.*;
@@ -39,7 +40,7 @@ public class GroupAndFileTests {
     @Test
     @Order(2)
     void createActiveFile() {
-        ActiveFile activeFile = new ActiveFile(group, "file1.txt");
+        ActiveFile activeFile = new ActiveFile(group, "file1.txt", FileScanStatus.PENDING);
 
         try {
             activeFiles.add(firestoreUtil.createActiveFile(activeFile));
@@ -102,8 +103,8 @@ public class GroupAndFileTests {
             Assertions.fail("Exception occurred during group creation: " + e.getMessage());
         }
 
-        ActiveFile activeFile = new ActiveFile(group, "file1.txt");
-        ActiveFile activeFile2 = new ActiveFile(group, "file2.txt");
+        ActiveFile activeFile = new ActiveFile(group, "file1.txt", FileScanStatus.PENDING);
+        ActiveFile activeFile2 = new ActiveFile(group, "file2.txt", FileScanStatus.PENDING);
         activeFiles.add(activeFile);
         activeFiles.add(activeFile2);
 
