@@ -1,9 +1,7 @@
 package dev.test.trustisend;
 
 import dev.test.trustisend.util.DataBucketUtil;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -25,6 +23,7 @@ class TrustiSendApplicationTests {
 
 	@Autowired
 	private DataBucketUtil dataBucketUtil;
+
 	private Path createTempFile(String prefix, String suffix, String content) throws IOException {
 		Path tempFile = Files.createTempFile(prefix,suffix);
 		Files.writeString(tempFile, content, StandardOpenOption.WRITE);
@@ -85,4 +84,5 @@ class TrustiSendApplicationTests {
 
 		Files.deleteIfExists(tempPath);
 	}
+
 }

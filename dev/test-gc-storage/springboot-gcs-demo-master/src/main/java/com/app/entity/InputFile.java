@@ -14,11 +14,12 @@ public class InputFile {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private String uID;
     private String fileName;
     private String fileUrl;
 
-    public InputFile(String fileName, String fileUrl) {
+    public InputFile(String uID, String fileName, String fileUrl) {
+        this.uID = uID;
         this.fileName = fileName;
         this.fileUrl = fileUrl;
     }

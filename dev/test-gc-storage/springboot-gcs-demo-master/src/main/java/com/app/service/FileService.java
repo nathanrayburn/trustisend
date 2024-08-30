@@ -28,19 +28,22 @@ public class FileService{
 
         List<InputFile> inputFiles = new ArrayList<>();
 
+        String uID = java.util.UUID.randomUUID().toString();
+
         Arrays.asList(files).forEach(file -> {
             String originalFileName = file.getOriginalFilename();
             if(originalFileName == null){
                 throw new BadRequestException("Original file name is null");
             }
+            
             Path path = new File(originalFileName).toPath();
 
             try {
                 String contentType = Files.probeContentType(path);
-                FileDto fileDto = dataBucketUtil.uploadFile(file, originalFileName, contentType);
+                FileDto fileDto = dataBucketUtil.uploadFile(file, originalFileName, contentType, uID);
 
                 if (fileDto != null) {
-                    inputFiles.add(new InputFile(fileDto.getFileName(), fileDto.getFileUrl()));
+                    inputFiles.add(new InputFile(uID, fileDto.getFileName(), fileDto.getFileUrl()));
                 }
             } catch (Exception e) {
                 throw new GCPFileUploadException("Error occurred while uploading: " + e.getMessage());

@@ -7,7 +7,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-
 import dev.test.trustisend.dto.FileDto;
 import dev.test.trustisend.exception.BadRequestException;
 import dev.test.trustisend.exception.FileWriteException;
@@ -17,17 +16,15 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
 import java.io.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class DataBucketUtil {
 
-    @Value("${gcp.credentials.path}")
+    @Value("${gcp.config.file}")
     private String gcpConfigFile;
 
     @Value("${gcp.project.id}")
@@ -41,23 +38,29 @@ public class DataBucketUtil {
 
 
     public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType) {
+        String uID = java.util.UUID.randomUUID().toString();
+
+        return uploadFile(multipartFile, fileName, contentType, uID);
+    }
+
+    public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType, String uID) {
 
         try{
             byte[] fileData = FileUtils.readFileToByteArray(convertFile(multipartFile));
 
-            File file = ResourceUtils.getFile(gcpConfigFile);
-            InputStream inputStream = new FileInputStream(file);
+            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
+
             StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
                     .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
 
             Storage storage = options.getService();
             Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
 
-            String id = UUID.randomUUID().toString();
-            Blob blob = bucket.create( fileName + "-" + id + checkFileExtension(fileName), fileData, contentType);
+            Blob blob = bucket.create( uID + "/" + fileName, fileData, contentType);
 
             if(blob != null){
-                return new FileDto(blob.getName(), blob.getMediaLink());
+                String[] name = blob.getName().split("/");
+                return new FileDto(fileName, blob.getMediaLink());
             }
 
         }catch (Exception e){
@@ -68,8 +71,7 @@ public class DataBucketUtil {
 
     public File downloadFile(String uID, String fileName){
         try{
-            File file = ResourceUtils.getFile(gcpConfigFile);
-            InputStream inputStream = new FileInputStream(file);
+            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
 
             StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
                     .setCredentials(GoogleCredentials.fromStream(inputStream)).build();

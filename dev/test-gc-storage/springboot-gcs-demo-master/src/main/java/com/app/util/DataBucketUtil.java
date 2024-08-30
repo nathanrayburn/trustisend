@@ -11,7 +11,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import net.bytebuddy.utility.RandomString;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -38,6 +37,12 @@ public class DataBucketUtil {
 
 
     public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType) {
+        String uID = java.util.UUID.randomUUID().toString();
+
+        return uploadFile(multipartFile, fileName, contentType, uID);
+    }
+
+    public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType, String uID) {
 
         try{
             byte[] fileData = FileUtils.readFileToByteArray(convertFile(multipartFile));
@@ -50,11 +55,11 @@ public class DataBucketUtil {
             Storage storage = options.getService();
             Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
 
-            RandomString id = new RandomString(6, ThreadLocalRandom.current());
-            Blob blob = bucket.create( fileName + "-" + id.nextString() + checkFileExtension(fileName), fileData, contentType);
+            Blob blob = bucket.create( uID + "/" + fileName, fileData, contentType);
 
             if(blob != null){
-                return new FileDto(blob.getName(), blob.getMediaLink());
+                String[] name = blob.getName().split("/");
+                return new FileDto(fileName, blob.getMediaLink());
             }
 
         }catch (Exception e){
