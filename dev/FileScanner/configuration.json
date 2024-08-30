@@ -9,7 +9,7 @@
         "bucket": "spring-boot-gcp-bucket-test"
     },
   "antivirus": {
-    "api-key": "YOUR_API_KEY_PATH_TO_MOUNT",
+    "api-key": "api",
     "file-scan-limit": 4
   }
 }
