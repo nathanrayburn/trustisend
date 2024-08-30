@@ -26,7 +26,8 @@ class UserTests {
         User user = new User("testuser@heig-vd.ch", "testpassword");
         try {
             // Create a user and get the returned ID
-            userId = firestoreUtil.createUser(user);
+            User newUser = firestoreUtil.createUser(user);
+            userId = newUser.getId();
 
             // Assert that the ID is not null or empty, meaning user creation was successful
             Assertions.assertNotNull(userId, "The returned ID should not be null.");

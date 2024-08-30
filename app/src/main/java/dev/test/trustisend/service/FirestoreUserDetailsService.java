@@ -2,11 +2,12 @@ package dev.test.trustisend.service;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import dev.test.trustisend.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import dev.test.trustisend.util.FirestoreUtil;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -15,10 +16,22 @@ import java.util.concurrent.ExecutionException;
 public class FirestoreUserDetailsService implements UserDetailsService {
 
     private final Firestore firestore;
+    @Autowired
+    private FirestoreUtil firestoreUtil;
 
     @Autowired
     public FirestoreUserDetailsService(Firestore firestore) {
         this.firestore = firestore;
+    }
+
+    public User createNewUser(String email, String hash){
+        dev.test.trustisend.entity.User user =  new dev.test.trustisend.entity.User(email, hash);
+        try {
+        return firestoreUtil.createUser(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -44,7 +57,7 @@ public class FirestoreUserDetailsService implements UserDetailsService {
             // System.out.println("User data found: " + document.getData()); // it prints the password hash
 
             // Create and return the UserDetails object
-            return User.withUsername(document.getString("email"))
+            return org.springframework.security.core.userdetails.User.withUsername(document.getString("email"))
                     .password(document.getString("hash"))  // Ensure 'hash' exists in the document
                     .roles("USER")
                     .build();

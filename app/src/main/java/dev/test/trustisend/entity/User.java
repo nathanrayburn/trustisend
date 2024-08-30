@@ -26,6 +26,12 @@ public class User implements UserDetails {
         this.hash = hash;
     }
 
+    public User(String id, String email, String hash) {
+        this.id = id;
+        this.email = email;
+        this.hash = hash;
+    }
+
     public String getId() {
         return id;
     }

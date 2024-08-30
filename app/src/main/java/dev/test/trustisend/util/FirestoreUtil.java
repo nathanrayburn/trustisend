@@ -6,8 +6,8 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import dev.test.trustisend.entity.ActiveFile;
 import dev.test.trustisend.entity.Group;
+import dev.test.trustisend.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -49,13 +49,23 @@ public class FirestoreUtil {
         );
     }
 
-    public String createUser(dev.test.trustisend.entity.User user) throws Exception {
+    public User createUser(dev.test.trustisend.entity.User user) throws Exception {
+        // Check if the user already exists
+        UserDetails existingUser = readUserByEmail(user.getEmail());
+        if (existingUser != null) {
+            System.out.println("User with email: " + user.getEmail() + " already exists");
+            return null;
+        }
         Map<String, Object> userData = prepareUserData(user);
         CollectionReference users = firestore.collection("users");
         ApiFuture<DocumentReference> result = users.add(userData);
         String userId = result.get().getId();
         System.out.println("User created with ID: " + userId);
-        return userId;
+        return new User(
+                userId,
+                user.getEmail(),
+                user.getHash()
+        );
     }
 
     public UserDetails readUserByEmail(String email) throws Exception{
@@ -71,7 +81,7 @@ public class FirestoreUtil {
             }
             DocumentSnapshot document = documents.get(0);
             // Create and return the UserDetails object
-            return User.withUsername(document.getString("email"))
+            return org.springframework.security.core.userdetails.User.withUsername(document.getString("email"))
                     .password(document.getString("hash"))  // Ensure 'hash' exists in the document
                     .roles("USER")
                     .build();
@@ -97,7 +107,7 @@ public class FirestoreUtil {
             }
 
             // Create and return the UserDetails object
-            return User.withUsername(document.getString("email"))
+            return org.springframework.security.core.userdetails.User.withUsername(document.getString("email"))
                     .password(document.getString("hash"))  // Ensure 'hash' exists in the document
                     .roles("USER")
                     .build();
