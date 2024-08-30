@@ -35,7 +35,7 @@ public class FirestoreUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
         try {
             // Debug log to check if the method is called
             System.out.println("Looking for user with email: " + email);
@@ -57,10 +57,7 @@ public class FirestoreUserDetailsService implements UserDetailsService {
             // System.out.println("User data found: " + document.getData()); // it prints the password hash
 
             // Create and return the UserDetails object
-            return org.springframework.security.core.userdetails.User.withUsername(document.getString("email"))
-                    .password(document.getString("hash"))  // Ensure 'hash' exists in the document
-                    .roles("USER")
-                    .build();
+            return new User(document.getId(), document.getString("email"), document.getString("hash"));
 
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
