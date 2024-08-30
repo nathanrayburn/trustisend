@@ -12,8 +12,43 @@ public class  HomeController {
         model.addAttribute("test","Test value message");
         return "index";
     }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
     @GetMapping("/secured")
     public String secured(){
         return "Hello, Secured!";
     }
+
+    @GetMapping("/signup")
+    public String signup() {
+        return "signup";
+    }
+    @GetMapping("/home")
+    public String home() {
+        return "home";
+    }
+    @GetMapping("/upload")
+    public String upload() {
+        return "upload";
+    }
+
+    @GetMapping("/myfiles")
+    public String myfiles() {
+        return "myfiles";
+    }
+
+    @GetMapping("/download")
+    public String download() {
+        return "download";
+    }
+
+    @GetMapping("/faq")
+    public String faq() {
+        return "faq";
+    }
+
+
 }

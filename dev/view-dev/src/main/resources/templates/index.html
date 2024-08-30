@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,7 +10,7 @@
     <meta name="description" content="TrustiSend Landing Page" />
     <meta name="keywords" content="" />
     <meta name="author" content="" />
-    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css"/>
+    <link th:href="@{/main.css}" rel="stylesheet" />
     <!--Replace with your tailwind.css once created-->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet" />
     <!-- Define your gradient here - use online tools to find a gradient matching your branding-->
@@ -19,13 +19,28 @@
             background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
         }
     </style>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 1s forwards;
+        }
+    </style>
+
 </head>
 <body class="leading-normal tracking-normal text-white gradient" style="font-family: 'Source Sans Pro', sans-serif;">
 <!--Nav-->
 <nav id="header" class="fixed w-full z-30 top-0 text-white">
     <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
         <div class="pl-4 flex items-center">
-            <a class="toggleColour text-white no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="#">
+            <a class="toggleColour text-white no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/#">
                 <!--Icon from: http://www.potlabicons.com/ -->
                 <svg class="h-8 fill-current inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.005 512.005">
                     <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" transform="matrix(1,0,0,1,0,0)" />
@@ -54,15 +69,17 @@
                     <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">About us</a>
                 </li>
                 <li class="mr-3">
-                    <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">Sign up</a>
+                    <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="/signup">Sign up</a>
                 </li>
             </ul>
             <button
                     id="navAction"
                     class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full mt-4 lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                    onclick="window.location.href='/login'"
             >
                 Login
             </button>
+
         </div>
     </div>
     <hr class="border-b border-gray-100 opacity-25 my-0 py-0" />
@@ -106,8 +123,8 @@
     </svg>
 </div>
 <section class="bg-white border-b py-8">
-    <div class="container max-w-5xl mx-auto m-8">
-        <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
+    <div class="container max-w-5xl mx-auto m-8 ">
+        <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800 js-show-on-scroll fade-target">
             TrustiSend
         </h2>
         <div class="w-full mb-4">
@@ -126,14 +143,13 @@
                 </p>
             </div>
             <div class="w-full sm:w-1/2 p-6">
-
-                <img class="w-full sm:h-64 mx-auto" src="https://i.postimg.cc/vZqvrvWf/Capture.png">
-
+                <img class="w-full h-auto mx-auto object-contain" src="https://i.postimg.cc/qRxhC1h0/Project-2-08.jpg">
             </div>
+
         </div>
         <div class="flex flex-wrap flex-col-reverse sm:flex-row">
             <div class="w-full sm:w-1/2 p-6 mt-6">
-                 <img class="w-full sm:h-64 mx-auto" src="https://i.postimg.cc/sD7Zw47b/Capture1.png">
+                 <img class="w-full sm:h-64 mx-auto " src="https://i.postimg.cc/R03zjhQH/311-generated.jpg">
             </div>
             <div class="w-full sm:w-1/2 p-6 mt-6">
                 <div class="align-middle">
@@ -153,132 +169,63 @@
 <section class="bg-white border-b py-8">
     <div class="container mx-auto flex flex-wrap pt-4 pb-12">
         <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
-            TrustiSend
+            Nos Principales Fonctionnalités
         </h2>
         <div class="w-full mb-4">
             <div class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
         </div>
-        <div class="w-full md:w-1/3 p-6 flex flex-col flex-grow flex-shrink">
-            <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
-                <a href="#" class="flex flex-wrap no-underline hover:no-underline">
-                    <div class="w-full font-bold text-xl text-gray-800 px-6">
-                        Partage de fichier
+        <!-- Feature 1 -->
+        <div class="w-full md:w-1/3 p-6 flex flex-col">
+            <div class="flex-1 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg p-6 shadow-lg transform transition duration-500 hover:scale-105">
+                <a href="#" class="no-underline hover:no-underline">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-white mr-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M4 3h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1zm1 2v10h10V5H5z" />
+                        </svg>
+                        <h3 class="text-2xl font-bold text-white">Partage de fichier</h3>
                     </div>
-                    <p class="text-gray-800 text-base px-6 mb-5">
-                        Partagez facilement vos fichiers jusqu’à 1Gb
-                        Les fichiers sont automatiquement supprimés après 30 jours d’inactivité
+                    <p class="text-white text-base">
+                        Partagez facilement vos fichiers jusqu’à 1Gb. Les fichiers sont automatiquement supprimés après 30 jours d’inactivité.
                     </p>
                 </a>
             </div>
         </div>
-        <div class="w-full md:w-1/3 p-6 flex flex-col flex-grow flex-shrink">
-            <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
-                <a href="#" class="flex flex-wrap no-underline hover:no-underline">
-                    <div class="w-full font-bold text-xl text-gray-800 px-6">
-                        Download sûr
+        <!-- Feature 2 -->
+        <div class="w-full md:w-1/3 p-6 flex flex-col">
+            <div class="flex-1 bg-gradient-to-br from-green-400 to-teal-500 rounded-lg p-6 shadow-lg transform transition duration-500 hover:scale-105">
+                <a href="#" class="no-underline hover:no-underline">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-white mr-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M10 2a6 6 0 00-6 6v2a2 2 0 01-2 2v2h12v-2a2 2 0 01-2-2V8a6 6 0 00-6-6zM5 14v2h2v-2H5zm4 0v2h2v-2H9zm4 0v2h2v-2h-2z" />
+                        </svg>
+                        <h3 class="text-2xl font-bold text-white">Download sûr</h3>
                     </div>
-                    <p class="text-gray-800 text-base px-6 mb-5">
-                        Tous les fichiers sont automatiquement scannés par un antivirus
-                        Aucun fichier détecté comme dangereux n’est partageable
+                    <p class="text-white text-base">
+                        Tous les fichiers sont automatiquement scannés par un antivirus. Aucun fichier détecté comme dangereux n’est partageable.
                     </p>
                 </a>
             </div>
         </div>
-        <div class="w-full md:w-1/3 p-6 flex flex-col flex-grow flex-shrink">
-            <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
-                <a href="#" class="flex flex-wrap no-underline hover:no-underline">
-                    <div class="w-full font-bold text-xl text-gray-800 px-6">
-                        Prise en main rapide et facile
+        <!-- Feature 3 -->
+        <div class="w-full md:w-1/3 p-6 flex flex-col">
+            <div class="flex-1 bg-gradient-to-br from-pink-500 to-red-500 rounded-lg p-6 shadow-lg transform transition duration-500 hover:scale-105">
+                <a href="#" class="no-underline hover:no-underline">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-white mr-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M12 4a4 4 0 01.832 7.912A5.98 5.98 0 0116 14v2h2v2H2v-2h2v-2a5.98 5.98 0 013.168-2.088A4 4 0 0112 4zm0 10H8v2h4v-2zM4 14h2v2H4v-2zm10 0h2v2h-2v-2z" />
+                        </svg>
+                        <h3 class="text-2xl font-bold text-white">Prise en main rapide</h3>
                     </div>
-                    <p class="text-gray-800 text-base px-6 mb-5">
-                        Connectez-vous et partagez vos fichiers rapidement avec votre compte Google ou GitHub
+                    <p class="text-white text-base">
+                        Connectez-vous et partagez vos fichiers rapidement avec votre compte Google ou GitHub.
                     </p>
                 </a>
             </div>
         </div>
     </div>
 </section>
-<section class="bg-gray-100 py-8">
-    <div class="container mx-auto px-2 pt-4 pb-12 text-gray-800">
-        <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
-            Pricing
-        </h2>
-        <div class="w-full mb-4">
-            <div class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
-        </div>
-        <div class="flex flex-col sm:flex-row justify-center pt-12 my-12 sm:my-4">
-            <div class="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
-                <div class="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
-                    <div class="p-8 text-3xl font-bold text-center border-b-4">
-                        Free
-                    </div>
-                    <ul class="w-full text-center text-sm">
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                    </ul>
-                </div>
-                <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                    <div class="w-full pt-6 text-3xl text-gray-600 font-bold text-center">
-                        £0
-                        <span class="text-base">for one user</span>
-                    </div>
-                    <div class="flex items-center justify-center">
-                        <button class="mx-auto lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                            Sign Up
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 shadow-lg z-10">
-                <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
-                    <div class="w-full p-8 text-3xl font-bold text-center">Basic</div>
-                    <div class="h-1 w-full gradient my-0 py-0 rounded-t"></div>
-                    <ul class="w-full text-center text-base font-bold">
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                    </ul>
-                </div>
-                <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                    <div class="w-full pt-6 text-4xl font-bold text-center">
-                        £x.99
-                        <span class="text-base">/ per user</span>
-                    </div>
-                    <div class="flex items-center justify-center">
-                        <button class="mx-auto lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                            Sign Up
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
-                <div class="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
-                    <div class="p-8 text-3xl font-bold text-center border-b-4">
-                        Pro
-                    </div>
-                    <ul class="w-full text-center text-sm">
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                    </ul>
-                </div>
-                <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                    <div class="w-full pt-6 text-3xl text-gray-600 font-bold text-center">
-                        £x.99
-                        <span class="text-base">/ per user</span>
-                    </div>
-                    <div class="flex items-center justify-center">
-                        <button class="mx-auto lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                            Sign Up
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+
+
 <!-- Change the colour #f8fafc to match the previous section colour -->
 <svg class="wave-top" viewBox="0 0 1439 147" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -311,9 +258,13 @@
     <h3 class="my-4 text-3xl leading-tight">
         Il est temps d'essayer.
     </h3>
-    <button class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-        Clic pour tester !
-    </button>
+
+    <a href="/login">
+        <button class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+            Clic pour tester !
+        </button>
+    </a>
+
 </section>
 <!--Footer-->
 <footer class="bg-white">
@@ -336,13 +287,13 @@
                 <p class="uppercase text-gray-500 md:mb-6">Links</p>
                 <ul class="list-reset mb-6">
                     <li class="mt-2 inline-block mr-2 md:block md:mr-0">
-                        <a href="#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">FAQ</a>
+                        <a href="/faq" class="no-underline hover:underline text-gray-800 hover:text-pink-500">FAQ</a>
                     </li>
                     <li class="mt-2 inline-block mr-2 md:block md:mr-0">
-                        <a href="#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Help</a>
+                        <a href="/#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Help</a>
                     </li>
                     <li class="mt-2 inline-block mr-2 md:block md:mr-0">
-                        <a href="#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Support</a>
+                        <a href="/#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Support</a>
                     </li>
                 </ul>
             </div>
@@ -350,10 +301,10 @@
                 <p class="uppercase text-gray-500 md:mb-6">Legal</p>
                 <ul class="list-reset mb-6">
                     <li class="mt-2 inline-block mr-2 md:block md:mr-0">
-                        <a href="#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Terms</a>
+                        <a href="https://www.termsfeed.com/live/e86b25de-50be-4c1b-b5ee-c65080b2bd5f" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Terms</a>
                     </li>
                     <li class="mt-2 inline-block mr-2 md:block md:mr-0">
-                        <a href="#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Privacy</a>
+                        <a href="https://www.privacypolicies.com/live/701346aa-136e-4a6e-bca3-deea2d36515c" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Privacy</a>
                     </li>
                 </ul>
             </div>
@@ -473,5 +424,31 @@
         return false;
     }
 </script>
+
+<script>
+    const callback = function (entries) {
+        entries.forEach((entry) => {
+            console.log(entry);
+
+            if (entry.isIntersecting) {
+                entry.target.classList.add("animate-fadeIn");
+            } else {
+                entry.target.classList.remove("animate-fadeIn");
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(callback);
+
+    const targets = document.querySelectorAll(".js-show-on-scroll.fade-target");
+    targets.forEach(function (target) {
+        target.classList.add("opacity-0");
+        observer.observe(target);
+    });
+
+
+
+</script>
+
 </body>
 </html>
