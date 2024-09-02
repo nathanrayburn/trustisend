@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -49,11 +51,13 @@ public class DataBucketUtil {
 
         try{
             byte[] fileData = FileUtils.readFileToByteArray(convertFile(multipartFile));
-
-            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+            GoogleCredentials credentials = GoogleCredentials.fromStream(
+                    new ByteArrayInputStream(credentialsJson.getBytes())
+            );
 
             StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
-                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
+                    .setCredentials(credentials).build();
 
             Storage storage = options.getService();
             Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
