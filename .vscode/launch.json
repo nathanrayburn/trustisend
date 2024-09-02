@@ -19,6 +19,16 @@
             "projectName": "social-login",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-TrustiSendApplication<dev.test-social-login>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "dev.test.trustisend.TrustiSendApplication",
+            "projectName": "dev.test-social-login",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
