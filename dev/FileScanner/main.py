@@ -7,8 +7,8 @@ import requests
 from activefile import ActiveFile
 import json
 import schedule
-import threading  # Import threading
-import time  # Import time for the scheduler loop
+import threading
+import time
 
 app = Flask(__name__)
 
@@ -264,6 +264,7 @@ def home():
 
 
 if __name__ == '__main__':
+
     # Start the scheduler thread
     scheduler_thread = threading.Thread(target=run_scheduler)
     scheduler_thread.daemon = True  # Daemonize thread to ensure it exits when main program exits
