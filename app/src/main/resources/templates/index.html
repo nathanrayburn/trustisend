@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,7 +10,7 @@
     <meta name="description" content="TrustiSend Landing Page" />
     <meta name="keywords" content="" />
     <meta name="author" content="" />
-    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet" />
     <!--Replace with your tailwind.css once created-->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet" />
     <!-- Define your gradient here - use online tools to find a gradient matching your branding-->
@@ -19,20 +19,20 @@
             background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
         }
     </style>
+
+
 </head>
 <body class="leading-normal tracking-normal text-white gradient" style="font-family: 'Source Sans Pro', sans-serif;">
 <!--Nav-->
 <nav id="header" class="fixed w-full z-30 top-0 text-white">
     <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
         <div class="pl-4 flex items-center">
-            <a class="toggleColour text-white no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="#">
+            <a class="toggleColour text-white no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/#">
                 <!--Icon from: http://www.potlabicons.com/ -->
                 <svg class="h-8 fill-current inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.005 512.005">
                     <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" transform="matrix(1,0,0,1,0,0)" />
-                    <path
-                            class="plane-take-off"
-                            d=" M 510.7 189.151 C 505.271 168.95 484.565 156.956 464.365 162.385 L 330.156 198.367 L 155.924 35.878 L 107.19 49.008 L 211.729 230.183 L 86.232 263.767 L 36.614 224.754 L 0 234.603 L 45.957 314.27 L 65.274 347.727 L 105.802 336.869 L 240.011 300.886 L 349.726 271.469 L 483.935 235.486 C 504.134 230.057 516.129 209.352 510.7 189.151 Z "
-                    />
+                    <path class="plane-take-off"
+                          d=" M 510.7 189.151 C 505.271 168.95 484.565 156.956 464.365 162.385 L 330.156 198.367 L 155.924 35.878 L 107.19 49.008 L 211.729 230.183 L 86.232 263.767 L 36.614 224.754 L 0 234.603 L 45.957 314.27 L 65.274 347.727 L 105.802 336.869 L 240.011 300.886 L 349.726 271.469 L 483.935 235.486 C 504.134 230.057 516.129 209.352 510.7 189.151 Z " />
                 </svg>
                 TrustiSend
             </a>
@@ -54,38 +54,63 @@
                     <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">About us</a>
                 </li>
                 <li class="mr-3">
-                    <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">Sign up</a>
+                    <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="/signup">Sign up</a>
                 </li>
             </ul>
             <button
                     id="navAction"
                     class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full mt-4 lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-            >
+                    onclick="window.location.href='/login'">
                 Login
+            </button>
+            <!-- Dark Mode Toggle Button -->
+            <button id="invert-dark-mode-toggle" class="p-2 ml-4 bg-gray-200 rounded">
+                🌙
             </button>
         </div>
     </div>
     <hr class="border-b border-gray-100 opacity-25 my-0 py-0" />
 </nav>
-<!--Hero-->
+
+<!-- Hero Container -->
 <div class="pt-24">
-    <div class="container px-3 mx-auto flex flex-wrap flex-col md:flex-row items-center">
-        <!--Left Col-->
-        <div class="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left">
-            <p class="uppercase tracking-loose w-full">Secured file transfer</p>
-            <h1 class="my-4 text-5xl font-bold leading-tight">
-                Partagez vos fichiers manière simple et sécurisée
-            </h1>
-            <p class="leading-normal text-2xl mb-8">
-                Transmettez vos fichiers en seulement quelques clics à vos collaborateurs.
-            </p>
+    <div class="container mx-auto grid grid-cols-2 gap-4">
+        <!-- Left Col: Trust I Send Text + Branding Section (1/2) -->
+        <div class="flex flex-col h-full">
+            <!-- Subgrid to split Trust I Send and Branding Section -->
+            <div class="grid grid-cols-2 h-full">
+                <!-- Trust I Send Text Container (Left Half) -->
+                <div class="threed-text-container relative flex flex-col justify-start items-start">
+                    <div class="threed-text">
+                        <span class="trigger-hover">Trust</span>
+                        <div class="falling-text delay-2 hidden"><span>I</span></div>
+                        <div class="falling-text delay-3 hidden"><span>Send</span></div>
+
+                        <!-- Move WHAT inside the same container -->
+                        <div id="what-popup" class="what-text hidden">WHAT</div>
+                    </div>
+                </div>
+
+                <!-- Branding Section (Right Half of Left Column) -->
+                <div class="flex flex-col justify-center items-start p-4">
+                    <h2 class="text-3xl font-bold text-white"></h2>
+                    <p class="mt-4 text-lg text-gray-200"></p>
+                </div>
+            </div>
         </div>
-        <!--Right Col-->
-        <div class="w-full md:w-3/5 py-6 text-center">
-            <img class="w-full md:w-4/5 z-50" src="https://i.postimg.cc/mZYtf2p5/hero.png">
+
+        <!-- Right Col: Image (1/2) -->
+        <div class="py-6 text-center flex items-center justify-center">
+            <!-- Ajuster le z-index de l'image pour qu'elle passe derrière la navbar -->
+            <img class="w-full md:w-4/5 z-10" src="/images/hero.png" alt="Image de sécurité">
         </div>
     </div>
 </div>
+
+
+
+
+
 <div class="relative -mt-12 lg:-mt-24">
     <svg viewBox="0 0 1428 174" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -107,7 +132,7 @@
 </div>
 <section class="bg-white border-b py-8">
     <div class="container max-w-5xl mx-auto m-8">
-        <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
+        <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800 js-show-on-scroll fade-target">
             TrustiSend
         </h2>
         <div class="w-full mb-4">
@@ -118,167 +143,96 @@
                 <h3 class="text-3xl text-gray-800 font-bold leading-none mb-3">
                     Qui sommes-nous ?
                 </h3>
-                <p class="text-gray-600 mb-8">
-                    Nous sommes une petite équipe de 4 jeunes ambitieux, à la pointe de la technologie et de la sécurité.
-                    <br />
-                    <br />
-
+                <p class="text-gray-600 mb-8 js-show-on-scroll fade-target">
+                    Nous sommes une petite équipe de 4 jeunes ambitieux, passionnés par l'innovation technologique et la sécurité numérique. Avec des expertises variées allant du développement logiciel à la gestion de la cybersécurité, nous avons uni nos forces pour créer TrustiSend, une plateforme de transfert de fichiers qui place la sécurité et la simplicité au cœur de son fonctionnement.
+                    <br /><br />
+                    Notre mission est de révolutionner la façon dont les entreprises et les particuliers partagent leurs documents en ligne, en offrant une solution rapide, fiable et sécurisée. Chaque membre de notre équipe apporte une expérience unique et un engagement envers l'excellence, ce qui nous permet de répondre efficacement aux besoins de nos utilisateurs et de continuer à innover. Chez TrustiSend, nous croyons que la protection des données ne doit jamais être un compromis, et nous nous engageons à fournir des outils à la hauteur de cette promesse.
                 </p>
             </div>
             <div class="w-full sm:w-1/2 p-6">
-
-                <img class="w-full sm:h-64 mx-auto" src="https://i.postimg.cc/vZqvrvWf/Capture.png">
-
+                <img class="w-full h-auto mx-auto object-contain js-show-on-scroll fade-target fade-right" src="https://i.postimg.cc/qRxhC1h0/Project-2-08.jpg">
             </div>
         </div>
         <div class="flex flex-wrap flex-col-reverse sm:flex-row">
             <div class="w-full sm:w-1/2 p-6 mt-6">
-                 <img class="w-full sm:h-64 mx-auto" src="https://i.postimg.cc/sD7Zw47b/Capture1.png">
+                <img class="w-full sm:h-64 mx-auto js-show-on-scroll fade-target fade-left" src="https://i.postimg.cc/R03zjhQH/311-generated.jpg">
             </div>
             <div class="w-full sm:w-1/2 p-6 mt-6">
                 <div class="align-middle">
                     <h3 class="text-3xl text-gray-800 font-bold leading-none mb-3">
                         Anti-virus protection
                     </h3>
-                    <p class="text-gray-600 mb-8">
-                        Aucun fichier détecté comme dangereux n'est partageable.
-                        <br />
-                        <br />
+                    <p class="text-gray-600 mb-8 js-show-on-scroll fade-target">
+                        Aucun fichier détecté comme dangereux n'est partageable. Chez TrustiSend, nous avons intégré des mécanismes de sécurité avancés pour garantir que chaque fichier téléchargé et partagé sur notre plateforme est minutieusement scanné par notre système antivirus de pointe. Ce processus automatique bloque immédiatement tout document suspect, empêchant ainsi la propagation de malwares, virus ou tout autre type de menace numérique.
+                        <br /><br />
+                        Notre technologie de protection évolue constamment pour rester en phase avec les nouvelles menaces du cyberespace, assurant à nos utilisateurs une tranquillité d'esprit totale. Ainsi, que vous partagiez des documents professionnels, des fichiers personnels ou des données sensibles, vous pouvez être certain que TrustiSend met tout en œuvre pour protéger vos échanges de bout en bout. La sécurité de vos fichiers est notre priorité absolue, et nous travaillons sans relâche pour garantir une expérience utilisateur sécurisée, sans compromis.
                     </p>
                 </div>
             </div>
         </div>
     </div>
 </section>
-<section class="bg-white border-b py-8">
-    <div class="container mx-auto flex flex-wrap pt-4 pb-12">
+
+<section class="bg-white border-b py-8 ">
+    <div class="container mx-auto flex flex-wrap pt-4 pb-12 js-show-on-scroll fade-target">
         <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
-            TrustiSend
+            Nos Principales Fonctionnalités
         </h2>
         <div class="w-full mb-4">
             <div class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
         </div>
-        <div class="w-full md:w-1/3 p-6 flex flex-col flex-grow flex-shrink">
-            <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
-                <a href="#" class="flex flex-wrap no-underline hover:no-underline">
-                    <div class="w-full font-bold text-xl text-gray-800 px-6">
-                        Partage de fichier
+        <!-- Feature 1 -->
+        <div class="w-full md:w-1/3 p-6 flex flex-col">
+            <div class="flex-1 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg p-6 shadow-lg transform transition duration-500 hover:scale-105">
+                <a href="#" class="no-underline hover:no-underline">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-white mr-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M4 3h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1zm1 2v10h10V5H5z" />
+                        </svg>
+                        <h3 class="text-2xl font-bold text-white">Partage de fichier</h3>
                     </div>
-                    <p class="text-gray-800 text-base px-6 mb-5">
-                        Partagez facilement vos fichiers jusqu’à 1Gb
-                        Les fichiers sont automatiquement supprimés après 30 jours d’inactivité
+                    <p class="text-white text-base">
+                        Partagez facilement vos fichiers jusqu’à 1Gb. Les fichiers sont automatiquement supprimés après 30 jours d’inactivité.
                     </p>
                 </a>
             </div>
         </div>
-        <div class="w-full md:w-1/3 p-6 flex flex-col flex-grow flex-shrink">
-            <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
-                <a href="#" class="flex flex-wrap no-underline hover:no-underline">
-                    <div class="w-full font-bold text-xl text-gray-800 px-6">
-                        Download sûr
+        <!-- Feature 2 -->
+        <div class="w-full md:w-1/3 p-6 flex flex-col">
+            <div class="flex-1 bg-gradient-to-br from-green-400 to-teal-500 rounded-lg p-6 shadow-lg transform transition duration-500 hover:scale-105">
+                <a href="#" class="no-underline hover:no-underline">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-white mr-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M10 2a6 6 0 00-6 6v2a2 2 0 01-2 2v2h12v-2a2 2 0 01-2-2V8a6 6 0 00-6-6zM5 14v2h2v-2H5zm4 0v2h2v-2H9zm4 0v2h2v-2h-2z" />
+                        </svg>
+                        <h3 class="text-2xl font-bold text-white">Download sûr</h3>
                     </div>
-                    <p class="text-gray-800 text-base px-6 mb-5">
-                        Tous les fichiers sont automatiquement scannés par un antivirus
-                        Aucun fichier détecté comme dangereux n’est partageable
+                    <p class="text-white text-base">
+                        Tous les fichiers sont automatiquement scannés par un antivirus. Aucun fichier détecté comme dangereux n’est partageable.
                     </p>
                 </a>
             </div>
         </div>
-        <div class="w-full md:w-1/3 p-6 flex flex-col flex-grow flex-shrink">
-            <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
-                <a href="#" class="flex flex-wrap no-underline hover:no-underline">
-                    <div class="w-full font-bold text-xl text-gray-800 px-6">
-                        Prise en main rapide et facile
+        <!-- Feature 3 -->
+        <div class="w-full md:w-1/3 p-6 flex flex-col">
+            <div class="flex-1 bg-gradient-to-br from-pink-500 to-red-500 rounded-lg p-6 shadow-lg transform transition duration-500 hover:scale-105">
+                <a href="#" class="no-underline hover:no-underline">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-white mr-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M12 4a4 4 0 01.832 7.912A5.98 5.98 0 0116 14v2h2v2H2v-2h2v-2a5.98 5.98 0 013.168-2.088A4 4 0 0112 4zm0 10H8v2h4v-2zM4 14h2v2H4v-2zm10 0h2v2h-2v-2z" />
+                        </svg>
+                        <h3 class="text-2xl font-bold text-white">Prise en main rapide</h3>
                     </div>
-                    <p class="text-gray-800 text-base px-6 mb-5">
-                        Connectez-vous et partagez vos fichiers rapidement avec votre compte Google ou GitHub
+                    <p class="text-white text-base">
+                        Connectez-vous et partagez vos fichiers rapidement avec votre compte Google ou GitHub.
                     </p>
                 </a>
             </div>
         </div>
     </div>
 </section>
-<section class="bg-gray-100 py-8">
-    <div class="container mx-auto px-2 pt-4 pb-12 text-gray-800">
-        <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
-            Pricing
-        </h2>
-        <div class="w-full mb-4">
-            <div class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
-        </div>
-        <div class="flex flex-col sm:flex-row justify-center pt-12 my-12 sm:my-4">
-            <div class="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
-                <div class="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
-                    <div class="p-8 text-3xl font-bold text-center border-b-4">
-                        Free
-                    </div>
-                    <ul class="w-full text-center text-sm">
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                    </ul>
-                </div>
-                <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                    <div class="w-full pt-6 text-3xl text-gray-600 font-bold text-center">
-                        £0
-                        <span class="text-base">for one user</span>
-                    </div>
-                    <div class="flex items-center justify-center">
-                        <button class="mx-auto lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                            Sign Up
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 shadow-lg z-10">
-                <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
-                    <div class="w-full p-8 text-3xl font-bold text-center">Basic</div>
-                    <div class="h-1 w-full gradient my-0 py-0 rounded-t"></div>
-                    <ul class="w-full text-center text-base font-bold">
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                    </ul>
-                </div>
-                <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                    <div class="w-full pt-6 text-4xl font-bold text-center">
-                        £x.99
-                        <span class="text-base">/ per user</span>
-                    </div>
-                    <div class="flex items-center justify-center">
-                        <button class="mx-auto lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                            Sign Up
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
-                <div class="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
-                    <div class="p-8 text-3xl font-bold text-center border-b-4">
-                        Pro
-                    </div>
-                    <ul class="w-full text-center text-sm">
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                        <li class="border-b py-4">Thing</li>
-                    </ul>
-                </div>
-                <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                    <div class="w-full pt-6 text-3xl text-gray-600 font-bold text-center">
-                        £x.99
-                        <span class="text-base">/ per user</span>
-                    </div>
-                    <div class="flex items-center justify-center">
-                        <button class="mx-auto lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                            Sign Up
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+
+
 <!-- Change the colour #f8fafc to match the previous section colour -->
 <svg class="wave-top" viewBox="0 0 1439 147" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -301,7 +255,7 @@
         </g>
     </g>
 </svg>
-<section class="container mx-auto text-center py-6 mb-12">
+<section class="container mx-auto text-center py-6 mb-12 js-show-on-scroll fade-target">
     <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-white">
         Want to try ?
     </h2>
@@ -311,9 +265,13 @@
     <h3 class="my-4 text-3xl leading-tight">
         Il est temps d'essayer.
     </h3>
-    <button class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-        Clic pour tester !
-    </button>
+
+    <a href="/login">
+        <button class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+            Clic pour tester !
+        </button>
+    </a>
+
 </section>
 <!--Footer-->
 <footer class="bg-white">
@@ -336,13 +294,13 @@
                 <p class="uppercase text-gray-500 md:mb-6">Links</p>
                 <ul class="list-reset mb-6">
                     <li class="mt-2 inline-block mr-2 md:block md:mr-0">
-                        <a href="#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">FAQ</a>
+                        <a href="/faq" class="no-underline hover:underline text-gray-800 hover:text-pink-500">FAQ</a>
                     </li>
                     <li class="mt-2 inline-block mr-2 md:block md:mr-0">
-                        <a href="#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Help</a>
+                        <a href="/#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Help</a>
                     </li>
                     <li class="mt-2 inline-block mr-2 md:block md:mr-0">
-                        <a href="#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Support</a>
+                        <a href="/#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Support</a>
                     </li>
                 </ul>
             </div>
@@ -350,10 +308,10 @@
                 <p class="uppercase text-gray-500 md:mb-6">Legal</p>
                 <ul class="list-reset mb-6">
                     <li class="mt-2 inline-block mr-2 md:block md:mr-0">
-                        <a href="#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Terms</a>
+                        <a href="https://www.termsfeed.com/live/e86b25de-50be-4c1b-b5ee-c65080b2bd5f" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Terms</a>
                     </li>
                     <li class="mt-2 inline-block mr-2 md:block md:mr-0">
-                        <a href="#" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Privacy</a>
+                        <a href="https://www.privacypolicies.com/live/701346aa-136e-4a6e-bca3-deea2d36515c" class="no-underline hover:underline text-gray-800 hover:text-pink-500">Privacy</a>
                     </li>
                 </ul>
             </div>
@@ -473,5 +431,92 @@
         return false;
     }
 </script>
+
+<script>
+    const callback = (entries) => {
+        entries.forEach((entry) => {
+            const target = entry.target;
+
+            // Calcule le pourcentage d'intersection (0 à 1) pour dynamiser l'animation
+            const progress = Math.min(Math.max(entry.intersectionRatio, 0), 1);
+
+            if (entry.isIntersecting) {
+                // Applique les transformations en fonction du pourcentage d'intersection pour une animation dynamique
+                if (target.classList.contains('fade-left')) {
+                    target.style.transform = `translateX(${(1 - progress) * -100}%)`;
+                    target.style.opacity = progress;
+                } else if (target.classList.contains('fade-right')) {
+                    target.style.transform = `translateX(${(1 - progress) * 100}%)`;
+                    target.style.opacity = progress;
+                } else {
+                    target.style.opacity = progress;
+                    target.style.transform = `translateY(${(1 - progress) * 20}px)`;
+                }
+            } else {
+                // Réinitialise les styles lorsque l'élément sort du champ de vision
+                target.style.opacity = 0;
+                target.style.transform = '';
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(callback, {
+        threshold: Array.from({ length: 101 }, (_, i) => i / 100), // Définir plusieurs seuils pour une animation fluide
+    });
+
+    // Sélectionner tous les éléments avec la classe `js-show-on-scroll`
+    const targets = document.querySelectorAll('.js-show-on-scroll.fade-target');
+    targets.forEach((target) => {
+        // Ajouter une opacité initiale pour que les éléments soient invisibles avant l'animation
+        target.style.opacity = 0;
+        observer.observe(target);
+    });
+</script>
+
+
+
+
+<script>
+    document.querySelector('.trigger-hover').addEventListener('mouseover', function() {
+        // Animer le changement de couleur de Trust
+        this.classList.add('color-animate');
+
+        // Attendre que le changement de couleur de "Trust" soit visible
+        setTimeout(() => {
+            // Animer "WHAT" au centre de l'écran
+            const whatElement = document.getElementById('what-popup');
+            whatElement.classList.remove('hidden');
+            whatElement.classList.add('animate');
+
+            // Attendre que l'animation de "WHAT" se termine avant de continuer
+            setTimeout(() => {
+                // Afficher et animer "I" après un court délai
+                const iElement = document.querySelector('.falling-text.delay-2');
+                const sendElement = document.querySelector('.falling-text.delay-3');
+
+                // Afficher et animer "I"
+                iElement.classList.remove('hidden');
+                iElement.classList.add('animate');
+
+                // Afficher et animer "Send" après un délai supplémentaire
+                setTimeout(() => {
+                    sendElement.classList.remove('hidden');
+                    sendElement.classList.add('animate');
+                }, 400); // Ajustez le délai pour que Send tombe après I
+            }, 1200); // Temps de l'animation de "WHAT" (1.2 secondes)
+        }, 400); // Délai pour voir la couleur verte de Trust avant l'apparition de WHAT
+    });
+</script>
+
+
+<script>
+    // Script pour inverser les couleurs
+    document.getElementById('invert-dark-mode-toggle').addEventListener('click', function() {
+        document.documentElement.style.filter = document.documentElement.style.filter ? '' : 'invert(100%)';
+    });
+</script>
+
+
+
 </body>
 </html>
