@@ -51,7 +51,9 @@ public class DataBucketUtil {
 
         try{
             byte[] fileData = FileUtils.readFileToByteArray(convertFile(multipartFile));
+
             String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+
             GoogleCredentials credentials = GoogleCredentials.fromStream(
                     new ByteArrayInputStream(credentialsJson.getBytes())
             );
@@ -77,10 +79,14 @@ public class DataBucketUtil {
 
     public File downloadFile(String uID, String fileName){
         try{
-            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+
+            GoogleCredentials credentials = GoogleCredentials.fromStream(
+                    new ByteArrayInputStream(credentialsJson.getBytes())
+            );
 
             StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
-                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
+                    .setCredentials(credentials).build();
 
             Storage storage = options.getService();
             Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
@@ -110,10 +116,14 @@ public class DataBucketUtil {
     //@TODO test
     public List<File> downloadFolder(String uID){
         try{
-            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+
+            GoogleCredentials credentials = GoogleCredentials.fromStream(
+                    new ByteArrayInputStream(credentialsJson.getBytes())
+            );
 
             StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
-                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
+                    .setCredentials(credentials).build();
 
             Storage storage = options.getService();
             Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
@@ -140,10 +150,14 @@ public class DataBucketUtil {
 
     public boolean deleteFile(String uID, String fileName){
         try{
-            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+
+            GoogleCredentials credentials = GoogleCredentials.fromStream(
+                    new ByteArrayInputStream(credentialsJson.getBytes())
+            );
 
             StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
-                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
+                    .setCredentials(credentials).build();
 
             Storage storage = options.getService();
             Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
@@ -170,10 +184,14 @@ public class DataBucketUtil {
     //@TODO test
     public boolean deleteFolder(String uID){
         try{
-            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+
+            GoogleCredentials credentials = GoogleCredentials.fromStream(
+                    new ByteArrayInputStream(credentialsJson.getBytes())
+            );
 
             StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
-                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
+                    .setCredentials(credentials).build();
 
             Storage storage = options.getService();
             Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
