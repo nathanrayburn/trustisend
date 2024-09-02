@@ -18,7 +18,8 @@
             "mainClass": "dev.test.social_login.SocialLoginApplication",
             "projectName": "social-login",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=2286 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=social-login"
         },
         {
             "type": "java",
@@ -27,6 +28,16 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "dev.test.trustisend.TrustiSendApplication",
             "projectName": "dev.test-social-login",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-TrustiSendApplication<trustisend>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "dev.test.trustisend.TrustiSendApplication",
+            "projectName": "trustisend",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }

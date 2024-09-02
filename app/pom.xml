@@ -109,12 +109,6 @@
 		</dependency>
 	</dependencies>
 
-	<dependency>
-		<groupId>org.springframework</groupId>
-		<artifactId>spring-webmvc</artifactId>
-		<version>6.1.12</version>
-	</dependency>
-
 	<build>
 		<plugins>
 			<plugin>
