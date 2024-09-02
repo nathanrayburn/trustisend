@@ -102,7 +102,6 @@ def sendToAPI(file):
 
     response = requests.post(url, files=files, headers=headers)
 
-    print(response.text)
     return response
 
 
@@ -173,7 +172,6 @@ def handleFile(file_uuid, data):
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
-        print(response.text)
         res = response.json()
         if res['data']['attributes']['status'] == "completed":
             status = FileScanStatus.PENDING
