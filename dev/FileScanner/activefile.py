@@ -1,4 +1,3 @@
-import group as Group
 
 class ActiveFile():
     def __init__(self, group_uuid, file_uuid, path, scan_status):

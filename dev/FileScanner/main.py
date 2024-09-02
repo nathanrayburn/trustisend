@@ -7,6 +7,8 @@ import requests
 from activefile import ActiveFile
 import json
 import schedule
+import threading  # Import threading
+import time  # Import time for the scheduler loop
 
 app = Flask(__name__)
 
@@ -30,7 +32,6 @@ db = firestore.Client.from_service_account_json(data['firestore']['credentials']
                                                 database=data['firestore']['databaseID'])
 storage_client = storage.Client.from_service_account_json(data['storage']['credentials'])
 bucketName = data['storage']['bucket']
-
 
 
 def getActiveFilesFromFirestore():
@@ -157,7 +158,9 @@ def followUpFileAnalysis():
 
     # Remove the keys after the iteration is complete
     for key in keys_to_remove:
+        print(f"Removing file {key} from hashmap")
         hashmap.pop(key)
+        print("Hashmap after removal: ", hashmap)
 
 
 def handleFile(file_uuid, data):
@@ -197,46 +200,64 @@ def handleFile(file_uuid, data):
 
 
 def scanNewFiles():
-    # get all files from firestore that have scanStatus = PENDING
-    activeFiles = getActiveFilesFromFirestore()
+    try:
+        # Get all files from Firestore that have scanStatus = PENDING
+        activeFiles = getActiveFilesFromFirestore()
+        # Remove files that are in the hashmap
+        activeFiles = [file for file in activeFiles if file.file_uuid not in hashmap]
+        if not activeFiles:
+            print("No files found with PENDING status.")
+            return  # Return early if no files to process
 
-    if not activeFiles:
-        print("No files found with PENDING status.")
-        return  # Return early if no files to process
+        # Select the first n oldest files
+        filesToScan = selectFirstOldestFiles(data['antivirus']['file-scan-limit'], activeFiles)
+        for file in filesToScan:
+            print(file.group_uuid, file.file_uuid, file.path, file.scan_status)
 
-    for file in activeFiles:
-        print(file.group_uuid, file.file_uuid, file.path, file.scan_status)
+        # Get the files from cloud storage
+        downloadFilesFromCloudStorage(filesToScan)
 
-    # select the first n oldest files
-    filesToScan = selectFirstOldestFiles(data['antivirus']['file-scan-limit'], activeFiles)
-    for file in filesToScan:
-        print(file.group_uuid, file.file_uuid, file.path, file.scan_status)
+        # Scan and update the scanStatus in Firestore
+        for file in filesToScan:
+            res = sendToAPI(file)
+            if res.status_code == 200:
+                associateFileToAnalysisID(file, res.json()['data'])
+            else:
+                db.collection("files").document(file.file_uuid).update({"scanStatus": FileScanStatus.ERROR.value})
 
-    # get the files from cloud storage
-    downloadFilesFromCloudStorage(filesToScan)
+        # Remove the files from the temp directory
+        for file in filesToScan:
+            try:
+                os.remove(tempDirectory + file.file_uuid + "." + getExtension(file.path))
+            except OSError as e:
+                print(f"Error deleting file {file.file_uuid}: {e}")
 
-    # scan and update the scanStatus in firestore
-    for file in filesToScan:
-        res = sendToAPI(file)
-        if res.status_code == 200:
-            associateFileToAnalysisID(file, res.json()['data'])
-        else:
-            db.collection("files").document(file.file_uuid).update({"scanStatus": FileScanStatus.ERROR.value})
+    except Exception as e:
+        print(f"An error occurred while scanning files: {e}")
+        import traceback
+        traceback.print_exc()
 
-    # remove the files from the temp directory
-    for file in filesToScan:
+
+def safe_execution(task_function):
+    def wrapper():
         try:
-            os.remove(tempDirectory + file.file_uuid + "." + getExtension(file.path))
-        except OSError as e:
-            print(f"Error deleting file {file.file_uuid}: {e}")
-
-    followUpFileAnalysis()
-
-
-#scanNewFiles()
+            task_function()
+        except Exception as e:
+            print(f"An error occurred in scheduled task {task_function.__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+    return wrapper
 
 
-# schedule.every(70).seconds.do(scanNewFiles)
+# Schedule the scanNewFiles function to run every minute using the safe_execution wrapper
+schedule.every(1).minutes.do(safe_execution(scanNewFiles))
+schedule.every(1).minutes.do(safe_execution(followUpFileAnalysis))
+
+def run_scheduler():
+    while True:
+        schedule.run_pending()  # Check if any scheduled tasks are due to run
+        time.sleep(1)  # Sleep for a short time to prevent high CPU usage
+
 
 @app.route('/')
 def home():
@@ -245,4 +266,10 @@ def home():
 
 
 if __name__ == '__main__':
+    # Start the scheduler thread
+    scheduler_thread = threading.Thread(target=run_scheduler)
+    scheduler_thread.daemon = True  # Daemonize thread to ensure it exits when main program exits
+    scheduler_thread.start()
+
+    # Start the Flask application
     app.run(debug=True)
