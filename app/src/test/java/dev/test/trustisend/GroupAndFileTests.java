@@ -11,13 +11,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -139,8 +142,36 @@ public class GroupAndFileTests {
     }
 
     @Test
-    void downloadMultipleFiles() {
-        assertEquals(0, 0);  // Implement this test as needed
+    @Order(7)
+    void downloadAndDeleteMultipleFiles() throws IOException{
+        //setup
+
+        List<String> filenames = new ArrayList<>();
+
+        for(int i = 0; i<2; ++i){
+            Path tempPath = createTempFile("multipledownloadtest", ".txt", "Upload test file");
+
+            MultipartFile tempFile = createMultipartFile(tempPath);
+            try {
+                firestoreUtil.createActiveFile(testActiveFile);  // Ensure the file exists
+                dataBucketUtil.uploadFile(tempFile, tempFile.getOriginalFilename(), Files.probeContentType(tempPath), testGroup.getGroupUUID());
+            } catch (Exception e) {
+                fail("Exception occurred during file upload: " + e.getMessage());
+            } finally {
+                filenames.add(tempPath.getFileName().toString());
+                Files.deleteIfExists(tempPath);
+            }
+        }
+
+        List<File> files = dataBucketUtil.downloadFolder(testGroup.getGroupUUID());
+
+        assertEquals(files.size(), 2);
+
+        for(File file : files){
+            assert(filenames.contains(file.getName()));
+        }
+
+        dataBucketUtil.deleteFolder(testGroup.getGroupUUID());
     }
 
     @Test

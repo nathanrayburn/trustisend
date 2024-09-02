@@ -134,7 +134,7 @@ public class DataBucketUtil {
             for (Blob blob: blobs.getValues()) {
                 String blobName = blob.getName();
                 if (blobName.contains(uID)) {
-                    File downloadedFile = new File(blobName.substring(blobName.lastIndexOf('/')));
+                    File downloadedFile = new File(blobName.substring(blobName.lastIndexOf('/')+1));
                     FileOutputStream outputStream = new FileOutputStream(downloadedFile);
                     outputStream.write(blob.getContent());
                     outputStream.close();
