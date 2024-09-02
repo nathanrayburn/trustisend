@@ -38,16 +38,16 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
             .anyRequest().authenticated()
         )
         .formLogin(form -> form
-            .loginPage("/login.html")
+            .loginPage("/login")
             .loginProcessingUrl("/perform_login")
             .defaultSuccessUrl("/home", true) // Ensure this points to /home
-            .failureUrl("/login.html?error=true")
+            .failureUrl("/login?error=true")
             .permitAll()
         )
         .logout(logout -> logout
             .logoutUrl("/perform_logout")
             .deleteCookies("JSESSIONID")
-            .logoutSuccessUrl("/login.html?logout=true")
+            .logoutSuccessUrl("/login?logout=true")
             .permitAll()
         );
     return http.build();

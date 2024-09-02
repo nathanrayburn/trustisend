@@ -28,6 +28,12 @@ public class  HomeController {
     public String login(Model model){
         return "login";
     }
+
+    @GetMapping("/upload")
+    public String upload(Model model){
+        return "upload";
+    }
+
     @GetMapping("/home")
     public String home(@AuthenticationPrincipal User user, Model model) {
 
