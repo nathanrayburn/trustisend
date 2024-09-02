@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
@@ -64,7 +66,7 @@ public class DataBucketUtil {
             }
 
         }catch (Exception e){
-            throw new GCPFileUploadException("An error occurred while storing data to GCS");
+            throw new GCPFileUploadException("An error occurred while storing data to GCS: " + e.getMessage());
         }
         throw new GCPFileUploadException("An error occurred while storing data to GCS");
     }
@@ -101,6 +103,37 @@ public class DataBucketUtil {
         throw new BadRequestException("download failed");
     }
 
+    //@TODO test
+    public List<File> downloadFolder(String uID){
+        try{
+            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
+
+            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
+                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
+
+            Storage storage = options.getService();
+            Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
+
+            List<File> files = new ArrayList<>();
+            //search the right blobs
+            Page<Blob> blobs = bucket.list();
+            for (Blob blob: blobs.getValues()) {
+                String blobName = blob.getName();
+                if (blobName.contains(uID)) {
+                    File downloadedFile = new File(blobName.substring(blobName.lastIndexOf('/')));
+                    FileOutputStream outputStream = new FileOutputStream(downloadedFile);
+                    outputStream.write(blob.getContent());
+                    outputStream.close();
+                    files.add(downloadedFile);
+                }
+            }
+            return files;
+        }catch(Exception e){
+
+        }
+        throw new BadRequestException("download failed");
+    }
+
     public boolean deleteFile(String uID, String fileName){
         try{
             InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
@@ -128,6 +161,32 @@ public class DataBucketUtil {
             throw new BadRequestException("error while deleting");
         }
         throw new BadRequestException("error while deleting");
+    }
+
+    //@TODO test
+    public boolean deleteFolder(String uID){
+        try{
+            InputStream inputStream = new ClassPathResource(gcpConfigFile).getInputStream();
+
+            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
+                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
+
+            Storage storage = options.getService();
+            Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
+
+            //search the right blobs
+            Page<Blob> blobs = bucket.list();
+            for (Blob blob: blobs.getValues()) {
+                String blobName = blob.getName();
+                if (blobName.contains(uID)) {
+                    blob.delete();
+                }
+            }
+            return true;
+
+        }catch(Exception e){
+            throw new BadRequestException("error while deleting");
+        }
     }
 
     /**

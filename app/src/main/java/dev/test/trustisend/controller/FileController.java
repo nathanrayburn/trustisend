@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -46,15 +47,43 @@ public class FileController {
                 .body(resource);
     }
 
+
+    //@TODO test
+    @GetMapping("/{uid}")
+    ResponseEntity<Resource> getFolder(@PathVariable String uID) throws IOException {
+
+        File folder = fileService.downloadFolder(uID);
+
+        Path path = Paths.get(folder.getAbsolutePath());
+        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+
+        return ResponseEntity.ok()
+                .contentLength(folder.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
     @DeleteMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     ResponseEntity<?> deleteFile(@RequestParam("uid")String uID, @RequestParam("filename")String fileName) throws IOException{
         if(fileService.deleteFile(uID, fileName)){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        else{
             return new ResponseEntity<>(HttpStatus.OK);
         }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
+    }
+
+    //@TODO test
+    @DeleteMapping("/{uid}")
+    ResponseEntity<Resource> deleteFolder(@PathVariable String uID) throws IOException {
+
+        if(fileService.deleteFolder(uID)){
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
 

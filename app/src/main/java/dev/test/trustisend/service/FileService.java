@@ -6,11 +6,11 @@ import dev.test.trustisend.entity.InputFile;
 import dev.test.trustisend.exception.BadRequestException;
 import dev.test.trustisend.exception.GCPFileUploadException;
 import dev.test.trustisend.util.DataBucketUtil;
+import dev.test.trustisend.util.Zipper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import java.io.File;
 import java.nio.file.Files;
@@ -37,7 +37,7 @@ public class FileService{
             if(originalFileName == null){
                 throw new BadRequestException("Original file name is null");
             }
-            
+
             Path path = new File(originalFileName).toPath();
 
             try {
@@ -66,6 +66,15 @@ public class FileService{
         return dataBucketUtil.downloadFile(uID, fileName);
     }
 
+    //@TODO test
+    public File downloadFolder(String uID){
+        if(uID == null || uID.isEmpty()){
+            throw new BadRequestException("uID is null");
+        }
+
+        return Zipper.zip(dataBucketUtil.downloadFolder(uID), uID);
+    }
+
     public boolean deleteFile(String uID, String fileName){
         if(fileName == null){
             throw new BadRequestException("filename is null");
@@ -74,5 +83,13 @@ public class FileService{
             uID = "";
         }
         return dataBucketUtil.deleteFile(uID, fileName);
+    }
+
+    //@TODO test
+    public boolean deleteFolder(String uID){
+        if(uID == null || uID.isEmpty()){
+            throw new BadRequestException("uID is empty or null");
+        }
+        return dataBucketUtil.deleteFolder(uID);
     }
 }
