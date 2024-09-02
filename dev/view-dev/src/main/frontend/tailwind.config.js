@@ -7,9 +7,9 @@ module.exports = {
         sans: ['Source Sans Pro', 'sans-serif'],
       },
       animation: {
-        fadeIn: "fadeIn 9s ease-in forwards",
+        fadeIn: "fadeIn 15s ease-in forwards",
         slideInLeft: "slideInLeft 3.8s ease-out forwards", // Ajouté slideInLeft
-        slideInRight: "slideInRight 1.8s ease-out forwards", // Ajouté slideInRight
+        slideInRight: "slideInRight 3.8s ease-out forwards", // Ajouté slideInRight
       },
       keyframes: {
         fadeIn: {
@@ -27,7 +27,6 @@ module.exports = {
       },
     },
   },
-  darkMode: 'class',
   plugins: [],
   variants: {
     animation: ["motion-safe"],
