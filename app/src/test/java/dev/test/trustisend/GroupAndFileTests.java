@@ -1,21 +1,36 @@
 package dev.test.trustisend;
 
 import dev.test.trustisend.entity.ActiveFile;
+import dev.test.trustisend.entity.FileScanStatus;
 import dev.test.trustisend.entity.Group;
 import dev.test.trustisend.util.FirestoreUtil;
+import dev.test.trustisend.util.DataBucketUtil;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GroupAndFileTests {
     @Autowired
     private FirestoreUtil firestoreUtil;
+
+    @Autowired
+    private DataBucketUtil dataBucketUtil;
+
     private static Group group;
     private static LinkedList<ActiveFile> activeFiles = new LinkedList<>();
 
@@ -39,7 +54,7 @@ public class GroupAndFileTests {
     @Test
     @Order(2)
     void createActiveFile() {
-        ActiveFile activeFile = new ActiveFile(group, "file1.txt");
+        ActiveFile activeFile = new ActiveFile(group, "file1.txt", FileScanStatus.PENDING);
 
         try {
             activeFiles.add(firestoreUtil.createActiveFile(activeFile));
@@ -102,8 +117,8 @@ public class GroupAndFileTests {
             Assertions.fail("Exception occurred during group creation: " + e.getMessage());
         }
 
-        ActiveFile activeFile = new ActiveFile(group, "file1.txt");
-        ActiveFile activeFile2 = new ActiveFile(group, "file2.txt");
+        ActiveFile activeFile = new ActiveFile(group, "file1.txt", FileScanStatus.PENDING);
+        ActiveFile activeFile2 = new ActiveFile(group, "file2.txt", FileScanStatus.PENDING);
         activeFiles.add(activeFile);
         activeFiles.add(activeFile2);
 
@@ -117,5 +132,55 @@ public class GroupAndFileTests {
             e.printStackTrace();
             Assertions.fail("Exception occurred during active file creation: " + e.getMessage());
         }
+    }
+    private Path createTempFile(String prefix, String suffix, String content) throws IOException {
+        Path tempFile = Files.createTempFile(prefix,suffix);
+        Files.writeString(tempFile, content, StandardOpenOption.WRITE);
+
+        return tempFile;
+    }
+    private MultipartFile createMultipartFile(Path path) throws IOException{
+        String filename = path.getFileName().toString();
+        String contentType = Files.probeContentType(path);
+        byte[] content = Files.readAllBytes(path);
+        return new MockMultipartFile("file", filename, contentType, content);
+
+    }
+    @Test
+    @Order(6)
+    void uploadSingleFile() throws IOException {
+
+        Path tempPath = createTempFile("single-upload", ".txt", "Upload test file");
+        MultipartFile tempFile = createMultipartFile(tempPath);
+        try{
+            ActiveFile activeFile = new ActiveFile(group, tempPath.getFileName().toString(), FileScanStatus.PENDING);
+            firestoreUtil.createActiveFile(activeFile);
+            dataBucketUtil.uploadFile(tempFile, tempFile.getOriginalFilename(), Files.probeContentType(tempPath), group.getGroupUUID());
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+            Assertions.fail("Exception occurred during file upload: " + e.getMessage());
+        }
+
+
+        Files.deleteIfExists(tempPath);
+    }
+
+    @Test
+    void downloadMultipleFiles(){
+        assertEquals(0,0);
+    }
+
+    @Test
+    void invalidFileTypeUpload() throws IOException {
+        Path tempPath = createTempFile("single-upload", ".txt", "Upload test file");
+        MultipartFile tempFile = createMultipartFile(tempPath);
+
+        assertThrows(Exception.class, () -> {
+            dataBucketUtil.uploadFile(tempFile, tempFile.getOriginalFilename(), Files.probeContentType(tempPath));
+        });
+
+        Files.deleteIfExists(tempPath);
     }
 }
