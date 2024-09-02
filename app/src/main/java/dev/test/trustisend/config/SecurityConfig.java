@@ -33,7 +33,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .csrf()
             .disable()
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/", "/login", "/login.html", "/perform_login", "/css/**", "/js/**").permitAll()
+            .requestMatchers("/", "/login", "/login.html", "/perform_login", "/css/**", "/js/**",  "/images/**").permitAll()
             .requestMatchers("/home").authenticated() // Ensuring that only authenticated users can access /home
             .anyRequest().authenticated()
         )
