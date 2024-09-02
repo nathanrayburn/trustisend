@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>My Files - TrustiSend</title>
+    <link th:href="@{/main.css}" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet" />
+    <style>
+        .background {
+            background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+        }
+        .table-container {
+            margin-top: 20px;
+            background-color: #2e4a66;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #40596f;
+        }
+        .table th {
+            background-color: #345270;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        .table td a {
+            color: #d53369;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .table td a:hover {
+            text-decoration: underline;
+        }
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body class="leading-normal tracking-normal text-white background h-screen" style="font-family: 'Source Sans Pro', sans-serif;">
+<!-- Nav -->
+<nav id="header" class="fixed w-full z-30 top-0 text-white bg-white shadow">
+    <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
+        <div class="pl-4 flex items-center">
+            <a class="toggleColour text-gray-800 no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/#">
+                <svg class="h-8 fill-current inline" xmlns="http://www.potlabicons.com/" viewBox="0 0 512.005 512.005">
+                    <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" />
+                    <path d="M510.7 189.151C505.271 168.95 484.565 156.956 464.365 162.385L330.156 198.367 155.924 35.878 107.19 49.008 211.729 230.183 86.232 263.767 36.614 224.754 0 234.603 45.957 314.27 65.274 347.727 105.802 336.869 240.011 300.886 349.726 271.469 483.935 235.486C504.134 230.057 516.129 209.352 510.7 189.151Z" />
+                </svg>
+                TrustiSend
+            </a>
+        </div>
+        <div class="pr-4 flex items-center">
+            <a href="/#" class="text-red-500 hover:text-red-700 font-bold mr-4">Sign Out</a>
+            <span class="text-gray-800 font-bold">Gaythan</span>
+        </div>
+    </div>
+</nav>
+
+<!-- My Files Section -->
+<div class="container mx-auto mt-24">
+    <div class="table-container">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Filename</th>
+                <th>Upload Date</th>
+                <th>Downloads</th>
+                <th>Virus Check</th>
+                <th>Links</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Document.pdf</td>
+                <td>03/07/2024</td>
+                <td>12</td>
+                <td><img src="/icons/check-circle.svg" alt="Checked" class="icon"></td>
+                <td><a href="/download/document.pdf"><img src="/icons/link.svg" alt="Download" class="icon"></a></td>
+            </tr>
+            <tr>
+                <td>video.mp4</td>
+                <td>01/08/2024</td>
+                <td>1</td>
+                <td><img src="/icons/check-circle.svg" alt="Checked" class="icon"></td>
+                <td><a href="/download/video.mp4"><img src="/icons/link.svg" alt="Download" class="icon"></a></td>
+            </tr>
+            <tr>
+                <td>music.mp3</td>
+                <td>21/08/2024</td>
+                <td>0</td>
+                <td><img src="/icons/clock.svg" alt="Pending" class="icon"></td>
+                <td><a href="/download/music.mp3"><img src="/icons/link.svg" alt="Download" class="icon"></a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

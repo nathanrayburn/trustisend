@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Download - TrustiSend</title>
+    <link th:href="@{/main.css}" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet" />
+    <style>
+        .background {
+            background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+        }
+        .download-box {
+            background-color: #345270;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 60%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .file-info {
+            background-color: #2e4a66;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+        .file-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .file-meta {
+            font-size: 14px;
+            color: #c1c1c1;
+        }
+        .button-group {
+            display: flex;
+            gap: 20px;
+        }
+        .action-button {
+            background-color: #d53369;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            display: inline-block;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .action-button:hover {
+            background-color: #daae51;
+        }
+    </style>
+</head>
+<body class="leading-normal tracking-normal text-white background h-screen" style="font-family: 'Source Sans Pro', sans-serif;">
+<!-- Nav -->
+<nav id="header" class="fixed w-full z-30 top-0 text-white bg-white shadow">
+    <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
+        <div class="pl-4 flex items-center">
+            <a class="toggleColour text-gray-800 no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/#">
+                <svg class="h-8 fill-current inline" xmlns="http://www.potlabicons.com/" viewBox="0 0 512.005 512.005">
+                    <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" />
+                    <path d="M510.7 189.151C505.271 168.95 484.565 156.956 464.365 162.385L330.156 198.367 155.924 35.878 107.19 49.008 211.729 230.183 86.232 263.767 36.614 224.754 0 234.603 45.957 314.27 65.274 347.727 105.802 336.869 240.011 300.886 349.726 271.469 483.935 235.486C504.134 230.057 516.129 209.352 510.7 189.151Z" />
+                </svg>
+                TrustiSend
+            </a>
+        </div>
+        <div class="pr-4 flex items-center">
+            <a href="/#" class="text-red-500 hover:text-red-700 font-bold mr-4">Sign Out</a>
+            <span class="text-gray-800 font-bold">Gaythan</span>
+        </div>
+    </div>
+</nav>
+
+<!-- Download Section -->
+<div class="flex items-center justify-center h-screen">
+    <div class="download-box">
+        <div class="file-info">
+            <img src="/icons/pdf-icon.svg" alt="PDF Icon" class="file-icon">
+            <div class="file-name">Document.pdf</div>
+            <div class="file-meta">Uploaded by User</div>
+            <div class="file-meta">Uploaded on January 1, 2023 at 11:14</div>
+        </div>
+        <div class="button-group">
+            <a href="/preview/document.pdf" class="action-button">
+                <svg class="inline w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553 4.553a1 1 0 0 1-1.415 1.414l-5.906-5.906a4 4 0 1 1 1.415-1.414L20 14v3h-3l-7.53-7.53A4.001 4.001 0 0 1 15 10z"></path>
+                </svg>
+                Preview
+            </a>
+            <a href="/download/document.pdf" class="action-button">
+                <svg class="inline w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-3-3m3 3l3-3m6 7H6"></path>
+                </svg>
+                Download
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
