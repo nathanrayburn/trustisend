@@ -27,37 +27,30 @@ import java.nio.file.Paths;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-        http.csrf()
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf()
             .disable()
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/login", "/login.html", "/perform_login", "/css/**", "/js/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login.html")
-                .loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/home.html", true)
-                .failureUrl("/login.html?error=true")
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/perform_logout")
-                .deleteCookies("JSESSIONID")
-                .logoutSuccessHandler(logoutSuccessHandler())
-            );
-        return http.build();
-    }
-
-    @Bean
-    public AuthenticationManager authManager(HttpSecurity http, FirestoreUserDetailsService firestoreUserDetailsService, PasswordEncoder passwordEncoder) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(firestoreUserDetailsService)
-                .passwordEncoder(passwordEncoder)
-                .and()
-                .build();
-    }
+        .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers("/", "/login", "/login.html", "/perform_login", "/css/**", "/js/**").permitAll()
+            .requestMatchers("/home").authenticated() // Ensuring that only authenticated users can access /home
+            .anyRequest().authenticated()
+        )
+        .formLogin(form -> form
+            .loginPage("/login.html")
+            .loginProcessingUrl("/perform_login")
+            .defaultSuccessUrl("/home", true) // Ensure this points to /home
+            .failureUrl("/login.html?error=true")
+            .permitAll()
+        )
+        .logout(logout -> logout
+            .logoutUrl("/perform_logout")
+            .deleteCookies("JSESSIONID")
+            .logoutSuccessUrl("/login.html?logout=true")
+            .permitAll()
+        );
+    return http.build();
+}
 
     @Bean
     public PasswordEncoder passwordEncoder() {

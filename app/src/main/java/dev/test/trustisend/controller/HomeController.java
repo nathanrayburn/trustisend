@@ -30,14 +30,15 @@ public class  HomeController {
     }
     @GetMapping("/home")
     public String home(@AuthenticationPrincipal User user, Model model) {
+
         if (user != null) {
             String email = user.getEmail();
 
             System.out.println("User email: " + email);
-
             model.addAttribute("email", email);
         } else {
             model.addAttribute("email", "Guest");
+
         }
         return "home";
     }
