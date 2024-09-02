@@ -23,20 +23,28 @@
 
 </head>
 <body class="leading-normal tracking-normal text-white gradient" style="font-family: 'Source Sans Pro', sans-serif;">
-<!--Nav-->
+<!-- Nav  -->
 <nav id="header" class="fixed w-full z-30 top-0 text-white">
     <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
         <div class="pl-4 flex items-center">
             <a class="toggleColour text-white no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/#">
-                <!--Icon from: http://www.potlabicons.com/ -->
+                <!-- Icone TrustiSend -->
                 <svg class="h-8 fill-current inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.005 512.005">
                     <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" transform="matrix(1,0,0,1,0,0)" />
-                    <path class="plane-take-off"
-                          d=" M 510.7 189.151 C 505.271 168.95 484.565 156.956 464.365 162.385 L 330.156 198.367 L 155.924 35.878 L 107.19 49.008 L 211.729 230.183 L 86.232 263.767 L 36.614 224.754 L 0 234.603 L 45.957 314.27 L 65.274 347.727 L 105.802 336.869 L 240.011 300.886 L 349.726 271.469 L 483.935 235.486 C 504.134 230.057 516.129 209.352 510.7 189.151 Z " />
+                    <path class="plane-take-off" d=" M 510.7 189.151 C 505.271 168.95 484.565 156.956 464.365 162.385 L 330.156 198.367 L 155.924 35.878 L 107.19 49.008 L 211.729 230.183 L 86.232 263.767 L 36.614 224.754 L 0 234.603 L 45.957 314.27 L 65.274 347.727 L 105.802 336.869 L 240.011 300.886 L 349.726 271.469 L 483.935 235.486 C 504.134 230.057 516.129 209.352 510.7 189.151 Z" />
                 </svg>
                 TrustiSend
             </a>
         </div>
+
+        <!-- Conteneur vidéo au milieu de la nav-barre -->
+        <div id="video-container" class="video-container">
+            <video id="scroll-video" muted preload>
+                <source src="/images/output-bg.webm" type="video/webm">
+                Votre navigateur ne supporte pas le format vidéo WebM.
+            </video>
+        </div>
+
         <div class="block lg:hidden pr-4">
             <button id="nav-toggle" class="flex items-center p-1 text-pink-800 hover:text-gray-900 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
                 <svg class="fill-current h-6 w-6" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -45,6 +53,8 @@
                 </svg>
             </button>
         </div>
+
+        <!-- Les autres éléments de la barre de navigation -->
         <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 bg-white lg:bg-transparent text-black p-4 lg:p-0 z-20" id="nav-content">
             <ul class="list-reset lg:flex justify-end flex-1 items-center">
                 <li class="mr-3">
@@ -57,20 +67,15 @@
                     <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="/signup">Sign up</a>
                 </li>
             </ul>
-            <button
-                    id="navAction"
-                    class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full mt-4 lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                    onclick="window.location.href='/login'">
+            <button id="navAction" class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full mt-4 lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out" onclick="window.location.href='/login'">
                 Login
-            </button>
-            <!-- Dark Mode Toggle Button -->
-            <button id="invert-dark-mode-toggle" class="p-2 ml-4 bg-gray-200 rounded">
-                🌙
             </button>
         </div>
     </div>
     <hr class="border-b border-gray-100 opacity-25 my-0 py-0" />
 </nav>
+
+
 
 <!-- Hero Container -->
 <div class="pt-24">
@@ -144,7 +149,7 @@
                     Qui sommes-nous ?
                 </h3>
                 <p class="text-gray-600 mb-8 js-show-on-scroll fade-target">
-                    Nous sommes une petite équipe de 4 jeunes ambitieux, passionnés par l'innovation technologique et la sécurité numérique. Avec des expertises variées allant du développement logiciel à la gestion de la cybersécurité, nous avons uni nos forces pour créer TrustiSend, une plateforme de transfert de fichiers qui place la sécurité et la simplicité au cœur de son fonctionnement.
+                    Nous sommes une petite équipe de 4 jeunes ambitieux, passionnés par l'innovation technologique et la sécurité numérique. Avec des expertises principalement axées sur la cybersécurité, nous avons uni nos forces pour créer TrustiSend, une plateforme de transfert de fichiers qui place la sécurité et la simplicité au cœur de son fonctionnement.
                     <br /><br />
                     Notre mission est de révolutionner la façon dont les entreprises et les particuliers partagent leurs documents en ligne, en offrant une solution rapide, fiable et sécurisée. Chaque membre de notre équipe apporte une expérience unique et un engagement envers l'excellence, ce qui nous permet de répondre efficacement aux besoins de nos utilisateurs et de continuer à innover. Chez TrustiSend, nous croyons que la protection des données ne doit jamais être un compromis, et nous nous engageons à fournir des outils à la hauteur de cette promesse.
                 </p>
@@ -163,9 +168,9 @@
                         Anti-virus protection
                     </h3>
                     <p class="text-gray-600 mb-8 js-show-on-scroll fade-target">
-                        Aucun fichier détecté comme dangereux n'est partageable. Chez TrustiSend, nous avons intégré des mécanismes de sécurité avancés pour garantir que chaque fichier téléchargé et partagé sur notre plateforme est minutieusement scanné par notre système antivirus de pointe. Ce processus automatique bloque immédiatement tout document suspect, empêchant ainsi la propagation de malwares, virus ou tout autre type de menace numérique.
+                        Aucun fichier détecté comme dangereux n'est partageable. Chez TrustiSend, nous avons intégré des mécanismes de sécurité avancés pour garantir que chaque fichier téléchargé et partagé sur notre plateforme est minutieusement scanné par un système antivirus de pointe. Ce processus automatique bloque immédiatement tout document suspect, empêchant ainsi la propagation de malwares, virus ou tout autre type de menace numérique.
                         <br /><br />
-                        Notre technologie de protection évolue constamment pour rester en phase avec les nouvelles menaces du cyberespace, assurant à nos utilisateurs une tranquillité d'esprit totale. Ainsi, que vous partagiez des documents professionnels, des fichiers personnels ou des données sensibles, vous pouvez être certain que TrustiSend met tout en œuvre pour protéger vos échanges de bout en bout. La sécurité de vos fichiers est notre priorité absolue, et nous travaillons sans relâche pour garantir une expérience utilisateur sécurisée, sans compromis.
+                        Notre but est d'avoir une technologie de protection qui évolue constamment pour rester en phase avec les nouvelles menaces du cyberespace, assurant à nos utilisateurs une tranquillité d'esprit totale. Ainsi, que vous partagiez des documents professionnels, des fichiers personnels ou des données sensibles, vous pouvez être certain que TrustiSend met tout en œuvre pour protéger vos échanges de bout en bout. La sécurité de vos fichiers est notre priorité absolue.
                     </p>
                 </div>
             </div>
@@ -514,6 +519,28 @@
     document.getElementById('invert-dark-mode-toggle').addEventListener('click', function() {
         document.documentElement.style.filter = document.documentElement.style.filter ? '' : 'invert(100%)';
     });
+</script>
+
+
+<script>
+    const registerVideo = (videoSelector) => {
+        const video = document.querySelector(videoSelector);
+
+        const scrollVideo = () => {
+            if (video.duration) {
+                const rawPercentScrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+                const percentScrolled = Math.min(Math.max(rawPercentScrolled, 0), 1);
+                video.currentTime = video.duration * percentScrolled;
+            }
+            requestAnimationFrame(scrollVideo);
+        };
+
+        requestAnimationFrame(scrollVideo);
+    };
+
+    // Enregistre la vidéo dans la nav-bar
+    registerVideo("#scroll-video");
+
 </script>
 
 
