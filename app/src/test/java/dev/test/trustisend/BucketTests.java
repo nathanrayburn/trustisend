@@ -71,6 +71,8 @@ public class BucketTests {
         } finally {
             Files.deleteIfExists(tempPath);
         }
+
+        dataBucketUtil.deleteFile(testGroup.getGroupUUID(), tempPath.getFileName().toString());
     }
 
     @Test
