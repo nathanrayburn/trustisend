@@ -23,11 +23,6 @@ public class  HomeController {
     @Autowired
     private FirestoreUserDetailsService userDetailsService;
 
-    @GetMapping("/")
-    public String home(Model model){
-        model.addAttribute("test","Test value message");
-        return "index";
-    }
     @PostMapping("/perform_signup")
     public String performSignup(@RequestParam("email") String email,
                                 @RequestParam("password") String password,
@@ -78,6 +73,16 @@ public class  HomeController {
     @GetMapping("/upload")
     public String upload(Model model){
         return "upload";
+    }
+
+    @GetMapping("/")
+    public String index(@AuthenticationPrincipal User user,Model model){
+        if(user != null){
+            String email = user.getEmail();
+            model.addAttribute("email",email);
+            return "home";
+        }
+        return "index";
     }
 
     @GetMapping("/home")
