@@ -32,8 +32,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -155,21 +157,31 @@ public class  HomeController {
         return "home";
     }
 
+    /**
+     * Get all the links of the user
+     * @param user
+     * @param model
+     * @return Map<GroupUUID, LinkedList<ActiveFile>>
+     */
     @GetMapping("/myLinks")
-    public String myLinks(@AuthenticationPrincipal User user ,Model model){
+    public String myLinks(@AuthenticationPrincipal User user, Model model) {
         if (user != null) {
             String email = user.getEmail();
 
-            // get groups of the user
-
+            // Get groups of the user
             LinkedList<Group> groups = userDetailsService.getGroups(email);
 
-            // get files for each group and create a map for each group, which contains a map of the files
+            // Map to store group UUIDs and their corresponding files
+            Map<String, LinkedList<ActiveFile>> groupFilesMap = new HashMap<>();
 
+            // Get files for each group and put them in the map
             for (Group group : groups) {
                 LinkedList<ActiveFile> files = userDetailsService.getFiles(group.getGroupUUID());
-                model.addAttribute(group.getGroupUUID(), files);
+                groupFilesMap.put(group.getGroupUUID(), files);
             }
+
+            // Add the map to the model
+            model.addAttribute("groupFilesMap", groupFilesMap);
 
             return "myLinks";
         }
