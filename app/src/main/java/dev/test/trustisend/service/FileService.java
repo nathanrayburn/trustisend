@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -27,30 +28,23 @@ public class FileService{
     @Autowired
     private final DataBucketUtil dataBucketUtil;
 
-    public List<InputFile> uploadFiles(MultipartFile[] files, String uID) {
+    public List<InputFile> uploadFiles(MultipartFile[] files, String uID) throws IOException {
 
         List<InputFile> inputFiles = new ArrayList<>();
 
-        Arrays.asList(files).forEach(file -> {
+        for (MultipartFile file : Arrays.asList(files)) {
             String originalFileName = file.getOriginalFilename();
-            if(originalFileName == null){
+            if (originalFileName == null) {
                 throw new BadRequestException("Original file name is null");
             }
 
-            Path path = new File(originalFileName).toPath();
+            FileDto fileDto = dataBucketUtil.uploadFile(file, originalFileName, file.getContentType(), uID);
 
-            try {
-                String contentType = Files.probeContentType(path);
-                FileDto fileDto = dataBucketUtil.uploadFile(file, originalFileName, contentType, uID);
-
-                if (fileDto != null) {
-                    inputFiles.add(new InputFile(uID, fileDto.getFileName(), fileDto.getFileUrl()));
-                }
-            } catch (Exception e) {
-                throw new GCPFileUploadException("Error occurred while uploading: " + e.getMessage());
+            if (fileDto != null) {
+                inputFiles.add(new InputFile(uID, fileDto.getFileName(), fileDto.getFileUrl()));
             }
-        });
 
+        }
         return inputFiles;
     }
 

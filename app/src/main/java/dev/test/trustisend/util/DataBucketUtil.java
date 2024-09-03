@@ -48,7 +48,14 @@ public class DataBucketUtil {
     public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType, String uID) {
 
         try{
-            byte[] fileData = FileUtils.readFileToByteArray(convertFile(multipartFile));
+            File tempFile = convertFile(multipartFile);
+            byte[] fileData = FileUtils.readFileToByteArray(tempFile);
+            if(tempFile.delete()){
+                System.out.println("temp file successfully deleted");
+            }
+            else{
+                System.out.println("couldn't delete temp file");
+            }
 
             String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
 
