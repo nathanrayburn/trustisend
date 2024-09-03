@@ -1,6 +1,9 @@
 package dev.test.trustisend.controller;
 
+import dev.test.trustisend.entity.InputFile;
+import dev.test.trustisend.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,12 +13,40 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import dev.test.trustisend.entity.User;
 import dev.test.trustisend.service.FirestoreUserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Controller
 public class  HomeController {
 
     @Autowired
+    private FileService fileService;
+
+    @Autowired
     private FirestoreUserDetailsService userDetailsService;
+
+
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public String createLink(@RequestParam("files")MultipartFile[] files, @AuthenticationPrincipal User user, Model model){
+       // fileService.uploadFiles(files);
+        if(user != null){
+
+            // create group in firestore
+
+            // retrieve group id
+            // pass the group unique id into the uploadFiles method
+            List<InputFile> inputFiles = fileService.uploadFiles(files);
+
+            // add files to group in firestore
+
+            model.addAttribute("inputFiles",inputFiles);
+
+            return "home";
+        }
+
+        return "redirect:/login";
+    }
 
     @PostMapping("/perform_signup")
     public String performSignup(@RequestParam("email") String email,
