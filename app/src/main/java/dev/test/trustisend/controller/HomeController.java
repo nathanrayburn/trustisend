@@ -50,11 +50,7 @@ public class  HomeController {
                 password.matches(".*[0-9].*") &&
                 password.matches(".*[!@#$%^&*(),.?\":{}|<>].*");
     }
-
-    @GetMapping("/secured")
-    public String secured(){
-        return "Hello, Secured!";
-    }
+    
     @GetMapping("/login")
     public String login(Model model){
         return "login";
