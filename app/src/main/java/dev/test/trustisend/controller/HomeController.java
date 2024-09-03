@@ -3,18 +3,15 @@ package dev.test.trustisend.controller;
 import dev.test.trustisend.service.FirestoreUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import dev.test.trustisend.entity.User;
-
 import org.springframework.ui.Model;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import dev.test.trustisend.entity.User;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @Controller
@@ -71,8 +68,15 @@ public class  HomeController {
     }
 
     @GetMapping("/upload")
-    public String upload(Model model){
-        return "upload";
+    public String upload(@AuthenticationPrincipal User user, Model model){
+
+        if (user != null) {
+            String email = user.getEmail();
+
+            model.addAttribute("email", email);
+            return "upload";
+        }
+        return "login";
     }
 
     @GetMapping("/")

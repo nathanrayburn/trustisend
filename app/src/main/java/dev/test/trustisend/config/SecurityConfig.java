@@ -48,7 +48,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .logout(logout -> logout
             .logoutUrl("/perform_logout")
             .deleteCookies("JSESSIONID")
-            .logoutSuccessUrl("/login?logout=true")
+            .logoutSuccessUrl("/")
             .permitAll()
         );
     return http.build();

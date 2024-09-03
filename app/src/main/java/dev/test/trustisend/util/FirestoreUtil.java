@@ -99,6 +99,11 @@ public class FirestoreUtil {
         }
     }
 
+    public User signOutUser()
+    {
+        return null;
+    }
+
 
     public UserDetails readUserById(String userId) throws Exception {
         try {
