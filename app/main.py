@@ -7,6 +7,7 @@ import requests
 from activefile import ActiveFile
 import json
 import schedule
+from waitress import serve
 import threading  # Import threading
 import time  # Import time for the scheduler loop
 
@@ -47,6 +48,9 @@ def getActiveFilesFromFirestore():
 def getTimestamp(group_uuid):
     group_ref = db.collection("groups").document(group_uuid)
     group = group_ref.get()
+    print("Group:", group)
+    if group.to_dict() is None:
+        return 0
     return group.to_dict()['timestamp']
 
 
@@ -55,8 +59,16 @@ def selectFirstOldestFiles(numberOfFiles, activeFiles):
         return []
     if len(activeFiles) <= numberOfFiles:
         return activeFiles
-    activeFiles.sort(key=lambda x: getTimestamp(x.group_uuid))
-    return activeFiles[:numberOfFiles]
+    
+    files_with_timestamps = [(file, getTimestamp(file.group_uuid)) for file in activeFiles]
+
+    # Filter out files with a timestamp of 0
+    valid_files = [file for file, timestamp in files_with_timestamps if timestamp != 0]
+
+    # Sort the valid files by their timestamp
+    valid_files.sort(key=lambda x: getTimestamp(x.group_uuid))
+    return valid_files[:numberOfFiles]
+
 
 
 def getExtension(path):
@@ -206,7 +218,6 @@ def scanNewFiles():
         if not activeFiles:
             print("No files found with PENDING status.")
             return  # Return early if no files to process
-
         # Select the first n oldest files
         filesToScan = selectFirstOldestFiles(data['antivirus']['file-scan-limit'], activeFiles)
         for file in filesToScan:
@@ -270,4 +281,4 @@ if __name__ == '__main__':
     scheduler_thread.start()
 
     # Start the Flask application
-    app.run(debug=True)
+    serve(app, host="127.0.0.1", port=5000)
