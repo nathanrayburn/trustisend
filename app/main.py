@@ -6,6 +6,9 @@ import google.cloud.storage as storage
 import requests
 from activefile import ActiveFile
 import json
+import logging
+import subprocess
+import sys
 import schedule
 from waitress import serve
 import threading  # Import threading
@@ -213,6 +216,54 @@ def scanNewFiles():
     try:
         # Get all files from Firestore that have scanStatus = PENDING
         activeFiles = getActiveFilesFromFirestore()
+        if not activeFiles:
+            logging.debug("No files found with PENDING status.")
+            return  # Return early if no files to process
+
+        # Remove files that are in the hashmap
+        activeFiles = [file for file in activeFiles if file.file_uuid not in hashmap]
+        if not activeFiles:
+            logging.debug("No new files found after filtering by hashmap.")
+            return  # Return early if no files to process
+
+        # Select the first n oldest files
+        filesToScan = selectFirstOldestFiles(data['antivirus']['file-scan-limit'], activeFiles)
+        for file in filesToScan:
+            logging.debug(f"Processing file: {file.group_uuid}, {file.file_uuid}, {file.path}, {file.scan_status}")
+
+        # Get the files from cloud storage
+        downloadFilesFromCloudStorage(filesToScan)
+
+        # Scan and update the scanStatus in Firestore
+        for file in filesToScan:
+            try:
+                res = sendToAPI(file)
+                if res.status_code == 200:
+                    associateFileToAnalysisID(file, res.json()['data'])
+                    logging.debug(f"File {file.file_uuid} sent to API successfully.")
+                else:
+                    db.collection("files").document(file.file_uuid).update({"scanStatus": FileScanStatus.ERROR.value})
+                    logging.debug(f"File {file.file_uuid} failed API scan.")
+            except FileNotFoundError as e:
+                logging.debug(f"Error: {e}")
+                db.collection("files").document(file.file_uuid).update({"scanStatus": FileScanStatus.ERROR.value})
+            
+        # Remove the files from the temp directory
+        for file in filesToScan:
+            try:
+                os.remove(tempDirectory + file.file_uuid + "." + getExtension(file.path))
+                logging.debug(f"File {file.file_uuid} deleted successfully.")
+            except OSError as e:
+                logging.debug(f"Error deleting file {file.file_uuid}: {e}")
+                db.collection("files").document(file.file_uuid).update({"scanStatus": FileScanStatus.ERROR.value})
+
+    except Exception as e:
+        logging.debug(f"An error occurred while scanning files: {e}")
+        import traceback
+        traceback.print_exc()
+    try:
+        # Get all files from Firestore that have scanStatus = PENDING
+        activeFiles = getActiveFilesFromFirestore()
         # Remove files that are in the hashmap
         activeFiles = [file for file in activeFiles if file.file_uuid not in hashmap]
         if not activeFiles:
@@ -275,10 +326,27 @@ def home():
 
 
 if __name__ == '__main__':
+    logging.info("Running specific tests: test_unit.py and test_system.py")
+
+    # List of specific test files to run
+    test_files = ['test_unit.py', 'test_system.py']
+
+    # Run pytest with specific test files and capture the exit code
+    result = subprocess.run(
+        [sys.executable, '-m', 'pytest', '--junitxml=./test-results.xml'] + test_files
+    )
+
+    # Check the result and exit if tests fail
+    if result.returncode != 0:
+        logging.error("Tests failed. Exiting...")
+        sys.exit(result.returncode)
+    
     # Start the scheduler thread
     scheduler_thread = threading.Thread(target=run_scheduler)
     scheduler_thread.daemon = True  # Daemonize thread to ensure it exits when main program exits
     scheduler_thread.start()
+
+    
 
     # Start the Flask application
     serve(app, host="0.0.0.0", port=5000)

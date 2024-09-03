@@ -11,9 +11,6 @@ COPY ./app/ /app/
 COPY ./app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Run tests
-RUN pytest --junitxml=./test-results.xml
-
 EXPOSE 5000 5000
 # Define the entry point to run the Python script
 ENTRYPOINT ["python", "main.py"]
