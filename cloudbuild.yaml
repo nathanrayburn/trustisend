@@ -2,11 +2,13 @@ steps:
   # Step 0: Run tests
   - name: python:3.8  # Use a Python Docker image for running tests
     id: test
-    entrypoint: python
+    entrypoint: bash
     args:
-      - -m
-      - pytest
-      - --junitxml=./test-results.xml  # Output test results in JUnit XML format
+      - '-c'
+      - |
+        pip install pytest          # Install pytest
+        pip install -r requirements.txt  # Install other dependencies
+        pytest --junitxml=./test-results.xml  # Run tests and generate JUnit XML report
 
   # Step 1: Build the Docker image and tag it with the commit SHA
   - name: gcr.io/cloud-builders/docker
