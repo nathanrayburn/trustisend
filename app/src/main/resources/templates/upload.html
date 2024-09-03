@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Upload - TrustiSend</title>
+    <link th:href="@{/css/main.css}" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet" />
+    <style>
+        .background {
+            background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+        }
+        .table-container {
+            margin-top: 20px;
+            background-color: rgba(46, 74, 102, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table th {
+            background-color: #4a5568;
+            text-transform: uppercase;
+            font-size: 14px;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        .table td {
+            padding: 12px 15px;
+            background-color: #2d3748;
+            border-bottom: 1px solid #40596f;
+        }
+        .table td:last-child {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .action-btn {
+            cursor: pointer;
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .remove-btn {
+            background-color: #e53e3e;
+            color: #fff;
+        }
+        .remove-btn:hover {
+            background-color: #c53030;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: #333;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body class="leading-normal tracking-normal text-white background h-screen" style="font-family: 'Source Sans Pro', sans-serif;">
+<!-- Nav -->
+<nav id="header" class="fixed w-full z-30 top-0 text-white bg-white shadow">
+    <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
+        <div class="pl-4 flex items-center">
+            <a class="toggleColour text-gray-800 no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/#">
+                <svg class="h-8 fill-current inline" xmlns="http://www.potlabicons.com/" viewBox="0 0 512.005 512.005">
+                    <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" />
+                    <path d="M510.7 189.151C505.271 168.95 484.565 156.956 464.365 162.385L330.156 198.367 155.924 35.878 107.19 49.008 211.729 230.183 86.232 263.767 36.614 224.754 0 234.603 45.957 314.27 65.274 347.727 105.802 336.869 240.011 300.886 349.726 271.469 483.935 235.486C504.134 230.057 516.129 209.352 510.7 189.151Z" />
+                </svg>
+                TrustiSend
+            </a>
+        </div>
+        <div class="pr-4 flex items-center">
+            <a href="/#" class="text-red-500 hover:text-red-700 font-bold mr-4">Sign Out</a>
+            <span class="text-gray-800 font-bold">Gaythan</span>
+        </div>
+    </div>
+</nav>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <h3>Are you sure you want to go to My Files?</h3>
+        <div class="checkbox-container">
+            <input type="checkbox" id="dontShowAgain" />
+            <label for="dontShowAgain">Don't show this message again</label>
+        </div>
+        <div class="modal-footer">
+            <button id="confirmButton" class="bg-green-500 text-white px-4 py-2 rounded">Yes</button>
+            <button id="cancelModalButton" class="bg-gray-500 text-white px-4 py-2 rounded">No</button>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Section -->
+<div class="flex items-center justify-center w-full h-5/6">
+    <div class="text-center">
+        <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg class="w-12 h-12 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                </svg>
+                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+            </div>
+            <input id="dropzone-file" type="file" class="hidden" multiple />
+        </label>
+
+        <!-- Instructional Text -->
+        <div class="mt-8 text-gray-100 text-lg">
+            <p>1. Drag your file/s into the box above or click to select.</p>
+            <p>2. Then click on upload when you put them all.</p>
+            <p>3. Once updated, you would be able to find them in the <a href="#" id="myFilesLink" class="text-blue-500 hover:text-blue-700 font-bold">My Files</a> page.</p>
+        </div>
+
+        <!-- Upload and Cancel Buttons -->
+        <div class="mt-6 flex justify-center gap-4">
+            <button id="uploadButton" class="mx-auto lg:mx-0 bg-white text-gray-800 font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                Upload
+            </button>
+            <button id="cancelButton" class="mx-auto lg:mx-0 bg-gray-800 text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                Cancel
+            </button>
+        </div>
+
+        <!-- Table of Files Ready to Upload -->
+        <div class="table-container mt-8">
+            <table class="table" id="fileTable">
+                <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>Upload Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="fileTableBody">
+                <!-- Rows will be added dynamically here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for managing actions -->
+<script>
+    const fileInput = document.getElementById('dropzone-file');
+    const uploadButton = document.getElementById('uploadButton');
+    const cancelButton = document.getElementById('cancelButton');
+    const fileTableBody = document.getElementById('fileTableBody');
+    const myFilesLink = document.getElementById('myFilesLink');
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmButton = document.getElementById('confirmButton');
+    const cancelModalButton = document.getElementById('cancelModalButton');
+    const dontShowAgain = document.getElementById('dontShowAgain');
+
+    // Add files to the table when selected
+    fileInput.addEventListener('change', () => {
+        for (const file of fileInput.files) {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${file.name}</td>
+                <td>${new Date().toLocaleDateString()}</td>
+                <td>Ready to Upload</td>
+                <td>
+                    <button class="action-btn remove-btn" onclick="removeFile(this)">Remove</button>
+                </td>
+            `;
+            fileTableBody.appendChild(newRow);
+        }
+    });
+
+    // Upload button action
+    uploadButton.addEventListener('click', () => {
+        if (fileTableBody.children.length > 0) {
+            alert('All files are being uploaded!');
+            [...fileTableBody.children].forEach(row => {
+                row.querySelector('td:nth-child(3)').textContent = 'Uploading...';
+                setTimeout(() => {
+                    row.querySelector('td:nth-child(3)').textContent = 'Uploaded';
+                }, 1000);
+            });
+        } else {
+            alert('Please select files before uploading.');
+        }
+    });
+
+    // Cancel button action
+    cancelButton.addEventListener('click', () => {
+        fileInput.value = '';
+        fileTableBody.innerHTML = '';
+        alert('File selection canceled.');
+    });
+
+    // Remove file from the table
+    function removeFile(button) {
+        const row = button.closest('tr');
+        row.remove();
+    }
+
+    // Handle navigation to My Files with confirmation
+    myFilesLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (localStorage.getItem('dontShowMyFilesConfirmation') !== 'true') {
+            confirmationModal.style.display = 'flex';
+        } else {
+            window.location.href = '/myfiles';
+        }
+    });
+
+    // Confirm navigation
+    confirmButton.addEventListener('click', () => {
+        if (dontShowAgain.checked) {
+            localStorage.setItem('dontShowMyFilesConfirmation', 'true');
+        }
+        window.location.href = '/myfiles';
+    });
+
+    // Cancel modal
+    cancelModalButton.addEventListener('click', () => {
+        confirmationModal.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>

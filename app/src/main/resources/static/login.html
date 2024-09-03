@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TrustiSend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-teal-900 text-white flex items-center justify-center min-h-screen">
+    <section class="bg-white text-teal-900 p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Login</h1>
+        <form action="/perform_login" method="post">
+            <div class="mb-4">
+                <label for="username" class="block text-sm font-medium mb-2">Username</label>
+                <input type="text" id="username" name="username" required class="w-full p-2 border border-teal-300 rounded">
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium mb-2">Password</label>
+                <input type="password" id="password" name="password" required class="w-full p-2 border border-teal-300 rounded">
+            </div>
+            <button type="submit" class="w-full bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600">Login</button>
+        </form>
+        <!-- Error message display only if the password was incorrect -->
+        <div th:if="${param.error} == 'wrong'" class="text-red-500 text-center mt-4">
+            Invalid password. Please try again.
+        </div>
+    </section>
+</body>
+</html>

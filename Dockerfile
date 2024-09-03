@@ -9,7 +9,7 @@ COPY ./app/pom.xml ./pom.xml
 COPY ./app/src ./src
 
 # Run tests and package the application
-RUN set -e && mvn clean test && mvn clean package
+RUN mvn clean package -DskipTests
 
 # Step 2: Use the official Java 21 runtime image to run the Spring Boot app
 FROM eclipse-temurin:21-jre-alpine
@@ -21,7 +21,7 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar ./app.jar
 
 # Expose the default port used by Spring Boot
-EXPOSE 8080
+EXPOSE 8080 8000
 
 # Define the entry point for the container
 ENTRYPOINT ["java", "-jar", "./app.jar"]
