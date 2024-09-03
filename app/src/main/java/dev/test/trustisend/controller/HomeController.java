@@ -1,6 +1,7 @@
 package dev.test.trustisend.controller;
 
 import dev.test.trustisend.entity.InputFile;
+import dev.test.trustisend.service.FileService;
 import dev.test.trustisend.service.FirestoreUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -11,6 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import dev.test.trustisend.entity.User;
+import dev.test.trustisend.service.FirestoreUserDetailsService;
 
 import java.util.List;
 
@@ -24,27 +27,6 @@ public class  HomeController {
     @Autowired
     private FirestoreUserDetailsService userDetailsService;
 
-
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public String createLink(@RequestParam("files")MultipartFile[] files, @AuthenticationPrincipal User user, Model model){
-       // fileService.uploadFiles(files);
-        if(user != null){
-
-            // create group in firestore
-
-            // retrieve group id
-            // pass the group unique id into the uploadFiles method
-            List<InputFile> inputFiles = fileService.uploadFiles(files);
-
-            // add files to group in firestore
-
-            model.addAttribute("inputFiles",inputFiles);
-
-            return "home";
-        }
-
-        return "redirect:/login";
-    }
 
     @PostMapping("/perform_signup")
     public String performSignup(@RequestParam("email") String email,
@@ -135,22 +117,23 @@ public class  HomeController {
     public String createLink(@RequestParam("files") MultipartFile[] files,
                              @AuthenticationPrincipal User user,
                              Model model) {
-        /*if (user != null) {
-            // 1. Create a group in Firestore for the user's files
-            String groupId = firestoreService.createGroup(user);
+        // fileService.uploadFiles(files);
+        if(user != null){
 
-            // 2. Upload the files and associate them with the group
-            List<InputFile> uploadedFiles = fileService.uploadFiles(files, groupId);
+            // create group in firestore
 
-            // 3. Save file metadata to Firestore under the created group
-            firestoreService.addFilesToGroup(groupId, uploadedFiles);
+            // retrieve group id
+            // pass the group unique id into the uploadFiles method
+            List<InputFile> inputFiles = fileService.uploadFiles(files);
 
-            // Redirect or update the model as needed
-            return "home"; // Adjust redirect as needed
+            // add files to group in firestore
+
+            model.addAttribute("inputFiles",inputFiles);
+
+            return "home";
         }
-*/
-        return "redirect:/login"; // If user is not authenticated
 
+        return "redirect:/login";
     }
 
 }
