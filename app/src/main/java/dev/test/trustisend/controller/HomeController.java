@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
@@ -136,7 +137,7 @@ public class  HomeController {
 
     }
 
-    @PostMapping("/download")
+    @PostMapping("/link")
     ResponseEntity<Resource> downloadFolder(@RequestParam("uid") String uID) throws IOException {
 
         try{
@@ -159,14 +160,17 @@ public class  HomeController {
 
 
     }
-
-    @PostMapping("/link")
-    public String folderContent(@RequestParam("uid") String uID, @AuthenticationPrincipal User user ,Model model){
+    @GetMapping("/link")
+    public String folderContent(@RequestParam("uid") String uID, Model model){
         // get files of the group in firestore
+        try{
+            LinkedList<ActiveFile> activeFiles = userDetailsService.getFiles(uID);
+            model.addAttribute("files", activeFiles);
 
-        // pass the files to the model
-        // return the files to the view
-        return "home";
+            return "folderContent";
+        }catch (Exception e){
+            return "redirect:/index";
+        }
     }
 
     /**
@@ -227,7 +231,7 @@ public class  HomeController {
             }
 
             // Redirect or update the model as needed
-            return "home"; // Adjust redirect as needed
+            return "redirect:/home"; // Adjust redirect as needed
 
         }
         return "redirect:/login"; // If user is not authenticated
