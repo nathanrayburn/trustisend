@@ -80,15 +80,24 @@ public class  HomeController {
     }
 
     @GetMapping("/upload")
-    public String upload(Model model){
+    public String upload(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        // Vérifiez si l'utilisateur est connecté
+        if (userDetails != null) {
+            String email = userDetails.getUsername(); // Récupère l'email ou username de l'utilisateur
+            model.addAttribute("email", email);
+        }
         return "upload";
     }
 
     @GetMapping("/myfiles")
-    public String myfiles(Model model){
+    public String myfiles(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        // Vérifiez si l'utilisateur est connecté
+        if (userDetails != null) {
+            String email = userDetails.getUsername(); // Récupère l'email ou username de l'utilisateur
+            model.addAttribute("email", email);
+        }
         return "myfiles";
     }
-
     @GetMapping("/home")
     public String home(@AuthenticationPrincipal User user, Model model) {
 
@@ -108,7 +117,7 @@ public class  HomeController {
     public String createLink(@RequestParam("files") MultipartFile[] files,
                              @AuthenticationPrincipal User user,
                              Model model) {
-        /*if (user != null) {
+       /* if (user != null) {
             // 1. Create a group in Firestore for the user's files
             String groupId = firestoreService.createGroup(user);
 
@@ -120,8 +129,7 @@ public class  HomeController {
 
             // Redirect or update the model as needed
             return "home"; // Adjust redirect as needed
-        }
-*/
+        }*/
         return "redirect:/login"; // If user is not authenticated
 
     }

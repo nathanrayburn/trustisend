@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Upload - TrustiSend</title>
-    <link th:href="@{/main.css}" rel="stylesheet" />
+    <link th:href="@{/css/main.css}" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet" />
     <style>
-        .background {
+        .gradient {
             background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+        }
+        .btn-large {
+            padding: 20px 40px;
+            font-size: 1.5rem;
         }
         .table-container {
             margin-top: 20px;
@@ -36,11 +40,6 @@
             padding: 12px 15px;
             background-color: #2d3748;
             border-bottom: 1px solid #40596f;
-        }
-        .table td:last-child {
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
         .action-btn {
             cursor: pointer;
@@ -87,27 +86,125 @@
             align-items: center;
             gap: 5px;
         }
+        .upload-container {
+            max-width: 600px; /* Réduit la largeur maximale */
+            margin: 150px auto; /* Centre horizontalement et ajuste le positionnement vertical */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload-container label {
+            width: 100%; /* S'assure que l'élément à l'intérieur prend toute la largeur disponible du conteneur */
+        }
+
+        .cancel-btn {
+            background-color: #e53e3e; /* Rouge */
+
+        }
+
     </style>
 </head>
-<body class="leading-normal tracking-normal text-white background h-screen" style="font-family: 'Source Sans Pro', sans-serif;">
+<body class="leading-normal tracking-normal text-white gradient" style="font-family: 'Source Sans Pro', sans-serif;">
 <!-- Nav -->
-<nav id="header" class="fixed w-full z-30 top-0 text-white bg-white shadow">
+<nav id="header" class="fixed w-full z-30 top-0 text-white">
     <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
         <div class="pl-4 flex items-center">
-            <a class="toggleColour text-gray-800 no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/#">
-                <svg class="h-8 fill-current inline" xmlns="http://www.potlabicons.com/" viewBox="0 0 512.005 512.005">
-                    <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" />
-                    <path d="M510.7 189.151C505.271 168.95 484.565 156.956 464.365 162.385L330.156 198.367 155.924 35.878 107.19 49.008 211.729 230.183 86.232 263.767 36.614 224.754 0 234.603 45.957 314.27 65.274 347.727 105.802 336.869 240.011 300.886 349.726 271.469 483.935 235.486C504.134 230.057 516.129 209.352 510.7 189.151Z" />
+            <a class="toggleColour text-white no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/#">
+                <!-- Icone TrustiSend -->
+                <svg class="h-8 fill-current inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.005 512.005">
+                    <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" transform="matrix(1,0,0,1,0,0)" />
+                    <path class="plane-take-off" d=" M 510.7 189.151 C 505.271 168.95 484.565 156.956 464.365 162.385 L 330.156 198.367 L 155.924 35.878 L 107.19 49.008 L 211.729 230.183 L 86.232 263.767 L 36.614 224.754 L 0 234.603 L 45.957 314.27 L 65.274 347.727 L 105.802 336.869 L 240.011 300.886 L 349.726 271.469 L 483.935 235.486 C 504.134 230.057 516.129 209.352 510.7 189.151 Z" />
                 </svg>
                 TrustiSend
             </a>
         </div>
-        <div class="pr-4 flex items-center">
-            <a href="/#" class="text-red-500 hover:text-red-700 font-bold mr-4">Sign Out</a>
-            <span class="text-gray-800 font-bold">Gaythan</span>
+
+        <!-- Conteneur vidéo au milieu de la nav-barre -->
+        <div id="video-container" class="video-container">
+            <video id="scroll-video" muted preload>
+                <source src="/images/output-bg.webm" type="video/webm">
+                Votre navigateur ne supporte pas le format vidéo WebM.
+            </video>
+        </div>
+
+        <div class="block lg:hidden pr-4">
+            <button id="nav-toggle" class="flex items-center p-1 text-pink-800 hover:text-gray-900 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                <svg class="fill-current h-6 w-6" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <title>Menu</title>
+                    <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Les autres éléments de la barre de navigation -->
+        <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 bg-white lg:bg-transparent text-black p-4 lg:p-0 z-20" id="nav-content">
+            <ul class="list-reset lg:flex justify-end flex-1 items-center">
+                <li class="mr-3">
+                    <a class="inline-block py-2 px-4 text-black font-bold no-underline" href="">Upload page</a>
+                </li>
+                <li class="mr-3">
+                    <a class="inline-block text-red-500 font-bold no-underline hover:text-red-700 py-2 px-4" href="/signout">Sign Out</a>
+                </li>
+            </ul>
+            <button id="navAction" class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full mt-4 lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                Username
+            </button>
         </div>
     </div>
+    <hr class="border-b border-gray-100 opacity-25 my-0 py-0" />
 </nav>
+
+<!-- Element caché pour passer l'email à JavaScript -->
+<div id="emailHolder" th:data-email="${email}" style="display: none;"></div>
+
+<!-- Upload Section -->
+<div class="upload-container">
+    <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <svg class="w-12 h-12 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+            </svg>
+            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+        </div>
+        <input id="dropzone-file" type="file" class="hidden" multiple />
+    </label>
+
+    <!-- Instructional Text -->
+    <div class="mt-8 text-gray-100 text-lg text-center">
+        <p>1. Drag your file/s into the box above or click to select.</p>
+        <p>2. Then click on upload when you put them all.</p>
+        <p>3. Once updated, you would be able to find them in the <a href="#" id="myFilesLink" class="text-blue-500 hover:text-blue-700 font-bold">My Files</a> page.</p>
+    </div>
+
+    <!-- Upload and Cancel Buttons -->
+    <div class="mt-6 flex justify-center gap-4">
+        <button id="uploadButton" class="btn-large bg-white text-gray-800 font-bold rounded-full shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+            Upload
+        </button>
+        <button id="cancelButton" class="cancel-btn btn-large mx-auto lg:mx-0 bg-gray-800 text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+            Cancel
+        </button>
+    </div>
+
+    <!-- Table of Files Ready to Upload -->
+    <div class="table-container mt-8">
+        <table class="table" id="fileTable">
+            <thead>
+            <tr>
+                <th>Filename</th>
+                <th>Upload Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="fileTableBody">
+            <!-- Rows will be added dynamically here -->
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <!-- Confirmation Modal -->
 <div id="confirmationModal" class="modal">
@@ -124,55 +221,68 @@
     </div>
 </div>
 
-<!-- Upload Section -->
-<div class="flex items-center justify-center w-full h-5/6">
-    <div class="text-center">
-        <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-            <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                <svg class="w-12 h-12 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                </svg>
-                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-            </div>
-            <input id="dropzone-file" type="file" class="hidden" multiple />
-        </label>
+<!-- Script pour extraire le username -->
+<script>
+    // Récupère l'email depuis l'attribut data-email de l'élément caché
+    const email = document.getElementById('emailHolder').getAttribute('data-email');
+    // Extrait le username avant le symbole @
+    const username = email.match(/^[^@]+/)[0];
+    // Affiche le username dans le bouton de la nav-bar
+    document.getElementById('navAction').textContent = username;
+</script>
 
-        <!-- Instructional Text -->
-        <div class="mt-8 text-gray-100 text-lg">
-            <p>1. Drag your file/s into the box above or click to select.</p>
-            <p>2. Then click on upload when you put them all.</p>
-            <p>3. Once updated, you would be able to find them in the <a href="#" id="myFilesLink" class="text-blue-500 hover:text-blue-700 font-bold">My Files</a> page.</p>
-        </div>
+<!-- Script pour contrôler la vidéo au scroll -->
+<script>
+    const registerVideo = (videoSelector) => {
+        const video = document.querySelector(videoSelector);
 
-        <!-- Upload and Cancel Buttons -->
-        <div class="mt-6 flex justify-center gap-4">
-            <button id="uploadButton" class="mx-auto lg:mx-0 bg-white text-gray-800 font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                Upload
-            </button>
-            <button id="cancelButton" class="mx-auto lg:mx-0 bg-gray-800 text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                Cancel
-            </button>
-        </div>
+        const scrollVideo = () => {
+            if (video.duration) {
+                const rawPercentScrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+                const percentScrolled = Math.min(Math.max(rawPercentScrolled, 0), 1);
+                video.currentTime = video.duration * percentScrolled;
+            }
+            requestAnimationFrame(scrollVideo);
+        };
 
-        <!-- Table of Files Ready to Upload -->
-        <div class="table-container mt-8">
-            <table class="table" id="fileTable">
-                <thead>
-                <tr>
-                    <th>Filename</th>
-                    <th>Upload Date</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody id="fileTableBody">
-                <!-- Rows will be added dynamically here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+        requestAnimationFrame(scrollVideo);
+    };
+
+    // Enregistre la vidéo dans la nav-bar
+    registerVideo("#scroll-video");
+</script>
+
+<!-- Script pour gérer le changement de couleur au défilement -->
+<script>
+    var scrollpos = window.scrollY;
+    var header = document.getElementById("header");
+    var navcontent = document.getElementById("nav-content");
+    var toToggle = document.querySelectorAll(".toggleColour");
+
+    document.addEventListener("scroll", function () {
+        scrollpos = window.scrollY;
+
+        if (scrollpos > 10) {
+            header.classList.add("bg-white");
+            header.classList.add("shadow");
+            for (var i = 0; i < toToggle.length; i++) {
+                toToggle[i].classList.add("text-gray-800");
+                toToggle[i].classList.remove("text-white");
+            }
+            navcontent.classList.remove("bg-gray-100");
+            navcontent.classList.add("bg-white");
+        } else {
+            header.classList.remove("bg-white");
+            header.classList.remove("shadow");
+            for (var i = 0; i < toToggle.length; i++) {
+                toToggle[i].classList.add("text-white");
+                toToggle[i].classList.remove("text-gray-800");
+            }
+            navcontent.classList.remove("bg-white");
+            navcontent.classList.add("bg-gray-100");
+        }
+    });
+</script>
 
 <!-- JavaScript for managing actions -->
 <script>
@@ -228,7 +338,6 @@
             alert('Please select files before uploading.');
         }
     });
-
 
     // Cancel button action
     cancelButton.addEventListener('click', () => {
