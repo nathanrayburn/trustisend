@@ -174,7 +174,7 @@ public class  HomeController {
     }
 
     /**
-     * Get all the links of the user
+     * Get user links
      * @param user
      * @param model
      * @return
