@@ -13,25 +13,29 @@
         }
         .table-container {
             margin-top: 20px;
-            background-color: #2e4a66;
-            border-radius: 8px;
+            background-color: rgba(46, 74, 102, 0.9);
+            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
         }
         .table {
             width: 100%;
             border-collapse: collapse;
-            color: white;
-        }
-        .table th, .table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #40596f;
+            color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
         }
         .table th {
-            background-color: #345270;
+            background-color: #4a5568;
             text-transform: uppercase;
             font-size: 14px;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        .table td {
+            padding: 12px 15px;
+            background-color: #2d3748;
+            border-bottom: 1px solid #40596f;
         }
         .table td a {
             color: #d53369;
@@ -76,36 +80,41 @@
                 <th>Filename</th>
                 <th>Upload Date</th>
                 <th>Downloads</th>
-                <th>Virus Check</th>
                 <th>Links</th>
             </tr>
             </thead>
             <tbody>
+            <!-- Example File Row -->
             <tr>
-                <td>Document.pdf</td>
-                <td>03/07/2024</td>
-                <td>12</td>
-                <td><img src="/icons/check-circle.svg" alt="Checked" class="icon"></td>
-                <td><a href="/download/document.pdf"><img src="/icons/link.svg" alt="Download" class="icon"></a></td>
+                <td>example-file.txt</td>
+                <td>20/08/2024</td>
+                <td class="download-count">0</td>
+                <td><a href="#" onclick="increaseDownloadCount(this)"><img src="/images/link-image-logo.png" alt="Download" class="icon"></a></td>
             </tr>
-            <tr>
-                <td>video.mp4</td>
-                <td>01/08/2024</td>
-                <td>1</td>
-                <td><img src="/icons/check-circle.svg" alt="Checked" class="icon"></td>
-                <td><a href="/download/video.mp4"><img src="/icons/link.svg" alt="Download" class="icon"></a></td>
-            </tr>
-            <tr>
-                <td>music.mp3</td>
-                <td>21/08/2024</td>
-                <td>0</td>
-                <td><img src="/icons/clock.svg" alt="Pending" class="icon"></td>
-                <td><a href="/download/music.mp3"><img src="/icons/link.svg" alt="Download" class="icon"></a></td>
+            <!-- Thymeleaf Loop to Display Uploaded Files -->
+            <tr th:each="file : ${uploadedFiles}">
+                <td th:text="${file.name}">Filename</td>
+                <td th:text="${file.uploadDate}">Upload Date</td>
+                <td th:text="${file.downloadCount}" class="download-count">0</td>
+                <td>
+                    <a th:href="@{/download/{filename}(filename=${file.name})}" onclick="increaseDownloadCount(this)">
+                        <img src="/icons/link.svg" alt="Download" class="icon">
+                    </a>
+                </td>
             </tr>
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+    // Function to increase the download count when the download link is clicked
+    function increaseDownloadCount(link) {
+        const downloadCountCell = link.closest('tr').querySelector('.download-count');
+        let currentCount = parseInt(downloadCountCell.textContent, 10);
+        downloadCountCell.textContent = currentCount + 1;
+    }
+</script>
 
 </body>
 </html>

@@ -11,6 +11,67 @@
         .background {
             background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
         }
+        .table-container {
+            margin-top: 20px;
+            background-color: rgba(46, 74, 102, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table th {
+            background-color: #4a5568;
+            text-transform: uppercase;
+            font-size: 14px;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        .table td {
+            padding: 12px 15px;
+            background-color: #2d3748;
+            border-bottom: 1px solid #40596f;
+        }
+        .table td:last-child {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .action-btn {
+            cursor: pointer;
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .remove-btn {
+            background-color: #e53e3e;
+            color: #fff;
+        }
+        .remove-btn:hover {
+            background-color: #c53030;
+        }
+        .scan-btn {
+            background-color: #e53e3e;
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .scan-btn:hover {
+            background-color: #c53030;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body class="leading-normal tracking-normal text-white background h-screen" style="font-family: 'Source Sans Pro', sans-serif;">
@@ -44,17 +105,122 @@
                 <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
             </div>
-            <input id="dropzone-file" type="file" class="hidden" />
+            <input id="dropzone-file" type="file" class="hidden" multiple />
         </label>
 
         <!-- Instructional Text -->
         <div class="mt-8 text-gray-100 text-lg">
-            <p>1. Drag your file into the box above or click to select.</p>
-            <p>2. The file will be automatically scanned for malware.</p>
-            <p>3. Once validated, your file will be securely uploaded.</p>
+            <p>1. Drag your files into the box above or click to select.</p>
+            <p>2. When you're done selecting, press scan to start scanning all the files.</p>
+            <p>3. Once validated, your files will be able to get uploaded.</p>
+        </div>
+
+        <!-- Upload, Scan, and Cancel Buttons -->
+        <div class="mt-6 flex justify-center gap-4">
+            <button id="uploadButton" class="mx-auto lg:mx-0 bg-white text-gray-800 font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                Upload
+            </button>
+            <button id="scanButton" class="mx-auto lg:mx-0 bg-red-600 text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                Scan
+            </button>
+            <button id="cancelButton" class="mx-auto lg:mx-0 bg-gray-800 text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                Cancel
+            </button>
+        </div>
+
+        <!-- Table of Files Ready to Upload -->
+        <div class="table-container mt-8">
+            <table class="table" id="fileTable">
+                <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>Upload Date</th>
+                    <th>Scan Status</th>
+                    <th>Upload Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="fileTableBody">
+                <!-- Rows will be added dynamically here -->
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
+<!-- JavaScript pour gérer les actions des boutons -->
+<script>
+    const fileInput = document.getElementById('dropzone-file');
+    const uploadButton = document.getElementById('uploadButton');
+    const cancelButton = document.getElementById('cancelButton');
+    const scanButton = document.getElementById('scanButton');
+    const fileTableBody = document.getElementById('fileTableBody');
+
+    // Ajouter des fichiers au tableau lorsqu'ils sont sélectionnés
+    fileInput.addEventListener('change', () => {
+        for (const file of fileInput.files) {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${file.name}</td>
+                <td>${new Date().toLocaleDateString()}</td>
+                <td class="scan-status">Not Scanned</td>
+                <td class="upload-status">Not Uploaded</td>
+                <td>
+                    <button class="action-btn remove-btn" onclick="removeFile(this)">Remove</button>
+                </td>
+            `;
+            fileTableBody.appendChild(newRow);
+        }
+    });
+
+    // Action du bouton Scan
+    scanButton.addEventListener('click', () => {
+        [...fileTableBody.children].forEach(row => {
+            const scanStatusCell = row.querySelector('.scan-status');
+            if (scanStatusCell.textContent === 'Not Scanned' || scanStatusCell.textContent === 'Scan Failed') {
+                scanStatusCell.textContent = 'Scanning...';
+                setTimeout(() => {
+                    // Simulate scan result
+                    const scanResult = Math.random() > 0.2 ? 'Scan Successful' : 'Scan Failed'; // 80% chance of success
+                    scanStatusCell.textContent = scanResult;
+                }, 1000); // Simulate scan delay
+            }
+        });
+    });
+
+    // Action du bouton Upload
+    uploadButton.addEventListener('click', () => {
+        const allScannedSuccessfully = [...fileTableBody.children].every(row => {
+            return row.querySelector('.scan-status').textContent === 'Scan Successful';
+        });
+
+        if (allScannedSuccessfully) {
+            alert('All files are being uploaded!');
+            [...fileTableBody.children].forEach(row => {
+                const uploadStatusCell = row.querySelector('.upload-status');
+                uploadStatusCell.textContent = 'Uploading...';
+                setTimeout(() => {
+                    uploadStatusCell.textContent = 'Uploaded';
+                }, 1000); // Simulate upload delay
+            });
+        } else {
+            alert('Some files have not been successfully scanned. Please scan all files before uploading.');
+        }
+    });
+
+    // Action du bouton Cancel
+    cancelButton.addEventListener('click', () => {
+        fileInput.value = ''; // Réinitialise l'input file
+        fileTableBody.innerHTML = ''; // Vide le tableau des fichiers
+        alert('File selection canceled.');
+    });
+
+    // Fonction pour enlever un fichier du tableau
+    function removeFile(button) {
+        const row = button.closest('tr');
+        row.remove();
+    }
+</script>
 
 </body>
 </html>
