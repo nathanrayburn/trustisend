@@ -108,7 +108,7 @@ public class  HomeController {
             String email = userDetails.getUsername(); // Récupère l'email ou username de l'utilisateur
             model.addAttribute("email", email);
         }
-        return "myfiles";
+        return "myLinks";
     }
 
 
@@ -203,7 +203,7 @@ public class  HomeController {
                 return "myLinks";
             }catch (Exception e){
                 model.addAttribute("error", "Error fetching user data: " + e.getMessage());
-                return "myLinks";
+                return "redirect:/home";
             }
 
         }
