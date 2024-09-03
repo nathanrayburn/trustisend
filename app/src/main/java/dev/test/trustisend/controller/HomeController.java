@@ -161,7 +161,7 @@ public class  HomeController {
      * Get all the links of the user
      * @param user
      * @param model
-     * @return Map<GroupUUID, LinkedList<ActiveFile>>
+     * @return 
      */
     @GetMapping("/myLinks")
     public String myLinks(@AuthenticationPrincipal User user, Model model) {
