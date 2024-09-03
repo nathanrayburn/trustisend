@@ -273,6 +273,34 @@ public class FirestoreUtil {
         }
     }
 
+    public LinkedList<Group> readGroupsByEmail(String email) throws Exception{
+        try {
+
+
+            Query query = firestore.collection("groups").whereEqualTo("userEmail", email);
+            ApiFuture<QuerySnapshot> future = query.get();
+            QuerySnapshot querySnapshot = future.get();
+            List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+            if (documents.isEmpty()) {
+                System.out.println("No group found with email: " + email);
+                return null;
+            }
+            LinkedList<Group> groups = new LinkedList<Group>();
+            for (DocumentSnapshot doc : documents) {
+                groups.add(new Group(
+                        doc.getId(),
+                        doc.getString("userEmail"),
+                        doc.getString("timestamp"),
+                        doc.getLong("numberDownloads").intValue()
+                ));
+            }
+            return groups;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error fetching group data", e);
+        }
+    }
+
     public LinkedList<ActiveFile> readActiveFilesByGroupUUID(String groupUUID) throws Exception {
         try {
             System.out.println("Looking for active files with group ID: " + groupUUID);

@@ -1,21 +1,40 @@
 package dev.test.trustisend.controller;
 
+import dev.test.trustisend.entity.ActiveFile;
+import dev.test.trustisend.entity.Group;
 import dev.test.trustisend.entity.InputFile;
 import dev.test.trustisend.service.FileService;
 import dev.test.trustisend.service.FirestoreUserDetailsService;
+import dev.test.trustisend.util.Zipper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import dev.test.trustisend.entity.User;
 import dev.test.trustisend.service.FirestoreUserDetailsService;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -111,6 +130,50 @@ public class  HomeController {
         return "redirect:/login";
 
 
+    }
+
+    @PostMapping("/download")
+    ResponseEntity<Resource> downloadFolder(@RequestParam("uid") String uID) throws IOException {
+
+        File folder = fileService.downloadFolder(uID);
+
+        Path path = Paths.get(folder.getAbsolutePath());
+        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+
+        return ResponseEntity.ok()
+                .contentLength(folder.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
+    @PostMapping("/link")
+    public String folderContent(@RequestParam("uid") String uID, @AuthenticationPrincipal User user ,Model model){
+        // get files of the group in firestore
+
+        // pass the files to the model
+        // return the files to the view
+        return "home";
+    }
+
+    @GetMapping("/myLinks")
+    public String myLinks(@AuthenticationPrincipal User user ,Model model){
+        if (user != null) {
+            String email = user.getEmail();
+
+            // get groups of the user
+
+            LinkedList<Group> groups = userDetailsService.getGroups(email);
+
+            // get files for each group and create a map for each group, which contains a map of the files
+
+            for (Group group : groups) {
+                LinkedList<ActiveFile> files = userDetailsService.getFiles(group.getGroupUUID());
+                model.addAttribute(group.getGroupUUID(), files);
+            }
+
+            return "myLinks";
+        }
+        return "redirect:/login";
     }
 
     @PostMapping("/upload")
