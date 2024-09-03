@@ -139,7 +139,7 @@ public class  HomeController {
             Path path = Paths.get(folder.getAbsolutePath());
             ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
 
-            userDetailsService.updateDownloadCount(uID);
+            userDetailsService.incrementDownloadCount(uID);
 
             return ResponseEntity.ok()
                     .contentLength(folder.length())
