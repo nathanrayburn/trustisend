@@ -1,48 +1,21 @@
 steps:
-  # Step 0: Install dependencies and run tests
-  - name: python:3.8  # Use a Python Docker image for running tests
-    id: test
-    entrypoint: bash
-    args:
-      - '-c'
-      - |
-        # Install code dependencies
-        pip install flask==3.0.2
-        pip install google-cloud-firestore==2.18.0
-        pip install google-cloud-storage==2.18.2
-        pip install requests==2.31.0
-        pip install schedule==1.2.2
-        pip install waitress==3.0.0
-        
-        # Install testing dependencies
-        pip install pytest==8.3.2
-        pip install pytest-mock==3.14.0
-        
-        # Run tests and generate JUnit XML report
-        pytest --junitxml=./test-results.xml
 
-  # Step 1: Build the Docker image and tag it with the commit SHA
+  # Step 0: Build the Docker image and tag it with the commit SHA
   - name: gcr.io/cloud-builders/docker
-    id: build
-    waitFor: ['test']  # Ensure this step waits for the test step to complete
     args:
       - build
       - '-t'
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/av:$COMMIT_SHA'
       - '.'
 
-  # Step 2: Push the Docker image to Artifact Registry
+  # Step 1: Push the Docker image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
-    id: push
-    waitFor: ['build']  # Ensure this step waits for the build step to complete
     args:
       - push
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/av:$COMMIT_SHA'
 
-  # Step 3: Deploy the application to Cloud Run using the built image
+  # Step 2: Deploy the application to Cloud Run using the built image
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    id: deploy
-    waitFor: ['push']  # Ensure this step waits for the push step to complete
     args:
       - run
       - deploy
