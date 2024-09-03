@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutionException;
 
 @Component
 public class FirestoreUtil {
-
+    @Autowired
     private final Firestore firestore;
 
     @Autowired
@@ -70,28 +70,35 @@ public class FirestoreUtil {
         );
     }
 
-    public UserDetails readUserByEmail(String email) throws Exception{
-        try{
+
+    public User readUserByEmail(String email) throws Exception {
+        try {
             System.out.println("Looking for user with email: " + email);
             Query query = firestore.collection("users").whereEqualTo("email", email);
             ApiFuture<QuerySnapshot> future = query.get();
             QuerySnapshot querySnapshot = future.get();
             List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+
+            // Return null if no user is found
             if (documents.isEmpty()) {
                 System.out.println("No user found with email: " + email);
                 return null;
             }
+
             DocumentSnapshot document = documents.get(0);
-            // Create and return the UserDetails object
-            return org.springframework.security.core.userdetails.User.withUsername(document.getString("email"))
-                    .password(document.getString("hash"))  // Ensure 'hash' exists in the document
-                    .roles("USER")
-                    .build();
+
+            // Create and return the User object
+            return new User(
+                    document.getId(),
+                    document.getString("email"),
+                    document.getString("hash")
+            );
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-            throw new UsernameNotFoundException("Error fetching user data", e);
+            throw new Exception("Error fetching user data", e);
         }
     }
+
 
     public UserDetails readUserById(String userId) throws Exception {
         try {

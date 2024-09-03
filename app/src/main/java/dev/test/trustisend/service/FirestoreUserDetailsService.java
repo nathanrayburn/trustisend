@@ -3,64 +3,51 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import dev.test.trustisend.entity.User;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import dev.test.trustisend.util.FirestoreUtil;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
 public class FirestoreUserDetailsService implements UserDetailsService {
 
-    private final Firestore firestore;
     @Autowired
     private FirestoreUtil firestoreUtil;
 
     @Autowired
-    public FirestoreUserDetailsService(Firestore firestore) {
-        this.firestore = firestore;
-    }
+    private PasswordEncoder passwordEncoder;
 
-    public User createNewUser(String email, String hash){
-        dev.test.trustisend.entity.User user =  new dev.test.trustisend.entity.User(email, hash);
-        try {
-        return firestoreUtil.createUser(user);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void registerNewUser(String email, String password) throws Exception {
+        // Check if the user already exists
+        User existingUser = firestoreUtil.readUserByEmail(email);
+        if (existingUser != null) {
+            throw new Exception("User already exists");
         }
-        return null;
+
+        // Encrypt the password
+        String encryptedPassword = passwordEncoder.encode(password);
+
+        // Create a new user object
+        User newUser = new User(email, encryptedPassword);
+
+        // Use FirestoreUtil to create the user in Firestore
+        firestoreUtil.createUser(newUser);
     }
 
     @Override
     public User loadUserByUsername(String email) throws UsernameNotFoundException {
         try {
-            // Debug log to check if the method is called
-            System.out.println("Looking for user with email: " + email);
-
-            // Perform the query
-            Query query = firestore.collection("users").whereEqualTo("email", email);
-            ApiFuture<QuerySnapshot> future = query.get();
-            QuerySnapshot querySnapshot = future.get();
-
-            // Check if we received any documents
-            List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
-            if (documents.isEmpty()) {
-                System.out.println("No user found with email: " + email);
-                throw new UsernameNotFoundException("User not found");
+            User user = firestoreUtil.readUserByEmail(email);
+            if (user == null) {
+                throw new UsernameNotFoundException("User not found with email: " + email);
             }
-
-            // Extract user data
-            DocumentSnapshot document = documents.get(0);
-            // System.out.println("User data found: " + document.getData()); // it prints the password hash
-
-            // Create and return the UserDetails object
-            return new User(document.getId(), document.getString("email"), document.getString("hash"));
-
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            return user;
+        } catch (Exception e) {
             throw new UsernameNotFoundException("Error fetching user data", e);
         }
     }
