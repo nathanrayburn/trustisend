@@ -11,7 +11,6 @@ import dev.test.trustisend.util.FirestoreUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.LinkedList;
-import java.util.List;
 
 @Service
 public class FirestoreUserDetailsService implements UserDetailsService {
@@ -38,7 +37,7 @@ public class FirestoreUserDetailsService implements UserDetailsService {
         // Use FirestoreUtil to create the user in Firestore
         firestoreUtil.createUser(newUser);
     }
-    public void updateDownloadCount(String groupUUID) throws Exception {
+    public void incrementDownloadCount(String groupUUID) throws Exception {
         try {
             firestoreUtil.incrementDownloadCount(groupUUID);
         } catch (Exception e) {
