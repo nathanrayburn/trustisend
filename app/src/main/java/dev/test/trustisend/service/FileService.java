@@ -68,17 +68,10 @@ public class FileService{
                     outputStream.write(multipartFile.getBytes());
                 }
 
-                // Create a new MultipartFile referring to the temporary file
-                MultipartFile tempMultipartFile = new MockMultipartFile(
-                        originalFileName,
-                        originalFileName,
-                        multipartFile.getContentType(),
-                        new FileInputStream(tempFilePath.toFile())
-                );
 
                 String contentType = Files.probeContentType(tempFilePath);
                 // Pass the temporary file to DataBucketUtil, use the updated convertFile method
-                FileDto fileDto = dataBucketUtil.uploadFileUsingTempFile(tempMultipartFile, tempFilePath.toFile(), originalFileName, contentType, uID);
+                FileDto fileDto = dataBucketUtil.uploadFileUsingTempFile(tempFilePath.toFile(), originalFileName, contentType, uID);
 
                 if (fileDto != null) {
                     inputFiles.add(new InputFile(uID, fileDto.getFileName(), fileDto.getFileUrl()));

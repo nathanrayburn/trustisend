@@ -76,7 +76,7 @@ public class DataBucketUtil {
      throw new GCPFileUploadException("An error occurred while storing data to GCS");
     }
 
-    public FileDto uploadFileUsingTempFile(MultipartFile multipartFile, File tempFile, String fileName, String contentType, String uID) {
+    public FileDto uploadFileUsingTempFile(File tempFile, String fileName, String contentType, String uID) {
         try {
             // Use the temporary file's data directly
             byte[] fileData = FileUtils.readFileToByteArray(tempFile);
