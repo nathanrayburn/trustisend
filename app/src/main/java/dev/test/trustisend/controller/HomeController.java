@@ -1,6 +1,5 @@
 package dev.test.trustisend.controller;
 
-import dev.test.trustisend.service.FirestoreUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -10,9 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import dev.test.trustisend.entity.User;
-import org.springframework.web.bind.annotation.RequestBody;
-
-
+import dev.test.trustisend.service.FirestoreUserDetailsService;
 
 @Controller
 public class  HomeController {

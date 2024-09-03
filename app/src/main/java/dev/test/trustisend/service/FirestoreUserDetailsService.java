@@ -1,17 +1,12 @@
 package dev.test.trustisend.service;
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import dev.test.trustisend.entity.User;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import dev.test.trustisend.util.FirestoreUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @Service
 public class FirestoreUserDetailsService implements UserDetailsService {
