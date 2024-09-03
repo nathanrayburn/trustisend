@@ -137,15 +137,25 @@ public class  HomeController {
     @PostMapping("/download")
     ResponseEntity<Resource> downloadFolder(@RequestParam("uid") String uID) throws IOException {
 
-        File folder = fileService.downloadFolder(uID);
+        try{
 
-        Path path = Paths.get(folder.getAbsolutePath());
-        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+            File folder = fileService.downloadFolder(uID);
 
-        return ResponseEntity.ok()
-                .contentLength(folder.length())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+            Path path = Paths.get(folder.getAbsolutePath());
+            ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+
+            userDetailsService.updateDownloadCount(uID);
+
+            return ResponseEntity.ok()
+                    .contentLength(folder.length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+
     }
 
     @PostMapping("/link")
@@ -161,29 +171,35 @@ public class  HomeController {
      * Get all the links of the user
      * @param user
      * @param model
-     * @return 
+     * @return
      */
     @GetMapping("/myLinks")
     public String myLinks(@AuthenticationPrincipal User user, Model model) {
         if (user != null) {
             String email = user.getEmail();
 
-            // Get groups of the user
-            LinkedList<Group> groups = userDetailsService.getGroups(email);
+            try{
+                // Get groups of the user
+                LinkedList<Group> groups = userDetailsService.getGroups(email);
 
-            // Map to store group UUIDs and their corresponding files
-            Map<String, LinkedList<ActiveFile>> groupFilesMap = new HashMap<>();
+                // Map to store group UUIDs and their corresponding files
+                Map<String, LinkedList<ActiveFile>> groupFilesMap = new HashMap<>();
 
-            // Get files for each group and put them in the map
-            for (Group group : groups) {
-                LinkedList<ActiveFile> files = userDetailsService.getFiles(group.getGroupUUID());
-                groupFilesMap.put(group.getGroupUUID(), files);
+                // Get files for each group and put them in the map
+                for (Group group : groups) {
+                    LinkedList<ActiveFile> files = userDetailsService.getFiles(group.getGroupUUID());
+                    groupFilesMap.put(group.getGroupUUID(), files);
+                }
+
+                // Add the map to the model
+                model.addAttribute("groupFilesMap", groupFilesMap);
+
+                return "myLinks";
+            }catch (Exception e){
+                model.addAttribute("error", "Error fetching user data: " + e.getMessage());
+                return "myLinks";
             }
 
-            // Add the map to the model
-            model.addAttribute("groupFilesMap", groupFilesMap);
-
-            return "myLinks";
         }
         return "redirect:/login";
     }

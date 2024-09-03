@@ -38,23 +38,30 @@ public class FirestoreUserDetailsService implements UserDetailsService {
         // Use FirestoreUtil to create the user in Firestore
         firestoreUtil.createUser(newUser);
     }
-    public LinkedList<Group> getGroups(String email) {
+    public void updateDownloadCount(String groupUUID) throws Exception {
+        try {
+            firestoreUtil.incrementDownloadCount(groupUUID);
+        } catch (Exception e) {
+            throw new Exception("Error fetching user data", e);
+        }
+    }
+    public LinkedList<Group> getGroups(String email) throws  Exception{
         try {
             User user = firestoreUtil.readUserByEmail(email);
             if (user == null) {
-                throw new UsernameNotFoundException("User not found with email: " + email);
+                throw new Exception("User not found with email: " + email);
             }
             return firestoreUtil.readGroupsByEmail(email);
         } catch (Exception e) {
-            throw new UsernameNotFoundException("Error fetching user data", e);
+            throw new Exception("Error fetching user data", e);
         }
     }
 
-    public LinkedList<ActiveFile> getFiles(String groupUUID){
+    public LinkedList<ActiveFile> getFiles(String groupUUID ) throws Exception {
         try {
             return firestoreUtil.readActiveFilesByGroupUUID(groupUUID);
         } catch (Exception e) {
-            throw new UsernameNotFoundException("Error fetching user data", e);
+            throw new Exception("Error fetching user data", e);
         }
     }
 
