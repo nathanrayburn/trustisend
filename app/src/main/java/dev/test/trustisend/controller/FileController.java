@@ -28,7 +28,8 @@ public class FileController {
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public List<InputFile> addFile(@RequestParam("files")MultipartFile[] files){
-        return fileService.uploadFiles(files);
+        String uID = java.util.UUID.randomUUID().toString();
+        return fileService.uploadFiles(files, uID);
     }
 
     @GetMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

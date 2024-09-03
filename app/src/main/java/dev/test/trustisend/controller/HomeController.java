@@ -1,16 +1,13 @@
 package dev.test.trustisend.controller;
 
-import dev.test.trustisend.entity.ActiveFile;
-import dev.test.trustisend.entity.Group;
-import dev.test.trustisend.entity.InputFile;
+
+import dev.test.trustisend.entity.*;
 import dev.test.trustisend.service.FileService;
 import dev.test.trustisend.service.FirestoreUserDetailsService;
-import dev.test.trustisend.util.Zipper;
+import dev.test.trustisend.util.FirestoreUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,25 +15,21 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import dev.test.trustisend.entity.User;
-import dev.test.trustisend.service.FirestoreUserDetailsService;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -48,6 +41,8 @@ public class  HomeController {
     @Autowired
     private FirestoreUserDetailsService userDetailsService;
 
+    @Autowired
+    private FirestoreUtil firestoreUtil;
 
     @PostMapping("/perform_signup")
     public String performSignup(@RequestParam("email") String email,
@@ -207,24 +202,26 @@ public class  HomeController {
     @PostMapping("/upload")
     public String createLink(@RequestParam("files") MultipartFile[] files,
                              @AuthenticationPrincipal User user,
-                             Model model) {
-        // fileService.uploadFiles(files);
-        if(user != null){
+                             Model model) throws Exception {
+        if (user != null) {
+            // 1. Create a group in Firestore for the user's files
+            Group group = firestoreUtil.createGroup(new Group(user.getEmail(), LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), 0));
+            String uID = group.getGroupUUID();
+            // 2. Upload the files and associate them with the group
+            List<InputFile> uploadedFiles = fileService.uploadFiles(files, uID);
 
-            // create group in firestore
+            // 3. Save file metadata to Firestore under the created group
+            for(InputFile file : uploadedFiles) {
 
-            // retrieve group id
-            // pass the group unique id into the uploadFiles method
-            List<InputFile> inputFiles = fileService.uploadFiles(files);
+                ActiveFile f = new ActiveFile(group, file.getFileName(), FileScanStatus.PENDING);
+                f = firestoreUtil.createActiveFile(f);
+            }
 
-            // add files to group in firestore
-
-            model.addAttribute("inputFiles",inputFiles);
-
-            return "home";
+            // Redirect or update the model as needed
+            return "home"; // Adjust redirect as needed
         }
+        return "redirect:/login"; // If user is not authenticated
 
-        return "redirect:/login";
     }
 
 }
