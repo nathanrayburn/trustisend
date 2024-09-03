@@ -225,6 +225,37 @@ public class FirestoreUtil {
         }
     }
 
+    public void incrementDownloadCount(String groupUUID) throws Exception {
+        try {
+            System.out.println("Attempting to increment download count for group with ID: " + groupUUID);
+
+            // Retrieve the document reference for the given group ID
+            DocumentReference docRef = firestore.collection("groups").document(groupUUID);
+            ApiFuture<DocumentSnapshot> future = docRef.get();
+            DocumentSnapshot document = future.get();
+
+            // Check if the document exists
+            if (!document.exists()) {
+                System.out.println("No group found with ID: " + groupUUID);
+                return;
+            }
+
+            // Increment the download count
+            int currentDownloads = document.getLong("numberDownloads").intValue();
+            int newDownloads = currentDownloads + 1;
+
+            // Update the download count in Firestore
+            ApiFuture<WriteResult> writeResult = docRef.update("numberDownloads", newDownloads);
+            WriteResult result = writeResult.get();
+
+            System.out.println("Download count for group with ID: " + groupUUID + " incremented to: " + newDownloads);
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error incrementing download count", e);
+        }
+    }
+
     public void deleteGroupWithDependecies(String groupUUID) throws Exception {
         try {
             System.out.println("Attempting to delete group with ID: " + groupUUID);
@@ -270,6 +301,34 @@ public class FirestoreUtil {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             throw new Exception("Error fetching active file data", e);
+        }
+    }
+
+    public LinkedList<Group> readGroupsByEmail(String email) throws Exception{
+        try {
+
+
+            Query query = firestore.collection("groups").whereEqualTo("userEmail", email);
+            ApiFuture<QuerySnapshot> future = query.get();
+            QuerySnapshot querySnapshot = future.get();
+            List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+            if (documents.isEmpty()) {
+                System.out.println("No group found with email: " + email);
+                return null;
+            }
+            LinkedList<Group> groups = new LinkedList<Group>();
+            for (DocumentSnapshot doc : documents) {
+                groups.add(new Group(
+                        doc.getId(),
+                        doc.getString("userEmail"),
+                        doc.getString("timestamp"),
+                        doc.getLong("numberDownloads").intValue()
+                ));
+            }
+            return groups;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new Exception("Error fetching group data", e);
         }
     }
 
