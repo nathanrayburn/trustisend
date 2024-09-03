@@ -18,7 +18,7 @@
 - **Base de données** : [Google Cloud Datastore](https://cloud.google.com/datastore) - Solution flexible et performante pour le stockage des données.
 - **Infrastructure** : [Google App Engine](https://cloud.google.com/appengine) - Plateforme de déploiement offrant scalabilité automatique et haute disponibilité.
 - **CI/CD** : [Google Cloud Build](https://cloud.google.com/build) - Pipeline d'intégration et de déploiement continu automatisé.
-- **Sécurité et Gestion des Accès** : [Casdoor](https://casdoor.org/) pour la gestion des identités et [Casbin](https://casbin.org/) pour les autorisations basées sur les rôles.
+- **Sécurité et Gestion des Accès** : [Spring Security](https://spring.io/projects/spring-security) - Intégration dans Spring Boot de gestion d'accès et d'authentification
 - **Gestion des fichiers** : Intégration avec [Google Cloud Storage](https://cloud.google.com/storage) pour un stockage sécurisé et scalable.
 - **Analyse de Malware** : [VirusTotal API](https://www.virustotal.com/) pour l'analyse des fichiers avant partage.
 

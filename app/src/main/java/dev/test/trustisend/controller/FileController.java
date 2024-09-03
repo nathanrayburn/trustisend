@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -29,7 +28,8 @@ public class FileController {
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public List<InputFile> addFile(@RequestParam("files")MultipartFile[] files){
-        return fileService.uploadFiles(files);
+        String uID = java.util.UUID.randomUUID().toString();
+        return fileService.uploadFiles(files, uID);
     }
 
     @GetMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

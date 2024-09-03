@@ -1,20 +1,13 @@
 package dev.test.trustisend.util;
 
-
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import dev.test.trustisend.dto.FileDto;
-import dev.test.trustisend.exception.BadRequestException;
-import dev.test.trustisend.exception.FileWriteException;
-import dev.test.trustisend.exception.GCPFileUploadException;
-import dev.test.trustisend.exception.InvalidFileTypeException;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,7 +16,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+
+import dev.test.trustisend.dto.FileDto;
+import dev.test.trustisend.exception.BadRequestException;
+import dev.test.trustisend.exception.FileWriteException;
+import dev.test.trustisend.exception.GCPFileUploadException;
+import dev.test.trustisend.exception.InvalidFileTypeException;
 
 @Component
 public class DataBucketUtil {

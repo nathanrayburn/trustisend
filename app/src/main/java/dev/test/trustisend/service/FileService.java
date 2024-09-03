@@ -8,6 +8,7 @@ import dev.test.trustisend.exception.GCPFileUploadException;
 import dev.test.trustisend.util.DataBucketUtil;
 import dev.test.trustisend.util.Zipper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,17 +21,15 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class FileService{
 
+    @Autowired
     private final DataBucketUtil dataBucketUtil;
 
-    public List<InputFile> uploadFiles(MultipartFile[] files) {
+    public List<InputFile> uploadFiles(MultipartFile[] files, String uID) {
 
         List<InputFile> inputFiles = new ArrayList<>();
-
-        String uID = java.util.UUID.randomUUID().toString();
 
         Arrays.asList(files).forEach(file -> {
             String originalFileName = file.getOriginalFilename();
