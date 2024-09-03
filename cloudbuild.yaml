@@ -1,21 +1,35 @@
 steps:
+  # Step 0: Run tests
+  - name: python:3.8  # Use a Python Docker image for running tests
+    id: test
+    entrypoint: python
+    args:
+      - -m
+      - pytest
+      - --junitxml=./test-results.xml  # Output test results in JUnit XML format
 
-  # Step 0: Build the Docker image and tag it with the commit SHA
+  # Step 1: Build the Docker image and tag it with the commit SHA
   - name: gcr.io/cloud-builders/docker
+    id: build
+    waitFor: ['test']  # Ensure this step waits for the test step to complete
     args:
       - build
       - '-t'
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/av:$COMMIT_SHA'
       - '.'
 
-  # Step 1: Push the Docker image to Artifact Registry
+  # Step 2: Push the Docker image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
+    id: push
+    waitFor: ['build']  # Ensure this step waits for the build step to complete
     args:
       - push
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/av:$COMMIT_SHA'
 
-  # Step 2: Deploy the application to Cloud Run using the built image
+  # Step 3: Deploy the application to Cloud Run using the built image
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: deploy
+    waitFor: ['push']  # Ensure this step waits for the push step to complete
     args:
       - run
       - deploy

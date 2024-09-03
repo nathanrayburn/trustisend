@@ -1,6 +1,11 @@
+# code dependencies
 flask==3.0.2
 google-cloud-firestore==2.18.0
 google-cloud-storage==2.18.2
 requests==2.31.0
 schedule==1.2.2
 waitress==3.0.0
+
+# Testing dependencies
+pytest==8.3.2          
+pytest-mock==3.14.0   
