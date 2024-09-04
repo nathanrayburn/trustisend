@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>My Files - TrustiSend</title>
+    <title>My Links - TrustiSend</title>
     <link th:href="@{/css/main.css}" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet" />
     <style>
@@ -61,7 +61,6 @@
                 <svg class="h-8 fill-current inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.005 512.005">
                     <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" transform="matrix(1,0,0,1,0,0)" />
                     <path class="plane-take-off" d="M510.7 189.151C505.271 168.95 484.565 156.956 464.365 162.385L330.156 198.367 155.924 35.878 107.19 49.008 211.729 230.183 86.232 263.767 36.614 224.754 0 234.603 45.957 314.27 65.274 347.727 105.802 336.869 240.011 300.886 349.726 271.469 483.935 235.486C504.134 230.057 516.129 209.352 510.7 189.151Z" />
-
                 </svg>
                 TrustiSend
             </a>
@@ -111,34 +110,21 @@
         <table class="table">
             <thead>
             <tr>
-                <th>Filename</th>
+                <th>Directory UUID</th>
                 <th>Upload Date</th>
-                <th>Downloads</th>
-                <th>Scan Status</th>
+                <th>Download Count</th>
                 <th>Links</th>
             </tr>
             </thead>
             <tbody>
-            <!-- Example File Row -->
-            <tr>
-                <td>example-file.txt</td>
-                <td>20/08/2024</td>
-                <td class="download-count">0</td>
-                <td><img src="/images/scan-success.svg" alt="Scan Successful" class="icon"></td>
-                <td><a href="#" onclick="increaseDownloadCount(this)"><img src="/images/link-image-logo.png" alt="Download" class="icon"></a></td>
-            </tr>
-            <!-- Thymeleaf Loop to Display Uploaded Files -->
-            <tr th:each="file : ${uploadedFiles}">
-                <td th:text="${file.name}">Filename</td>
-                <td th:text="${file.uploadDate}">Upload Date</td>
-                <td th:text="${file.downloadCount}" class="download-count">0</td>
+            <!-- Thymeleaf Loop to Display Group Information -->
+            <tr th:each="groupEntry : ${groupFilesMap}">
+                <td th:text="${groupEntry.key}">Directory UUID</td>
+                <td th:text="${#lists.isEmpty(groupEntry.value) ? 'N/A' : groupEntry.value.get(0).timestamp}">Upload Date</td>
+                <td th:text="${#lists.isEmpty(groupEntry.value) ? 0 : groupEntry.value.get(0).numberDownloads}">Download Count</td>
                 <td>
-                    <img th:src="@{/images/{icon}(icon=${file.scanStatus == 'successful' ? 'scan-success.svg' : (file.scanStatus == 'failed' ? 'scan-failed.svg' : 'scan-pending.svg'))}"
-                         alt="Scan Status" class="icon" />
-                </td>
-                <td>
-                    <a th:href="@{/download/{filename}(filename=${file.name})}" onclick="increaseDownloadCount(this)">
-                        <img src="/icons/link.svg" alt="Download" class="icon">
+                    <a th:href="@{/link/{uid}(uid=${groupEntry.key})}">
+                        <img src="/icons/link.svg" alt="Link" class="icon">
                     </a>
                 </td>
             </tr>

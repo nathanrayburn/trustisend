@@ -68,7 +68,6 @@ public class FileService{
                     outputStream.write(multipartFile.getBytes());
                 }
 
-
                 String contentType = Files.probeContentType(tempFilePath);
                 // Pass the temporary file to DataBucketUtil, use the updated convertFile method
                 FileDto fileDto = dataBucketUtil.uploadFileUsingTempFile(tempFilePath.toFile(), originalFileName, contentType, uID);

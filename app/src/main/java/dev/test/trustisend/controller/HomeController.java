@@ -101,17 +101,6 @@ public class  HomeController {
         return "login";
     }
 
-    @GetMapping("/myfiles")
-    public String myfiles(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        // Vérifiez si l'utilisateur est connecté
-        if (userDetails != null) {
-            String email = userDetails.getUsername(); // Récupère l'email ou username de l'utilisateur
-            model.addAttribute("email", email);
-        }
-        return "myLinks";
-    }
-
-
     @GetMapping("/")
     public String index(@AuthenticationPrincipal User user,Model model){
         if(user != null){
