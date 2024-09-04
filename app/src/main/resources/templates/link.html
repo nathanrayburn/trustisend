@@ -150,12 +150,11 @@
         </table>
         <!-- Conteneur pour centrer le bouton Download All -->
         <div class="flex justify-center mt-4">
-            <button class="download-btn" onclick="downloadAllFiles()">Download All</button>
+            <!-- Set the UID dynamically from the folderName -->
+            <button class="download-btn" onclick="downloadAllFiles()" th:data-uid="${folderName}">Download All</button>
         </div>
     </div>
 </div>
-
-
 
 <!-- Scripts -->
 <script>
@@ -235,8 +234,40 @@
 
     // Function to trigger the download of all files
     function downloadAllFiles() {
-        alert('This feature will allow downloading all files in the future.');
-        // Here you would add logic to download all files, like making a request to a download endpoint.
+        // Retrieve the UID from the button's data attribute
+        const uid = document.querySelector('.download-btn').getAttribute('data-uid');
+
+        // Define the URL for the API call
+        const url = `http://localhost:8080/link?uid=${uid}`;
+
+        // Use fetch to make a POST request to the download endpoint
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob(); // Expecting a blob (binary large object) as a response
+            })
+            .then(blob => {
+                // Create a link element, use it to download the blob, and remove it
+                const downloadUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = `${uid}_folder.zip`; // The name of the downloaded file
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(downloadUrl); // Clean up the URL object
+            })
+            .catch(error => {
+                console.error('There was a problem with the download request:', error);
+                alert('An error occurred while trying to download the folder. Please try again.');
+            });
     }
 </script>
 

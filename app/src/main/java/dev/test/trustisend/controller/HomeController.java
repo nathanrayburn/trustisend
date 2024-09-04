@@ -181,9 +181,6 @@ public class  HomeController {
         }
     }
 
-
-
-
     @GetMapping("/viewFolderContents")
     public ResponseEntity<List<ActiveFile>> viewFolderContents(@RequestParam("uid") String uID) {
         try {
