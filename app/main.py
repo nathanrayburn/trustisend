@@ -205,7 +205,9 @@ def handleFile(file_uuid, data):
 
             # update firestore
             db.collection("files").document(file_uuid).update({"scanStatus": status.value})
-            print("File " + file_uuid + " is clean")
+            if status == FileScanStatus.CLEAN:
+                print("File " + file_uuid + " is clean")
+                return True  # Mark for removal since it is clean
         elif res['data']['attributes']['status'] == "queued":
             print("File " + file_uuid + " is queued")
         elif res['data']['attributes']['status'] == "in-progress":
@@ -316,8 +318,8 @@ def safe_execution(task_function):
 
 
 # Schedule the scanNewFiles function to run every 2 minute using the safe_execution wrapper
-schedule.every(65).seconds.do(safe_execution(scanNewFiles))
-schedule.every(65).seconds.do(safe_execution(followUpFileAnalysis))
+schedule.every(60).seconds.do(safe_execution(scanNewFiles))
+schedule.every(60).seconds.do(safe_execution(followUpFileAnalysis))
 
 def run_scheduler():
     while True:
