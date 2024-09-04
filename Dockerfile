@@ -30,4 +30,4 @@ COPY --from=build /app/target/*.jar ./app.jar
 EXPOSE 8080 8000
 
 # Define the entry point for the container
-ENTRYPOINT ["java", "$JAVA_OPTS", "-jar", "./app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar ./app.jar"]
