@@ -47,15 +47,7 @@ public class DataBucketUtil {
     }
     public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType, String uID) {
 
-        try{
-            File tempFile = convertFile(multipartFile);
-            byte[] fileData = FileUtils.readFileToByteArray(tempFile);
-            if(tempFile.delete()){
-                System.out.println("temp file successfully deleted");
-            }
-            else{
-                System.out.println("couldn't delete temp file");
-            }
+     try{
 
          byte[] fileData = FileUtils.readFileToByteArray(convertFile(multipartFile));
 
