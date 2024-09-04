@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 tempDirectory = "temp/"
 url = "https://www.virustotal.com/api/v3/files"
-
+upload_url_endpoint = "https://www.virustotal.com/api/v3/files/upload_url"
 
 class FileScanStatus(Enum):
     PENDING = "PENDING"
@@ -72,7 +72,6 @@ def selectFirstOldestFiles(numberOfFiles, activeFiles):
     return valid_files[:numberOfFiles]
 
 
-
 def getExtension(path):
     return path.split('.')[-1]
 
@@ -107,16 +106,31 @@ def readAPIKey():
 
 def sendToAPI(file):
     fileName = tempDirectory + file.file_uuid + "." + getExtension(file.path)
-    files = {"file": (fileName, open(fileName, "rb"), "application/octet-stream")}
+    file_size = os.path.getsize(fileName)
     key = readAPIKey()
     headers = {
         "accept": "application/json",
         "x-apikey": key
     }
 
-    response = requests.post(url, files=files, headers=headers, verify=False)
-
-    return response
+    # If the file is larger than 32MB, use the upload URL method
+    if file_size > 32 * 1024 * 1024:  # 32MB in bytes
+        response = requests.get(upload_url_endpoint, headers=headers)
+        if response.status_code == 200:
+            upload_url = response.json()["data"]
+            with open(fileName, "rb") as f:
+                files = {"file": (fileName, f, "application/octet-stream")}
+                upload_response = requests.post(upload_url, files=files, headers=headers)
+                return upload_response
+        else:
+            print(f"Failed to get upload URL: {response.text}")
+            db.collection("files").document(file.file_uuid).update({"scanStatus": FileScanStatus.ERROR.value})
+            return response
+    else:
+        # For files <= 32MB, use the standard upload method
+        files = {"file": (fileName, open(fileName, "rb"), "application/octet-stream")}
+        response = requests.post(url, files=files, headers=headers)
+        return response
 
 
 # hashmap to track the analysis id of each file
@@ -230,7 +244,6 @@ def scanNewFiles():
         for file in filesToScan:
             try:
                 res = sendToAPI(file)
-                print(res.status_code)
                 if res.status_code == 200:
                     associateFileToAnalysisID(file, res.json()['data'])
                     logging.debug(f"File {file.file_uuid} sent to API successfully.")
@@ -343,4 +356,3 @@ if __name__ == '__main__':
 
     # Start the Flask application
     serve(app, host="0.0.0.0", port=5000)
-
