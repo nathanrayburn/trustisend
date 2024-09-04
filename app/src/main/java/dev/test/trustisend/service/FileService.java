@@ -1,6 +1,6 @@
 package dev.test.trustisend.service;
 
-
+import org.springframework.mock.web.MockMultipartFile;
 import dev.test.trustisend.dto.FileDto;
 import dev.test.trustisend.entity.InputFile;
 import dev.test.trustisend.exception.BadRequestException;
@@ -14,8 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,28 +32,67 @@ public class FileService{
     private final DataBucketUtil dataBucketUtil;
 
     public List<InputFile> uploadFiles(MultipartFile[] files, String uID) {
-
         List<InputFile> inputFiles = new ArrayList<>();
 
-        Arrays.asList(files).forEach(file -> {
-            String originalFileName = file.getOriginalFilename();
-            if(originalFileName == null){
-                throw new BadRequestException("Original file name is null");
+        // Use system's default temporary directory and create a subdirectory named after the unique uID
+        String tempDir = System.getProperty("java.io.tmpdir");
+        String uniqueTempDir = "temp_" + uID;
+        Path tempDirPath = Paths.get(tempDir, uniqueTempDir);
+
+        // Create the temporary directory if it doesn't exist
+        if (!Files.exists(tempDirPath)) {
+            try {
+                Files.createDirectories(tempDirPath);
+            } catch (IOException e) {
+                throw new GCPFileUploadException("Error creating temporary directory: " + e.getMessage());
+            }
+        }
+
+        Arrays.asList(files).forEach(multipartFile -> {
+            String originalFileName = multipartFile.getOriginalFilename();
+            if (originalFileName == null || originalFileName.trim().isEmpty()) {
+                throw new BadRequestException("Original file name is null or empty");
             }
 
-            Path path = new File(originalFileName).toPath();
-
             try {
-                String contentType = Files.probeContentType(path);
-                FileDto fileDto = dataBucketUtil.uploadFile(file, originalFileName, contentType, uID);
+                // Define the path for the temporary file using the original file name
+                Path tempFilePath = tempDirPath.resolve(originalFileName);
+
+                // Ensure that any existing temporary file is deleted before creating a new one
+                if (Files.exists(tempFilePath)) {
+                    Files.delete(tempFilePath);
+                }
+
+                // Save the file to the temporary directory using try-with-resources
+                try (FileOutputStream outputStream = new FileOutputStream(tempFilePath.toFile())) {
+                    outputStream.write(multipartFile.getBytes());
+                }
+
+                String contentType = Files.probeContentType(tempFilePath);
+                // Pass the temporary file to DataBucketUtil, use the updated convertFile method
+                FileDto fileDto = dataBucketUtil.uploadFileUsingTempFile(tempFilePath.toFile(), originalFileName, contentType, uID);
 
                 if (fileDto != null) {
                     inputFiles.add(new InputFile(uID, fileDto.getFileName(), fileDto.getFileUrl()));
                 }
+
+                // Clean up the temporary file after successful upload
+                Files.deleteIfExists(tempFilePath);
+
+            } catch (IOException e) {
+                throw new GCPFileUploadException("Error occurred while handling file: " + e.getMessage());
             } catch (Exception e) {
-                throw new GCPFileUploadException("Error occurred while uploading: " + e.getMessage());
+                throw new GCPFileUploadException("Unexpected error occurred: " + e.getMessage());
             }
         });
+
+        // Optional: Clean up the temporary directory after all files are processed
+        try {
+            Files.deleteIfExists(tempDirPath);
+        } catch (IOException e) {
+            // Log a warning if unable to delete, but don't throw an exception
+            System.err.println("Warning: Unable to delete temporary directory: " + e.getMessage());
+        }
 
         return inputFiles;
     }

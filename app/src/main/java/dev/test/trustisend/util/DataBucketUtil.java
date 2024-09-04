@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,37 +40,61 @@ public class DataBucketUtil {
     private String gcpDirectoryName;
 
 
-    public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType) {
+   public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType) {
         String uID = java.util.UUID.randomUUID().toString();
 
         return uploadFile(multipartFile, fileName, contentType, uID);
     }
-
     public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType, String uID) {
 
-        try{
-            byte[] fileData = FileUtils.readFileToByteArray(convertFile(multipartFile));
+     try{
+
+         byte[] fileData = FileUtils.readFileToByteArray(convertFile(multipartFile));
+
+         String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+
+         GoogleCredentials credentials = GoogleCredentials.fromStream(
+                 new ByteArrayInputStream(credentialsJson.getBytes())
+         );
+
+         StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
+                 .setCredentials(credentials).build();
+
+         Storage storage = options.getService();
+         Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
+
+         Blob blob = bucket.create( uID + "/" + fileName, fileData, contentType);
+
+         if(blob != null){
+             String[] name = blob.getName().split("/");
+             return new FileDto(fileName, blob.getMediaLink());
+         }
+
+     }catch (Exception e){
+         throw new GCPFileUploadException("An error occurred while storing data to GCS: " + e.getMessage());
+     }
+     throw new GCPFileUploadException("An error occurred while storing data to GCS");
+    }
+
+    public FileDto uploadFileUsingTempFile(File tempFile, String fileName, String contentType, String uID) {
+        try {
+            // Use the temporary file's data directly
+            byte[] fileData = FileUtils.readFileToByteArray(tempFile);
 
             String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
-
-            GoogleCredentials credentials = GoogleCredentials.fromStream(
-                    new ByteArrayInputStream(credentialsJson.getBytes())
-            );
-
-            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
-                    .setCredentials(credentials).build();
+            GoogleCredentials credentials = GoogleCredentials.fromStream(new ByteArrayInputStream(credentialsJson.getBytes()));
+            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId).setCredentials(credentials).build();
 
             Storage storage = options.getService();
-            Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
+            Bucket bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
 
-            Blob blob = bucket.create( uID + "/" + fileName, fileData, contentType);
+            Blob blob = bucket.create(uID + "/" + fileName, fileData, contentType);
 
-            if(blob != null){
-                String[] name = blob.getName().split("/");
+            if (blob != null) {
                 return new FileDto(fileName, blob.getMediaLink());
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new GCPFileUploadException("An error occurred while storing data to GCS: " + e.getMessage());
         }
         throw new GCPFileUploadException("An error occurred while storing data to GCS");
@@ -229,6 +254,7 @@ public class DataBucketUtil {
             throw new FileWriteException("An error has occurred while converting the file");
         }
     }
+
 
     /**
      * Return the file extension, throws an exception if the file name has no extension
