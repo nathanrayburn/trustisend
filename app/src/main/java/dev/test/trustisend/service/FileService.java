@@ -109,13 +109,47 @@ public class FileService{
     }
 
     //@TODO test
-    public File downloadFolder(String uID){
-        if(uID == null || uID.isEmpty()){
+    public File downloadFolder(String uID) {
+        if (uID == null || uID.isEmpty()) {
             throw new BadRequestException("uID is null");
         }
 
-        return Zipper.zip(dataBucketUtil.downloadFolder(uID), uID);
+        // Use the system's default temporary directory and create a subdirectory named after the unique uID
+        String tempDir = System.getProperty("java.io.tmpdir");
+        String uniqueTempDir = "temp_" + uID;
+        Path tempDirPath = Paths.get(tempDir, uniqueTempDir);
+
+        // Create the temporary directory if it doesn't exist
+        if (!Files.exists(tempDirPath)) {
+            try {
+                Files.createDirectories(tempDirPath);
+            } catch (IOException e) {
+                throw new BadRequestException("Error creating temporary directory: " + e.getMessage());
+            }
+        }
+
+        // Get the list of files from the DataBucketUtil
+        List<File> files = dataBucketUtil.downloadFolder(uID);
+
+        // Define the path for the zip file within the temporary directory
+        Path zipFilePath = tempDirPath.resolve(uID + "_folder.zip");
+
+        // Ensure that any existing zip file is deleted before creating a new one
+        try {
+            if (Files.exists(zipFilePath)) {
+                Files.delete(zipFilePath);
+            }
+        } catch (IOException e) {
+            throw new BadRequestException("Error deleting existing zip file: " + e.getMessage());
+        }
+
+        // Create the zip file in the temporary directory
+        File zipFile = Zipper.zip(files, zipFilePath.toString());
+
+        // Return the zip file created in the temporary directory
+        return zipFile;
     }
+
 
     public boolean deleteFile(String uID, String fileName){
         if(fileName == null){
