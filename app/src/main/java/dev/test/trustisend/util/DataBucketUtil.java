@@ -190,7 +190,6 @@ public class DataBucketUtil {
             }
             return files;
         } catch (Exception e) {
-            System.out.println("Download failed: " + e.getMessage());
             throw new BadRequestException("Download failed: " + e.getMessage());
         }
     }

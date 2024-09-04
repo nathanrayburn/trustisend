@@ -243,8 +243,6 @@ public class  HomeController {
             Group group = firestoreUtil.createGroup(new Group(user.getEmail(), LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), 0));
             String uID = group.getGroupUUID();
 
-            System.out.println("Calling uploadFiles");
-
             // 2. Upload the files and associate them with the group
             List<InputFile> uploadedFiles = fileService.uploadFiles(files, uID);
 
