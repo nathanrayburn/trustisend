@@ -337,19 +337,14 @@
             Array.from(fileInput.files).forEach(file => formData.append('files', file));
 
             try {
-                // Get the current protocol (HTTP or HTTPS)
-                const protocol = window.location.protocol;
-                // Get the current host (domain or IP)
-                const host = window.location.host;
-                // Construct the full upload URL using the current protocol and host
-                const uploadUrl = `${protocol}//${host}/upload`;
+                // Use protocol-relative URL to adapt to HTTP/HTTPS
+                const uploadUrl = `//${window.location.host}/upload`;
 
                 // Use fetch to upload the files
                 const response = await fetch(uploadUrl, {
                     method: 'POST',
                     body: formData,
                 });
-
 
                 // Check if the response is successful
                 if (response.ok) {
@@ -369,6 +364,7 @@
             alert('Please select files before uploading.');
         }
     });
+
 
 
     // Cancel button action
