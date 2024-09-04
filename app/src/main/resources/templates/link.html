@@ -231,14 +231,16 @@
             }
         });
     });
-
     // Function to trigger the download of all files
     function downloadAllFiles() {
         // Retrieve the UID from the button's data attribute
         const uid = document.querySelector('.download-btn').getAttribute('data-uid');
 
-        // Define the URL for the API call
-        const url = `http://localhost:8080/link?uid=${uid}`;
+        // Get the current base URL dynamically
+        const baseUrl = window.location.origin; // This will automatically use the current domain and protocol
+
+        // Define the URL for the API call dynamically
+        const url = `${baseUrl}/link?uid=${uid}`;
 
         // Use fetch to make a POST request to the download endpoint
         fetch(url, {

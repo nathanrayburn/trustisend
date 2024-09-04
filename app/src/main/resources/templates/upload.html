@@ -329,30 +329,45 @@
 
     // Upload button action
     uploadButton.addEventListener('click', async () => {
+        // Check if there are any files selected
         if (fileTableBody.children.length > 0) {
             const formData = new FormData();
+
+            // Append each selected file to the FormData object
             Array.from(fileInput.files).forEach(file => formData.append('files', file));
 
             try {
-                const response = await fetch('/upload', {
+                // Dynamically construct the base URL
+                const baseUrl = window.location.origin;
+
+                // Construct the full URL for the upload endpoint
+                const uploadUrl = `${baseUrl}/upload`;
+
+                // Make the POST request using fetch
+                const response = await fetch(uploadUrl, {
                     method: 'POST',
                     body: formData,
                 });
 
+                // Check if the response is successful
                 if (response.ok) {
                     alert('Files uploaded successfully!');
+                    // Update the status column to 'Uploaded'
                     [...fileTableBody.children].forEach(row => row.querySelector('td:nth-child(3)').textContent = 'Uploaded');
                 } else {
                     alert('Failed to upload files.');
                 }
             } catch (error) {
+                // Log the error and display an alert
                 console.error('Error uploading files:', error);
                 alert('An error occurred while uploading files.');
             }
         } else {
+            // Alert if no files are selected
             alert('Please select files before uploading.');
         }
     });
+
 
     // Cancel button action
     cancelButton.addEventListener('click', () => {
