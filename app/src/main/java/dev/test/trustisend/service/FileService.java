@@ -38,13 +38,18 @@ public class FileService{
 
         // Determine the current working directory
         String currentDir = System.getProperty("user.dir");
+        System.out.println("Current working directory: " + currentDir);
+
         // Create a temporary directory within the current working directory
         String uniqueTempDir = "temp_" + uID;
         Path tempDirPath = Paths.get(currentDir, uniqueTempDir);
 
+        System.out.println("Temporary directory path: " + tempDirPath);
+
         // Create the temporary directory if it doesn't exist
         if (!Files.exists(tempDirPath)) {
             try {
+                System.out.println("Creating temporary directory...");
                 Files.createDirectories(tempDirPath);
             } catch (IOException e) {
                 System.out.println("Error creating temporary directory: " + e.getMessage());
@@ -53,6 +58,7 @@ public class FileService{
         }
 
         Arrays.asList(files).forEach(multipartFile -> {
+            System.out.println("Processing file: " + multipartFile.getOriginalFilename());
             String originalFileName = multipartFile.getOriginalFilename();
             if (originalFileName == null || originalFileName.trim().isEmpty()) {
                 System.out.println("Original file name is null or empty");
@@ -62,25 +68,32 @@ public class FileService{
             try {
                 // Define the path for the temporary file using the original file name
                 Path tempFilePath = tempDirPath.resolve(originalFileName);
-
+                System.out.println("Temporary file path: " + tempFilePath);
                 // Ensure that any existing temporary file is deleted before creating a new one
                 if (Files.exists(tempFilePath)) {
+                    System.out.println("Deleting existing temporary file...");
                     Files.delete(tempFilePath);
                 }
-
+                System.out.println("Creating temporary file...");
                 // Save the file to the temporary directory using try-with-resources
                 try (FileOutputStream outputStream = new FileOutputStream(tempFilePath.toFile())) {
+                    System.out.println("Writing file to temporary directory...");
                     outputStream.write(multipartFile.getBytes());
+                }catch (IOException e){
+                    System.out.println("Error writing file to temporary directory: " + e.getMessage());
+                    throw new GCPFileUploadException("Error writing file to temporary directory: " + e.getMessage());
                 }
 
                 String contentType = Files.probeContentType(tempFilePath);
+                System.out.println("Content type: " + contentType);
                 // Pass the temporary file to DataBucketUtil, use the updated convertFile method
+                System.out.println("Uploading file to GCP...");
                 FileDto fileDto = dataBucketUtil.uploadFileUsingTempFile(tempFilePath.toFile(), originalFileName, contentType, uID);
 
                 if (fileDto != null) {
                     inputFiles.add(new InputFile(uID, fileDto.getFileName(), fileDto.getFileUrl()));
                 }
-
+                System.out.println("Delete temporary file...");
                 // Clean up the temporary file after successful upload
                 Files.deleteIfExists(tempFilePath);
 
