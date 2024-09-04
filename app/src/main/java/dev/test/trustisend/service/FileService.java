@@ -1,5 +1,6 @@
 package dev.test.trustisend.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
 import dev.test.trustisend.dto.FileDto;
 import dev.test.trustisend.entity.InputFile;
@@ -31,18 +32,20 @@ public class FileService{
     @Autowired
     private final DataBucketUtil dataBucketUtil;
 
+    @Value("${app.temp.dir}")
+    private String tempDirPath;
+
     public List<InputFile> uploadFiles(MultipartFile[] files, String uID) {
         List<InputFile> inputFiles = new ArrayList<>();
 
-        // Use system's default temporary directory and create a subdirectory named after the unique uID
-        String tempDir = System.getProperty("java.io.tmpdir");
+        // Use the custom temporary directory and create a subdirectory named after the unique uID
         String uniqueTempDir = "temp_" + uID;
-        Path tempDirPath = Paths.get(tempDir, uniqueTempDir);
+        Path customTempDirPath = Paths.get(tempDirPath, uniqueTempDir);
 
         // Create the temporary directory if it doesn't exist
-        if (!Files.exists(tempDirPath)) {
+        if (!Files.exists(customTempDirPath)) {
             try {
-                Files.createDirectories(tempDirPath);
+                Files.createDirectories(customTempDirPath);
             } catch (IOException e) {
                 throw new GCPFileUploadException("Error creating temporary directory: " + e.getMessage());
             }
@@ -56,7 +59,7 @@ public class FileService{
 
             try {
                 // Define the path for the temporary file using the original file name
-                Path tempFilePath = tempDirPath.resolve(originalFileName);
+                Path tempFilePath = customTempDirPath.resolve(originalFileName);
 
                 // Ensure that any existing temporary file is deleted before creating a new one
                 if (Files.exists(tempFilePath)) {
@@ -88,7 +91,7 @@ public class FileService{
 
         // Optional: Clean up the temporary directory after all files are processed
         try {
-            Files.deleteIfExists(tempDirPath);
+            Files.deleteIfExists(customTempDirPath);
         } catch (IOException e) {
             // Log a warning if unable to delete, but don't throw an exception
             System.err.println("Warning: Unable to delete temporary directory: " + e.getMessage());
