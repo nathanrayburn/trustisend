@@ -179,7 +179,7 @@
     <div class="mt-8 text-gray-100 text-lg text-center">
         <p>1. Drag your file/s into the box above or click to select.</p>
         <p>2. Then click on upload when you put them all.</p>
-        <p>3. Once updated, you would be able to find them in the <a href="#" id="myFilesLink" class="text-blue-500 hover:text-blue-700 font-bold">My Files</a> page.</p>
+        <p>3. Once updated, you would be able to find them in the <a href="#" id="myLinksLink" class="text-blue-500 hover:text-blue-700 font-bold">My Links</a> page.</p>
     </div>
 
     <!-- Upload and Cancel Buttons -->
@@ -294,7 +294,7 @@
     const uploadButton = document.getElementById('uploadButton');
     const cancelButton = document.getElementById('cancelButton');
     const fileTableBody = document.getElementById('fileTableBody');
-    const myFilesLink = document.getElementById('myFilesLink');
+    const myLinksLink = document.getElementById('myLinksLink');
     const confirmationModal = document.getElementById('confirmationModal');
     const confirmButton = document.getElementById('confirmButton');
     const cancelModalButton = document.getElementById('cancelModalButton');
@@ -357,21 +357,21 @@
     }
 
     // Handle navigation to My Files with confirmation
-    myFilesLink.addEventListener('click', (e) => {
+    myLinksLink.addEventListener('click', (e) => {
         e.preventDefault();
-        if (localStorage.getItem('dontShowMyFilesConfirmation') !== 'true') {
+        if (localStorage.getItem('dontShowMyLinksConfirmation') !== 'true') {
             confirmationModal.style.display = 'flex';
         } else {
-            window.location.href = '/myfiles';
+            window.location.href = '/myLinks';
         }
     });
 
     // Confirm navigation
     confirmButton.addEventListener('click', () => {
         if (dontShowAgain.checked) {
-            localStorage.setItem('dontShowMyFilesConfirmation', 'true');
+            localStorage.setItem('dontShowMyLinksConfirmation', 'true');
         }
-        window.location.href = '/myfiles';
+        window.location.href = '/myLinks';
     });
 
     // Cancel modal

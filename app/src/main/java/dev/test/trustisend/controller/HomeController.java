@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
@@ -162,8 +163,23 @@ public class  HomeController {
         }
     }
 
+
+
+    @GetMapping("/viewFolderContents")
+    public ResponseEntity<List<ActiveFile>> viewFolderContents(@RequestParam("uid") String uID) {
+        try {
+            // Fetch the files in the folder based on the group UUID
+            LinkedList<ActiveFile> files = userDetailsService.getFiles(uID);
+            return ResponseEntity.ok(files); // Return the list of files as JSON
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Handle errors gracefully
+        }
+    }
+
+
+
     /**
-     * Get user links
+     * Get user links and display them
      * @param user
      * @param model
      * @return
