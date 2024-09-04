@@ -49,6 +49,71 @@
             width: 24px;
             height: 24px;
         }
+        /* Modal styling for better display */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #2d3748;
+            padding: 30px;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 90%;
+            color: #e2e8f0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #daae51;
+        }
+
+        .modal-content ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .modal-content li {
+            padding: 8px;
+            border-bottom: 1px solid #40596f;
+            font-size: 16px;
+        }
+
+        .modal-content li:last-child {
+            border-bottom: none;
+        }
+
+        .modal-content button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #d53369;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .modal-content button:hover {
+            background-color: #b8285b;
+        }
     </style>
 </head>
 <body class="leading-normal tracking-normal text-white background h-screen" style="font-family: 'Source Sans Pro', sans-serif;">
@@ -119,8 +184,18 @@
             <tbody>
             <!-- Thymeleaf Loop to Display Group Information -->
             <tr th:each="groupEntry : ${groupFilesMap}">
-                <td th:text="${groupEntry.key}">Directory UUID</td>
-                <td th:text="${#lists.isEmpty(groupEntry.value) ? 'N/A' : groupEntry.value.get(0).timestamp}">Upload Date</td>
+                <td>
+                    <span th:text="${groupEntry.key}">Directory UUID</span>
+                    <!-- Eye icon button to view folder contents -->
+                    <button class="view-folder-btn" th:data-uuid="${groupEntry.key}">
+                        <img src="/images/eye.png" alt="View" class="icon">
+                    </button>
+                </td>
+                <!-- Add a class to target this cell in JavaScript -->
+                <td class="upload-date" th:data-timestamp="${#lists.isEmpty(groupEntry.value) ? 'N/A' : groupEntry.value.get(0).timestamp}">
+                    <!-- Display a placeholder; will be formatted by JavaScript -->
+                    <span th:text="${#lists.isEmpty(groupEntry.value) ? 'N/A' : groupEntry.value.get(0).timestamp}">Upload Date</span>
+                </td>
                 <td th:text="${#lists.isEmpty(groupEntry.value) ? 0 : groupEntry.value.get(0).numberDownloads}">Download Count</td>
                 <td>
                     <a th:href="@{/link/{uid}(uid=${groupEntry.key})}">
@@ -129,9 +204,22 @@
                 </td>
             </tr>
             </tbody>
+
         </table>
     </div>
 </div>
+
+<!-- Modal to Display Folder Contents -->
+<div id="folderContentsModal" class="modal">
+    <div class="modal-content">
+        <h3 id="folderIdDisplay">Folder Contents</h3>
+        <ul id="folderContentsList">
+            <!-- File list will be populated here dynamically -->
+        </ul>
+        <button id="closeModalButton" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded mt-4">Close</button>
+    </div>
+</div>
+
 
 <!-- Scripts -->
 <script>
@@ -202,6 +290,105 @@
         downloadCountCell.textContent = currentCount + 1;
     }
 </script>
+
+<script>
+    // Fetch the modal and its elements
+    const folderContentsModal = document.getElementById('folderContentsModal');
+    const folderContentsList = document.getElementById('folderContentsList');
+    const closeModalButton = document.getElementById('closeModalButton');
+
+    // Function to show the modal
+    function showModal() {
+        folderContentsModal.style.display = 'flex';
+    }
+
+    // Function to close the modal
+    function closeModal() {
+        folderContentsModal.style.display = 'none';
+    }
+
+    // Close the modal when clicking outside the content box
+    folderContentsModal.addEventListener('click', (event) => {
+        if (event.target === folderContentsModal) {
+            closeModal();
+        }
+    });
+
+    // Event listener for the close button
+    closeModalButton.addEventListener('click', closeModal);
+
+    // Event listener for the view button to fetch folder contents
+    document.querySelectorAll('.view-folder-btn').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const folderUUID = event.currentTarget.getAttribute('data-uuid');
+
+            try {
+                // Fetch the folder contents from the backend
+                const response = await fetch(`/viewFolderContents?uid=${folderUUID}`);
+
+                // Check if response is okay
+                if (response.ok) {
+                    const files = await response.json();
+                    console.log('Files fetched:', files); // Debugging: Log the fetched files
+
+                    // Set folder ID in the modal header
+                    document.getElementById('folderIdDisplay').textContent = `Folder ID: ${folderUUID}`;
+
+                    // Check if files array is empty
+                    if (files.length === 0) {
+                        folderContentsList.innerHTML = '<li>No files found in this folder.</li>';
+                    } else {
+                        // Populate the list with fetched files
+                        folderContentsList.innerHTML = ''; // Clear previous contents
+                        files.forEach(file => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = file.path || 'Unnamed File'; // Use the 'path' property to display file names
+                            folderContentsList.appendChild(listItem);
+                        });
+                    }
+
+                    // Show the modal
+                    showModal();
+                } else {
+                    console.error('Failed to fetch folder contents:', response.status, response.statusText);
+                    alert('Failed to fetch folder contents.');
+                }
+            } catch (error) {
+                console.error('Error fetching folder contents:', error);
+                alert('An error occurred while fetching folder contents.');
+            }
+        });
+    });
+
+</script>
+
+<script>
+    // Function to format the timestamp into 'YYYY-MM-DD HH:mm:ss'
+    function formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    // Find all cells with the 'upload-date' class and format their timestamps
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.upload-date').forEach(cell => {
+            const timestamp = cell.getAttribute('data-timestamp');
+            if (timestamp && timestamp !== 'N/A') {
+                // Format the timestamp and update the cell content
+                cell.textContent = formatTimestamp(timestamp);
+            }
+        });
+    });
+</script>
+
+
+
 
 </body>
 </html>
