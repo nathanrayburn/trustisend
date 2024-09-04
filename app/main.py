@@ -51,7 +51,6 @@ def getActiveFilesFromFirestore():
 def getTimestamp(group_uuid):
     group_ref = db.collection("groups").document(group_uuid)
     group = group_ref.get()
-    print("Group:", group)
     if group.to_dict() is None:
         return 0
     return group.to_dict()['timestamp']
@@ -115,7 +114,7 @@ def sendToAPI(file):
         "x-apikey": key
     }
 
-    response = requests.post(url, files=files, headers=headers)
+    response = requests.post(url, files=files, headers=headers, verify=False)
 
     return response
 
@@ -141,24 +140,17 @@ def isExpectedResults(key, value):
                 "type-unsupported": x
     '''
     if key == "malicious" and value > 0:
-        print("File is malicious")
         return FileScanStatus.INFECTED
     elif key == "suspicious" and value > 0:
-        print("File is suspicious")
         return FileScanStatus.INFECTED
     elif key == "undetected" and value > 0:
-        print("File is undetected")
         return FileScanStatus.CLEAN
     elif key == "timeout" and value > 0:
-        print("File is timeout")
         return FileScanStatus.ERROR
     elif key == "confirmed-timeout" and value > 0:
-        print("File is confirmed-timeout")
         return FileScanStatus.ERROR
     elif key == "failure" and value > 0:
-        print("File is failure")
         return FileScanStatus.ERROR
-    print("File is clean")
     return FileScanStatus.CLEAN
 
 
@@ -178,7 +170,7 @@ def followUpFileAnalysis():
 
 
 def handleFile(file_uuid, data):
-    analysis_id = data['id']
+    analysis_id = data['id'] 
     url = data['links']['self']
     key = readAPIKey()
     headers = {
@@ -238,6 +230,7 @@ def scanNewFiles():
         for file in filesToScan:
             try:
                 res = sendToAPI(file)
+                print(res.status_code)
                 if res.status_code == 200:
                     associateFileToAnalysisID(file, res.json()['data'])
                     logging.debug(f"File {file.file_uuid} sent to API successfully.")
@@ -309,9 +302,9 @@ def safe_execution(task_function):
     return wrapper
 
 
-# Schedule the scanNewFiles function to run every minute using the safe_execution wrapper
-schedule.every(1).minutes.do(safe_execution(scanNewFiles))
-schedule.every(1).minutes.do(safe_execution(followUpFileAnalysis))
+# Schedule the scanNewFiles function to run every 2 minute using the safe_execution wrapper
+schedule.every(65).seconds.do(safe_execution(scanNewFiles))
+schedule.every(65).seconds.do(safe_execution(followUpFileAnalysis))
 
 def run_scheduler():
     while True:
@@ -350,3 +343,4 @@ if __name__ == '__main__':
 
     # Start the Flask application
     serve(app, host="0.0.0.0", port=5000)
+
