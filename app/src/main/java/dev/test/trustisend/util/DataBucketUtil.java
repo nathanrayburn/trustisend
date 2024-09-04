@@ -39,10 +39,6 @@ public class DataBucketUtil {
     @Value("${gcp.dir.name}")
     private String gcpDirectoryName;
 
-    @Value("${app.temp.dir}")
-    private String tempDirPath;
-
-
     public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType) {
         String uID = java.util.UUID.randomUUID().toString();
 
@@ -141,24 +137,31 @@ public class DataBucketUtil {
 
     //@TODO test
     public List<File> downloadFolder(String uID) {
-        // Use the custom temporary directory and create a subdirectory named after the unique uID
+        // Determine the current working directory
+        String currentDir = System.getProperty("user.dir");
+        // Create a temporary directory within the current working directory
         String uniqueTempDir = "temp_" + uID;
-        Path customTempDirPath = Paths.get(tempDirPath, uniqueTempDir); // Use custom temp directory
+        Path tempDirPath = Paths.get(currentDir, uniqueTempDir);
 
         // Create the temporary directory if it doesn't exist
-        if (!Files.exists(customTempDirPath)) {
+        if (!Files.exists(tempDirPath)) {
             try {
-                Files.createDirectories(customTempDirPath);
+                Files.createDirectories(tempDirPath);
             } catch (IOException e) {
                 throw new BadRequestException("Error creating temporary directory: " + e.getMessage());
             }
         }
 
         try {
-            // Same logic as before to interact with Google Cloud Storage
             String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
-            GoogleCredentials credentials = GoogleCredentials.fromStream(new ByteArrayInputStream(credentialsJson.getBytes()));
-            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId).setCredentials(credentials).build();
+
+            GoogleCredentials credentials = GoogleCredentials.fromStream(
+                    new ByteArrayInputStream(credentialsJson.getBytes())
+            );
+
+            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
+                    .setCredentials(credentials).build();
+
             Storage storage = options.getService();
             Bucket bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
 
@@ -169,7 +172,7 @@ public class DataBucketUtil {
                 String blobName = blob.getName();
                 if (blobName.contains(uID)) {
                     // Define the path for the temporary file using the blob's name
-                    Path tempFilePath = customTempDirPath.resolve(blobName.substring(blobName.lastIndexOf('/') + 1));
+                    Path tempFilePath = tempDirPath.resolve(blobName.substring(blobName.lastIndexOf('/') + 1));
 
                     // Ensure that any existing temporary file is deleted before creating a new one
                     if (Files.exists(tempFilePath)) {
@@ -190,7 +193,6 @@ public class DataBucketUtil {
             throw new BadRequestException("Download failed: " + e.getMessage());
         }
     }
-
 
     public boolean deleteFile(String uID, String fileName){
         try{

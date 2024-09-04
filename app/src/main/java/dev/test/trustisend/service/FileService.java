@@ -32,20 +32,20 @@ public class FileService{
     @Autowired
     private final DataBucketUtil dataBucketUtil;
 
-    @Value("${app.temp.dir}")
-    private String tempDirPath;
 
     public List<InputFile> uploadFiles(MultipartFile[] files, String uID) {
         List<InputFile> inputFiles = new ArrayList<>();
 
-        // Use the custom temporary directory and create a subdirectory named after the unique uID
+        // Determine the current working directory
+        String currentDir = System.getProperty("user.dir");
+        // Create a temporary directory within the current working directory
         String uniqueTempDir = "temp_" + uID;
-        Path customTempDirPath = Paths.get(tempDirPath, uniqueTempDir);
+        Path tempDirPath = Paths.get(currentDir, uniqueTempDir);
 
         // Create the temporary directory if it doesn't exist
-        if (!Files.exists(customTempDirPath)) {
+        if (!Files.exists(tempDirPath)) {
             try {
-                Files.createDirectories(customTempDirPath);
+                Files.createDirectories(tempDirPath);
             } catch (IOException e) {
                 throw new GCPFileUploadException("Error creating temporary directory: " + e.getMessage());
             }
@@ -59,7 +59,7 @@ public class FileService{
 
             try {
                 // Define the path for the temporary file using the original file name
-                Path tempFilePath = customTempDirPath.resolve(originalFileName);
+                Path tempFilePath = tempDirPath.resolve(originalFileName);
 
                 // Ensure that any existing temporary file is deleted before creating a new one
                 if (Files.exists(tempFilePath)) {
@@ -91,7 +91,7 @@ public class FileService{
 
         // Optional: Clean up the temporary directory after all files are processed
         try {
-            Files.deleteIfExists(customTempDirPath);
+            Files.deleteIfExists(tempDirPath);
         } catch (IOException e) {
             // Log a warning if unable to delete, but don't throw an exception
             System.err.println("Warning: Unable to delete temporary directory: " + e.getMessage());
@@ -99,7 +99,6 @@ public class FileService{
 
         return inputFiles;
     }
-
     public File downloadFile(String uID, String fileName){
 
         if(fileName == null){
