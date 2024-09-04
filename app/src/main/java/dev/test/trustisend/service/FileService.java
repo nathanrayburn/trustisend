@@ -47,6 +47,7 @@ public class FileService{
             try {
                 Files.createDirectories(tempDirPath);
             } catch (IOException e) {
+                System.out.println("Error creating temporary directory: " + e.getMessage());
                 throw new GCPFileUploadException("Error creating temporary directory: " + e.getMessage());
             }
         }
@@ -54,6 +55,7 @@ public class FileService{
         Arrays.asList(files).forEach(multipartFile -> {
             String originalFileName = multipartFile.getOriginalFilename();
             if (originalFileName == null || originalFileName.trim().isEmpty()) {
+                System.out.println("Original file name is null or empty");
                 throw new BadRequestException("Original file name is null or empty");
             }
 
@@ -83,8 +85,10 @@ public class FileService{
                 Files.deleteIfExists(tempFilePath);
 
             } catch (IOException e) {
+                System.out.println("Error occurred while handling file: " + e.getMessage());
                 throw new GCPFileUploadException("Error occurred while handling file: " + e.getMessage());
             } catch (Exception e) {
+                System.out.println("Unexpected error occurred: " + e.getMessage());
                 throw new GCPFileUploadException("Unexpected error occurred: " + e.getMessage());
             }
         });
