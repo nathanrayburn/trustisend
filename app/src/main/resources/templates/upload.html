@@ -17,29 +17,40 @@
         }
         .table-container {
             margin-top: 20px;
-            background-color: rgba(46, 74, 102, 0.9);
+            background-color: #ffffff; /* Fond blanc similaire à celui utilisé sur les autres pages */
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombre douce pour une apparence moderne */
         }
+
         .table {
             width: 100%;
             border-collapse: collapse;
-            color: #e2e8f0;
+            color: #333; /* Texte sombre pour une meilleure lisibilité */
             border-radius: 10px;
             overflow: hidden;
+            font-family: 'Source Sans Pro', sans-serif;
         }
+
         .table th {
-            background-color: #4a5568;
+            background-color: #f7f7f7; /* Fond clair pour l'en-tête */
+            color: #555; /* Texte en gris pour les titres */
             text-transform: uppercase;
             font-size: 14px;
             padding: 12px 15px;
             text-align: left;
+            border-bottom: 2px solid #e2e8f0; /* Légère séparation pour l'en-tête */
         }
+
         .table td {
             padding: 12px 15px;
-            background-color: #2d3748;
-            border-bottom: 1px solid #40596f;
+            background-color: #ffffff; /* Fond blanc pour le contenu du tableau */
+            border-bottom: 1px solid #e0e0e0; /* Ligne de séparation subtile */
+            transition: background-color 0.3s ease; /* Effet de transition pour le survol */
+        }
+
+        .table tr:hover td {
+            background-color: #f1f5f9; /* Fond légèrement gris au survol */
         }
         .action-btn {
             cursor: pointer;
