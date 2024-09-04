@@ -21,7 +21,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .csrf()
             .disable()
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/", "/signup", "/login", "/login.html", "/perform_login", "/css/**", "/js/**",  "/images/**").permitAll()
+            .requestMatchers("/", "/link", "/signup", "/login", "/login.html", "/perform_login", "/css/**", "/js/**",  "/images/**").permitAll()
             .requestMatchers("/perform_signup").permitAll()
             .requestMatchers("/home").authenticated() // Ensuring that only authenticated users can access /home
             .anyRequest().authenticated()

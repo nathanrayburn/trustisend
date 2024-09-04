@@ -137,8 +137,22 @@ public class DataBucketUtil {
     }
 
     //@TODO test
-    public List<File> downloadFolder(String uID){
-        try{
+    public List<File> downloadFolder(String uID) {
+        // Use the system's default temporary directory and create a subdirectory named after the unique uID
+        String tempDir = System.getProperty("java.io.tmpdir");
+        String uniqueTempDir = "temp_" + uID;
+        Path tempDirPath = Paths.get(tempDir, uniqueTempDir);
+
+        // Create the temporary directory if it doesn't exist
+        if (!Files.exists(tempDirPath)) {
+            try {
+                Files.createDirectories(tempDirPath);
+            } catch (IOException e) {
+                throw new BadRequestException("Error creating temporary directory: " + e.getMessage());
+            }
+        }
+
+        try {
             String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
 
             GoogleCredentials credentials = GoogleCredentials.fromStream(
@@ -149,27 +163,37 @@ public class DataBucketUtil {
                     .setCredentials(credentials).build();
 
             Storage storage = options.getService();
-            Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
+            Bucket bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
 
             List<File> files = new ArrayList<>();
-            //search the right blobs
+            // Search the right blobs
             Page<Blob> blobs = bucket.list();
-            for (Blob blob: blobs.getValues()) {
+            for (Blob blob : blobs.getValues()) {
                 String blobName = blob.getName();
                 if (blobName.contains(uID)) {
-                    File downloadedFile = new File(blobName.substring(blobName.lastIndexOf('/')+1));
-                    FileOutputStream outputStream = new FileOutputStream(downloadedFile);
-                    outputStream.write(blob.getContent());
-                    outputStream.close();
-                    files.add(downloadedFile);
+                    // Define the path for the temporary file using the blob's name
+                    Path tempFilePath = tempDirPath.resolve(blobName.substring(blobName.lastIndexOf('/') + 1));
+
+                    // Ensure that any existing temporary file is deleted before creating a new one
+                    if (Files.exists(tempFilePath)) {
+                        Files.delete(tempFilePath);
+                    }
+
+                    // Save the blob content to the temporary file
+                    try (FileOutputStream outputStream = new FileOutputStream(tempFilePath.toFile())) {
+                        outputStream.write(blob.getContent());
+                    }
+
+                    // Add the temporary file to the list of files
+                    files.add(tempFilePath.toFile());
                 }
             }
             return files;
-        }catch(Exception e){
-
+        } catch (Exception e) {
+            throw new BadRequestException("Download failed: " + e.getMessage());
         }
-        throw new BadRequestException("download failed");
     }
+
 
     public boolean deleteFile(String uID, String fileName){
         try{
