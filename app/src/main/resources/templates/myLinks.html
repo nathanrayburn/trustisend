@@ -13,38 +13,53 @@
         }
         .table-container {
             margin-top: 20px;
-            background-color: rgba(46, 74, 102, 0.9);
+            background-color: #ffffff; /* Fond blanc pour un style plus moderne */
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombre douce pour un effet de profondeur */
         }
+
         .table {
             width: 100%;
             border-collapse: collapse;
-            color: #e2e8f0;
+            color: #333; /* Texte en gris foncé pour la lisibilité */
             border-radius: 10px;
             overflow: hidden;
+            font-family: 'Source Sans Pro', sans-serif;
         }
+
         .table th {
-            background-color: #4a5568;
+            background-color: #f7f7f7; /* Fond clair pour l'en-tête */
+            color: #555; /* Texte en gris */
             text-transform: uppercase;
             font-size: 14px;
             padding: 12px 15px;
             text-align: left;
+            border-bottom: 2px solid #e2e8f0; /* Séparation subtile entre l'en-tête et le contenu */
         }
+
         .table td {
             padding: 12px 15px;
-            background-color: #2d3748;
-            border-bottom: 1px solid #40596f;
+            background-color: #ffffff; /* Garder le fond blanc pour un style épuré */
+            border-bottom: 1px solid #e0e0e0; /* Lignes de séparation légères */
+            transition: background-color 0.3s ease; /* Effet de transition pour le survol */
         }
+
+        .table tr:hover td {
+            background-color: #f1f5f9; /* Fond légèrement gris au survol */
+        }
+
         .table td a {
-            color: #d53369;
+            color: #d53369; /* Couleur vive pour les liens */
             text-decoration: none;
-            font-size: 18px;
+            font-size: 16px;
+            font-weight: 600;
         }
+
         .table td a:hover {
             text-decoration: underline;
         }
+
         .icon {
             width: 24px;
             height: 24px;
@@ -184,27 +199,25 @@
             <tbody>
             <!-- Thymeleaf Loop to Display Group Information -->
             <tr th:each="groupEntry : ${groupFilesMap}">
-                <td>
-                    <span th:text="${groupEntry.key}">Directory UUID</span>
+                <td style="display: flex; align-items: center;"> <!-- Flex container to align items -->
+                    <span th:text="${groupEntry.key}" style="margin-right: 8px;">Directory UUID</span>
                     <!-- Eye icon button to view folder contents -->
-                    <button class="view-folder-btn" th:data-uuid="${groupEntry.key}">
-                        <img src="/images/eye.png" alt="View" class="icon">
+                    <button class="view-folder-btn" th:data-uuid="${groupEntry.key}" style="border: none; background: transparent; cursor: pointer;">
+                        <img src="/images/white-eye.png" alt="View" class="icon">
                     </button>
                 </td>
                 <!-- Add a class to target this cell in JavaScript -->
                 <td class="upload-date" th:data-timestamp="${#lists.isEmpty(groupEntry.value) ? 'N/A' : groupEntry.value.get(0).timestamp}">
-                    <!-- Display a placeholder; will be formatted by JavaScript -->
                     <span th:text="${#lists.isEmpty(groupEntry.value) ? 'N/A' : groupEntry.value.get(0).timestamp}">Upload Date</span>
                 </td>
                 <td th:text="${#lists.isEmpty(groupEntry.value) ? 0 : groupEntry.value.get(0).numberDownloads}">Download Count</td>
                 <td>
                     <a th:href="@{/link/{uid}(uid=${groupEntry.key})}">
-                        <img src="/icons/link.svg" alt="Link" class="icon">
+                        <img src="/images/link-zelda.png" alt="Link" class="icon">
                     </a>
                 </td>
             </tr>
             </tbody>
-
         </table>
     </div>
 </div>

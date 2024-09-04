@@ -14,12 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
@@ -163,6 +160,28 @@ public class  HomeController {
         }
     }
 
+    // Inside your HomeController class
+
+    @GetMapping("/link/{id}")
+    public String getFolderContents(@PathVariable("id") String folderId, Model model) {
+        try {
+            // Fetch the files of the folder based on the folder ID
+            LinkedList<ActiveFile> activeFiles = userDetailsService.getFiles(folderId);
+
+            // Set the folder name (or ID) and files as model attributes to be displayed on the page
+            model.addAttribute("folderName", folderId);  // Using folderId as the name for now
+            model.addAttribute("files", activeFiles);    // Files fetched from the folder
+
+            // Return the link.html view
+            return "link"; // Ensure this corresponds to the name of your Thymeleaf template
+        } catch (Exception e) {
+            // Handle errors gracefully, log or redirect if needed
+            model.addAttribute("error", "Error fetching folder contents: " + e.getMessage());
+            return "redirect:/index"; // Redirect to home or error page if an error occurs
+        }
+    }
+
+
 
 
     @GetMapping("/viewFolderContents")
@@ -188,6 +207,7 @@ public class  HomeController {
     public String myLinks(@AuthenticationPrincipal User user, Model model) {
         if (user != null) {
             String email = user.getEmail();
+            model.addAttribute("email", email);
 
             try{
                 // Get groups of the user
