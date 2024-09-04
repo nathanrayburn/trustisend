@@ -254,7 +254,7 @@ public class  HomeController {
             }
 
             // Redirect or update the model as needed
-            return "redirect:/home"; // Adjust redirect as needed
+            return "redirect:/myLinks"; // Adjust redirect as needed
 
         }
         return "redirect:/login"; // If user is not authenticated
