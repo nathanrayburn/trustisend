@@ -11,6 +11,11 @@ COPY ./app/ /app/
 COPY ./app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 5000 5000
+# Install necessary system packages
+RUN apt-get update && apt-get install -y ntp ca-certificates
+
+# Expose the port that the application will run on
+EXPOSE 5000
+
 # Define the entry point to run the Python script
 ENTRYPOINT ["python", "main.py"]
