@@ -17,6 +17,12 @@ FROM eclipse-temurin:21-jre-alpine
 # Set the working directory inside the container
 WORKDIR /app
 
+# Create a temporary directory for file uploads and downloads
+RUN mkdir -p /app/tmp && chmod 777 /app/tmp
+
+# Set Java options, including the temp directory
+ENV JAVA_OPTS="-Djava.io.tmpdir=/app/tmp"
+
 # Copy the jar file generated during the build to the runtime image
 COPY --from=build /app/target/*.jar ./app.jar
 
@@ -24,4 +30,4 @@ COPY --from=build /app/target/*.jar ./app.jar
 EXPOSE 8080 8000
 
 # Define the entry point for the container
-ENTRYPOINT ["java", "-jar", "./app.jar"]
+ENTRYPOINT ["java", "$JAVA_OPTS", "-jar", "./app.jar"]
