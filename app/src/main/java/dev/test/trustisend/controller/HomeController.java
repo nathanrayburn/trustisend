@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -181,9 +182,6 @@ public class  HomeController {
         }
     }
 
-
-
-
     @GetMapping("/viewFolderContents")
     public ResponseEntity<List<ActiveFile>> viewFolderContents(@RequestParam("uid") String uID) {
         try {
@@ -238,29 +236,18 @@ public class  HomeController {
     @PostMapping("/upload")
     public String createLink(@RequestParam("files") MultipartFile[] files,
                              @AuthenticationPrincipal User user,
-
                              Model model) throws Exception {
-        if (user != null) {
-
-            // 1. Create a group in Firestore for the user's files
+        if (user != null || files.length > 0) {
+            // Create group in Firestore
             Group group = firestoreUtil.createGroup(new Group(user.getEmail(), LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), 0));
             String uID = group.getGroupUUID();
-            // 2. Upload the files and associate them with the group
-            List<InputFile> uploadedFiles = fileService.uploadFiles(files, uID);
 
-            // 3. Save file metadata to Firestore under the created group
-            for(InputFile file : uploadedFiles) {
+            // Delegate file handling to the FileService using streaming
+            fileService.uploadFiles(files, uID);
 
-                ActiveFile f = new ActiveFile(group, file.getFileName(), FileScanStatus.PENDING);
-                f = firestoreUtil.createActiveFile(f);
-            }
-
-            // Redirect or update the model as needed
-            return "redirect:/home"; // Adjust redirect as needed
-
+            return "redirect:/myLinks";
         }
-        return "redirect:/login"; // If user is not authenticated
-
+        return "redirect:/login";
     }
 
 }

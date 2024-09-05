@@ -23,5 +23,16 @@ COPY --from=build /app/target/*.jar ./app.jar
 # Expose the default port used by Spring Boot
 EXPOSE 8080 8000
 
-# Define the entry point for the container
-ENTRYPOINT ["java", "-jar", "./app.jar"]
+# JVM Memory Optimization for Spring Boot
+# -XX:+UseContainerSupport: Ensures that JVM optimizes memory usage based on container limits.
+# -XX:MaxRAMPercentage=75.0: Limits the JVM heap size to 75% of the container's memory limit.
+# -XshowSettings:vm: Shows the JVM settings at startup.
+
+ENTRYPOINT ["java", \
+  "-XX:+UseContainerSupport", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-XshowSettings:vm", \
+  "-XX:+ExitOnOutOfMemoryError", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", \
+  "./app.jar"]

@@ -1,5 +1,4 @@
 steps:
-
   # Step 0: Build the Docker image and tag it with the commit SHA
   - name: gcr.io/cloud-builders/docker
     args:
@@ -16,6 +15,7 @@ steps:
 
   # Step 2: Deploy the application to Cloud Run using the built image
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: 'gcloud'
     args:
       - run
       - deploy
@@ -28,13 +28,15 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--quiet'
+      - '--memory'
+      - '2Gi'  # Set the memory limit to 2GiB
+      - '--timeout'
+      - '900s'  # Increase the timeout to 15 minutes
       - '--update-secrets'
       - '/firestore-mnt/firestore=projects/579596661856/secrets/firestore:latest'
       - '--update-secrets'
       - '/gc-storage-mnt/storage=projects/579596661856/secrets/gc-storage-key:latest'
-    entrypoint: gcloud
 
-# Specify the images that will be pushed by Cloud Build
 images:
   - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/dev:$COMMIT_SHA'
 

@@ -2,10 +2,7 @@ package dev.test.trustisend.util;
 
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.*;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -39,8 +36,7 @@ public class DataBucketUtil {
     @Value("${gcp.dir.name}")
     private String gcpDirectoryName;
 
-
-   public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType) {
+    public FileDto uploadFile(MultipartFile multipartFile, String fileName, String contentType) {
         String uID = java.util.UUID.randomUUID().toString();
 
         return uploadFile(multipartFile, fileName, contentType, uID);
@@ -137,8 +133,23 @@ public class DataBucketUtil {
     }
 
     //@TODO test
-    public List<File> downloadFolder(String uID){
-        try{
+    public List<File> downloadFolder(String uID) {
+        // Determine the current working directory
+        String currentDir = System.getProperty("user.dir");
+        // Create a temporary directory within the current working directory
+        String uniqueTempDir = "temp_" + uID;
+        Path tempDirPath = Paths.get(currentDir, uniqueTempDir);
+
+        // Create the temporary directory if it doesn't exist
+        if (!Files.exists(tempDirPath)) {
+            try {
+                Files.createDirectories(tempDirPath);
+            } catch (IOException e) {
+                throw new BadRequestException("Error creating temporary directory: " + e.getMessage());
+            }
+        }
+
+        try {
             String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
 
             GoogleCredentials credentials = GoogleCredentials.fromStream(
@@ -149,26 +160,35 @@ public class DataBucketUtil {
                     .setCredentials(credentials).build();
 
             Storage storage = options.getService();
-            Bucket bucket = storage.get(gcpBucketId,Storage.BucketGetOption.fields());
+            Bucket bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
 
             List<File> files = new ArrayList<>();
-            //search the right blobs
+            // Search the right blobs
             Page<Blob> blobs = bucket.list();
-            for (Blob blob: blobs.getValues()) {
+            for (Blob blob : blobs.getValues()) {
                 String blobName = blob.getName();
                 if (blobName.contains(uID)) {
-                    File downloadedFile = new File(blobName.substring(blobName.lastIndexOf('/')+1));
-                    FileOutputStream outputStream = new FileOutputStream(downloadedFile);
-                    outputStream.write(blob.getContent());
-                    outputStream.close();
-                    files.add(downloadedFile);
+                    // Define the path for the temporary file using the blob's name
+                    Path tempFilePath = tempDirPath.resolve(blobName.substring(blobName.lastIndexOf('/') + 1));
+
+                    // Ensure that any existing temporary file is deleted before creating a new one
+                    if (Files.exists(tempFilePath)) {
+                        Files.delete(tempFilePath);
+                    }
+
+                    // Save the blob content to the temporary file
+                    try (FileOutputStream outputStream = new FileOutputStream(tempFilePath.toFile())) {
+                        outputStream.write(blob.getContent());
+                    }
+
+                    // Add the temporary file to the list of files
+                    files.add(tempFilePath.toFile());
                 }
             }
             return files;
-        }catch(Exception e){
-
+        } catch (Exception e) {
+            throw new BadRequestException("Download failed: " + e.getMessage());
         }
-        throw new BadRequestException("download failed");
     }
 
     public boolean deleteFile(String uID, String fileName){
@@ -202,6 +222,40 @@ public class DataBucketUtil {
             throw new BadRequestException("error while deleting");
         }
         throw new BadRequestException("error while deleting");
+    }
+    /**
+     * Uploads a file to Google Cloud Storage using an InputStream.
+     *
+     * @param fileStream the InputStream of the file to be uploaded
+     * @param fileName the name of the file to be stored in the bucket
+     * @param contentType the MIME type of the file
+     * @param uID the unique identifier for the user's directory
+     * @return a FileDto containing information about the uploaded file
+     */
+    public FileDto uploadFileStream(InputStream fileStream, String fileName, String contentType, String uID) {
+        try (InputStream stream = fileStream) {
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+            GoogleCredentials credentials = GoogleCredentials.fromStream(new ByteArrayInputStream(credentialsJson.getBytes()));
+            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId).setCredentials(credentials).build();
+
+            Storage storage = options.getService();
+            Bucket bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
+
+            // Create a BlobInfo object for the file
+            BlobInfo blobInfo = BlobInfo.newBuilder(gcpBucketId, uID + "/" + fileName)
+                    .setContentType(contentType)
+                    .build();
+
+            // Upload the file directly from the InputStream
+            Blob blob = storage.create(blobInfo, stream);
+
+            if (blob != null) {
+                return new FileDto(fileName, blob.getMediaLink());
+            }
+        } catch (Exception e) {
+            throw new GCPFileUploadException("An error occurred while storing data to GCS: " + e.getMessage());
+        }
+        throw new GCPFileUploadException("An error occurred while storing data to GCS");
     }
 
     //@TODO test
