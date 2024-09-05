@@ -8,6 +8,15 @@ import schedule
 import time
 import subprocess
 import sys
+import flask
+from waitress import serve
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    # Return the contents of the file as a string
+    return str("API is running")
 
 # Load configuration from the configuration.json file
 with open('configuration.json') as config_file:
@@ -205,3 +214,5 @@ if __name__ == '__main__':
     # Start the cleanup and tracking scheduler
     print("Starting cleanup and download tracking scheduler...")
     schedule_cleanup()
+    # Start the Flask application
+    serve(app, host="0.0.0.0", port=8080)

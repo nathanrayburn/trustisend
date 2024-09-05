@@ -32,8 +32,6 @@ steps:
       - '/firestore-mnt/firestore=projects/579596661856/secrets/firestore:latest'
       - '--update-secrets'
       - '/gc-storage-mnt/storage=projects/579596661856/secrets/gc-storage-key:latest'
-      - '--update-secrets'
-      - '/api-mnt/api=projects/579596661856/secrets/api:latest'
     entrypoint: gcloud
 
 # Specify the images that will be pushed by Cloud Build
