@@ -17,9 +17,6 @@ FROM eclipse-temurin:21-jre-alpine
 # Set the working directory inside the container
 WORKDIR /app
 
-# Create a temporary directory for file uploads and downloads
-RUN chmod 777 /tmp
-
 # Copy the jar file generated during the build to the runtime image
 COPY --from=build /app/target/*.jar ./app.jar
 

@@ -15,6 +15,7 @@ steps:
 
   # Step 2: Deploy the application to Cloud Run using the built image
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: 'gcloud'
     args:
       - run
       - deploy
