@@ -19,7 +19,7 @@ steps:
     args:
       - run
       - deploy
-      - av  # Cloud Run service name
+      - schedule  # Cloud Run service name
       - '--image'
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/av:$COMMIT_SHA'
       - '--region'
