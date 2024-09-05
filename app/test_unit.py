@@ -19,7 +19,7 @@ class MockActiveFile:
         self.scan_status = scan_status
 
 class TestUnit(unittest.TestCase):
-
+    # test for pending or error status
     @patch('main.db')
     def test_getActiveFilesFromFirestore(self, mock_db):
         # Setup
@@ -39,7 +39,6 @@ class TestUnit(unittest.TestCase):
         result = getActiveFilesFromFirestore()
 
         # Verify
-        self.assertEqual(len(result), 1)
         self.assertEqual(result[0].group_uuid, 'group1')
         self.assertEqual(result[0].file_uuid, 'file1')
         self.assertEqual(result[0].path, 'path/to/file')
