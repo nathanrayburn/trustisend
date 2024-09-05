@@ -141,32 +141,27 @@
         display: none;
     }
 
-    .video-container {
-        position: absolute; /* Assure que le conteneur de la vidéo est positionné par rapport à la nav-bar */
-        top: 50%; /* Centre verticalement dans la nav-bar */
-        left: 50%; /* Centre horizontalement dans la page */
-        transform: translate(-50%, -50%); /* Centre exactement avec une translation */
+
+    .file-container {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #2d3748;
+        border-radius: 8px;
+    }
+
+    .file-details-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .file-details-list li {
+        padding: 5px 0;
+        border-bottom: 1px solid #40596f;
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        width: 100px; /* Ajuste la largeur selon tes besoins */
-        height: 20px; /* Ajuste la hauteur pour correspondre à l'espace de la nav-bar */
-        pointer-events: none; /* Permet de cliquer à travers la vidéo */
     }
-
-    #scroll-video {
-        width: 100%;
-        height: auto;
-        pointer-events: none; /* Permet de cliquer à travers la vidéo */
-    }
-
-
-
-
-
-
-
-
 
 
 
