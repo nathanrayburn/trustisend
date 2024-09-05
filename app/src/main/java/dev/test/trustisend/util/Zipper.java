@@ -10,7 +10,12 @@ import java.util.zip.ZipOutputStream;
 
 public class Zipper {
 
-    //@TODO test
+    /**
+     * zip a list of files
+     * @param files list of files to zip
+     * @param filename name of the zip file
+     * @return zip file
+     */
     public static File zip(List<File> files, String filename) {
         File zipfile = new File(filename);
         // Create a buffer for reading the files

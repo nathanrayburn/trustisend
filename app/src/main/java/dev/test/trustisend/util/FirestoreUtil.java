@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import com.google.cloud.firestore.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,13 +39,6 @@ public class FirestoreUtil {
         );
     }
 
-    private static Map<String, Object> prepareGroupData(Group group){
-        return Map.of(
-                "userEmail", group.getUserEmail(),
-                "timestamp", group.getTimestamp(),
-                "numberDownloads", group.getNumberDownloads()
-        );
-    }
     private static Map<String, Object> prepareActiveFileData(ActiveFile activeFile){
         return Map.of(
                 "groupUUID", activeFile.getGroupUUID(),
@@ -52,7 +47,12 @@ public class FirestoreUtil {
         );
     }
 
-    public User createUser(dev.test.trustisend.entity.User user) throws Exception {
+    /**
+     * create a user in the db
+     * @param user the user to be added
+     * @return user that was added or null if user already exists
+     */
+    public User createUser(User user) throws Exception {
         // Check if the user already exists
         UserDetails existingUser = readUserByEmail(user.getEmail());
         if (existingUser != null) {
@@ -71,7 +71,12 @@ public class FirestoreUtil {
         );
     }
 
-
+    /**
+     * get a user from the db given his email
+     * @param email of the user
+     * @return user if he exists in the db
+     * @throws Exception if the user doesn't exist in the db
+     */
     public User readUserByEmail(String email) throws Exception {
         try {
             System.out.println("Looking for user with email: " + email);
@@ -100,39 +105,10 @@ public class FirestoreUtil {
         }
     }
 
-    public User signOutUser()
-    {
-        return null;
-    }
-
-
-    public UserDetails readUserById(String userId) throws Exception {
-        try {
-            System.out.println("Looking for user with ID: " + userId);
-
-            // Retrieve the document reference for the given user ID
-            DocumentReference docRef = firestore.collection("users").document(userId);
-            ApiFuture<DocumentSnapshot> future = docRef.get();
-            DocumentSnapshot document = future.get();
-
-            // Check if the document exists
-            if (!document.exists()) {
-                System.out.println("No user found with ID: " + userId);
-                return null;
-            }
-
-            // Create and return the UserDetails object
-            return org.springframework.security.core.userdetails.User.withUsername(document.getString("email"))
-                    .password(document.getString("hash"))  // Ensure 'hash' exists in the document
-                    .roles("USER")
-                    .build();
-
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            throw new UsernameNotFoundException("Error fetching user data", e);
-        }
-    }
-
+    /**
+     * delete the user from the db
+     * @param userId id of the user to delete
+     */
     public void deleteUser(String userId) throws Exception {
         try {
             System.out.println("Attempting to delete user with ID: " + userId);
@@ -154,9 +130,20 @@ public class FirestoreUtil {
         }
     }
 
-    // Create a new group and return the Group object
-    public Group createGroup(Group group) throws Exception {
-        Map<String, Object> groupData = prepareGroupData(group);
+    /**
+     * Create a new group and return the Group object. A group is all the files that are part of the same upload and
+     * share the same download link
+     * @param userEmail email of the user
+     * @return group with id
+     */
+    public Group createGroup(String userEmail) throws Exception {
+        Map<String, Object> groupData = Map.of(
+                "userEmail", userEmail,
+                "timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                "numberDownloads", 0
+        );
+
+
         try {
             CollectionReference groups = firestore.collection("groups");
             ApiFuture<DocumentReference> result = groups.add(groupData);
@@ -176,6 +163,13 @@ public class FirestoreUtil {
             throw new Exception("Error creating group", e);
         }
     }
+
+    /**
+     * get a group from the db
+     * @param groupUUID uuid of the group
+     * @return Group or null if the group doesn't exist
+     * @throws Exception
+     */
     public Group readGroupByUUID(String groupUUID) throws Exception {
         try {
             System.out.println("Looking for group with ID: " + groupUUID);
@@ -204,6 +198,12 @@ public class FirestoreUtil {
             throw new Exception("Error fetching group data", e);
         }
     }
+
+    /**
+     * deletes a group from the db
+     * @param groupId id of the group
+     * @throws Exception
+     */
     public void deleteGroup(String groupId) throws Exception {
         try {
             System.out.println("Attempting to delete group with ID: " + groupId);
@@ -225,6 +225,11 @@ public class FirestoreUtil {
         }
     }
 
+    /**
+     * increments the download count of a group
+     * @param groupUUID id of the group
+     * @throws Exception
+     */
     public void incrementDownloadCount(String groupUUID) throws Exception {
         try {
             System.out.println("Attempting to increment download count for group with ID: " + groupUUID);
@@ -256,6 +261,11 @@ public class FirestoreUtil {
         }
     }
 
+    /**
+     * deletes a group and all files that are part of the group from the db
+     * @param groupUUID id of the group
+     * @throws Exception
+     */
     public void deleteGroupWithDependecies(String groupUUID) throws Exception {
         try {
             System.out.println("Attempting to delete group with ID: " + groupUUID);
@@ -275,6 +285,12 @@ public class FirestoreUtil {
 
     }
 
+    /**
+     * get the info about a file from the db
+     * @param activeFileId id of the file
+     * @return ActiveFile object that contains the file path and scan status of the file in gcloud
+     * @throws Exception
+     */
     public ActiveFile readActiveFileByUUID(String activeFileId) throws Exception {
         try {
             System.out.println("Looking for active file with ID: " + activeFileId);
@@ -304,6 +320,12 @@ public class FirestoreUtil {
         }
     }
 
+    /**
+     * get all groups that belong to a user
+     * @param email email address of the user
+     * @return list of the user's groups
+     * @throws Exception
+     */
     public LinkedList<Group> readGroupsByEmail(String email) throws Exception{
         try {
 
@@ -332,6 +354,12 @@ public class FirestoreUtil {
         }
     }
 
+    /**
+     * get the info of all files in a group
+     * @param groupUUID id of the group
+     * @return a list of ActiveFile objects that contain info about the files in gcloud
+     * @throws Exception
+     */
     public LinkedList<ActiveFile> readActiveFilesByGroupUUID(String groupUUID) throws Exception {
         try {
             System.out.println("Looking for active files with group ID: " + groupUUID);
@@ -372,6 +400,12 @@ public class FirestoreUtil {
         }
     }
 
+    /**
+     * create an ActiveFile entry in the db
+     * @param activeFile
+     * @return the ActiveFile with an ID
+     * @throws Exception
+     */
     public ActiveFile createActiveFile(ActiveFile activeFile) throws Exception {
         Map<String, Object> activeFileData = prepareActiveFileData(activeFile);
         try {
@@ -397,6 +431,12 @@ public class FirestoreUtil {
             throw new Exception("Error creating activeFile", e);
         }
     }
+
+    /**
+     * delete the entry of a file in the db
+     * @param activeFileId
+     * @throws Exception
+     */
     public void deleteActiveFile(String activeFileId) throws Exception {
         try {
             System.out.println("Attempting to delete activeFile with ID: " + activeFileId);

@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -43,7 +44,7 @@ public class BucketTests {
         testActiveFile = createTestActiveFile(testGroup);
 
         // Ensure the group and file are created in Firestore
-        firestoreUtil.createGroup(testGroup);
+        firestoreUtil.createGroup(testGroup.getUserEmail());
         firestoreUtil.createActiveFile(testActiveFile);
     }
 
@@ -64,8 +65,8 @@ public class BucketTests {
         Path tempPath = createTempFile("single-upload", ".txt", "Upload test file");
         MultipartFile tempFile = createMultipartFile(tempPath);
 
-        try {
-            dataBucketUtil.uploadFile(tempFile, tempFile.getOriginalFilename(), Files.probeContentType(tempPath), testGroup.getGroupUUID());
+        try (InputStream inputStream = tempFile.getInputStream()) {
+            dataBucketUtil.uploadFileStream(inputStream, tempFile.getOriginalFilename(), Files.probeContentType(tempPath), testGroup.getGroupUUID());
         } catch (Exception e) {
             fail("Exception occurred during file upload: " + e.getMessage());
         } finally {
@@ -86,9 +87,9 @@ public class BucketTests {
             Path tempPath = createTempFile("multipledownloadtest", ".txt", "Upload test file");
 
             MultipartFile tempFile = createMultipartFile(tempPath);
-            try {
+            try (InputStream inputStream = tempFile.getInputStream()) {
                 firestoreUtil.createActiveFile(testActiveFile);  // Ensure the file exists
-                dataBucketUtil.uploadFile(tempFile, tempFile.getOriginalFilename(), Files.probeContentType(tempPath), testGroup.getGroupUUID());
+                dataBucketUtil.uploadFileStream(inputStream, tempFile.getOriginalFilename(), Files.probeContentType(tempPath), testGroup.getGroupUUID());
             } catch (Exception e) {
                 fail("Exception occurred during file upload: " + e.getMessage());
             } finally {
@@ -108,18 +109,6 @@ public class BucketTests {
         dataBucketUtil.deleteFolder(testGroup.getGroupUUID());
     }
 
-    @Test
-    void invalidFileTypeUpload() throws IOException {
-        Path tempPath = createTempFile("invalid-upload", ".txt", "Upload test file");
-        MultipartFile tempFile = createMultipartFile(tempPath);
-
-        assertThrows(Exception.class, () -> {
-            dataBucketUtil.uploadFile(tempFile, tempFile.getOriginalFilename(), Files.probeContentType(tempPath));
-        });
-
-        Files.deleteIfExists(tempPath);
-    }
-
     private Path createTempFile(String prefix, String suffix, String content) throws IOException {
         Path tempFile = Files.createTempFile(prefix, suffix);
         Files.writeString(tempFile, content, StandardOpenOption.WRITE);
@@ -134,9 +123,8 @@ public class BucketTests {
     }
 
     private Group createTestGroup() {
-        Group group = new Group("test@heig-vd.ch", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), 0);
         try {
-            return firestoreUtil.createGroup(group);
+            return firestoreUtil.createGroup("test@heig-vd.ch");
         } catch (Exception e) {
             fail("Exception occurred during group creation: " + e.getMessage());
             return null;

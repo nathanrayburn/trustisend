@@ -4,9 +4,6 @@ import dev.test.trustisend.entity.ActiveFile;
 import dev.test.trustisend.entity.FileScanStatus;
 import dev.test.trustisend.entity.Group;
 import dev.test.trustisend.util.FirestoreUtil;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mock.web.MockMultipartFile;
-import dev.test.trustisend.dto.FileDto;
 import dev.test.trustisend.entity.InputFile;
 import dev.test.trustisend.exception.BadRequestException;
 import dev.test.trustisend.exception.GCPFileUploadException;
@@ -15,7 +12,6 @@ import dev.test.trustisend.util.Zipper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -35,7 +31,12 @@ public class FileService{
     @Autowired
     private FirestoreUtil firestoreUtil;
 
-
+    /**
+     * upload a list of files to gcloud and logs them in firestoredb
+     * @param files list of files to upload
+     * @param uID name of the folder in which to upload files
+     * @return list of InputFiles objects that contain the file name and folder name of the files successfully uploaded
+     */
     public List<InputFile> uploadFiles(MultipartFile[] files, String uID) {
         List<InputFile> inputFiles = new ArrayList<>();
 
@@ -48,12 +49,14 @@ public class FileService{
             try (InputStream inputStream = multipartFile.getInputStream()) {
                 String contentType = multipartFile.getContentType();
 
-                FileDto fileDto = dataBucketUtil.uploadFileStream(inputStream, originalFileName, contentType, uID);
+                //upload file
+                String fileName = dataBucketUtil.uploadFileStream(inputStream, originalFileName, contentType, uID);
 
-                if (fileDto != null) {
-                    inputFiles.add(new InputFile(uID, fileDto.getFileName(), fileDto.getFileUrl()));
+                //update the database
+                if (fileName != null) {
+                    inputFiles.add(new InputFile(uID, fileName));
                     Group group = firestoreUtil.readGroupByUUID(uID);
-                    ActiveFile activeFile = new ActiveFile(group, fileDto.getFileName(), FileScanStatus.PENDING);
+                    ActiveFile activeFile = new ActiveFile(group, fileName, FileScanStatus.PENDING);
                     activeFile = firestoreUtil.createActiveFile(activeFile);
                 }
             } catch (IOException e) {
@@ -66,6 +69,12 @@ public class FileService{
         return inputFiles;
     }
 
+    /**
+     * download a single file from gcloud
+     * @param uID name of the folder
+     * @param fileName name of the file
+     * @return the downloaded file
+     */
     public File downloadFile(String uID, String fileName){
 
         if(fileName == null){
@@ -77,7 +86,11 @@ public class FileService{
         return dataBucketUtil.downloadFile(uID, fileName);
     }
 
-    //@TODO test
+    /**
+     * download a folder as a zip file from gcloud
+     * @param uID name of the folder
+     * @return a zip file containing all files in the folder
+     */
     public File downloadFolder(String uID) {
         if (uID == null || uID.isEmpty()) {
             throw new BadRequestException("uID is null");
@@ -128,6 +141,11 @@ public class FileService{
     }
 
 
+    /**
+     * delete a file from gcloud
+     * @param uID name of the folder
+     * @param fileName name of the file
+     */
     public boolean deleteFile(String uID, String fileName){
         if(fileName == null){
             throw new BadRequestException("filename is null");
@@ -138,7 +156,10 @@ public class FileService{
         return dataBucketUtil.deleteFile(uID, fileName);
     }
 
-    //@TODO test
+    /**
+     * delete a folder and its contents from gcloud
+     * @param uID name of the folder
+     */
     public boolean deleteFolder(String uID){
         if(uID == null || uID.isEmpty()){
             throw new BadRequestException("uID is empty or null");

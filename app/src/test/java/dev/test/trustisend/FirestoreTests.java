@@ -26,8 +26,7 @@ public class FirestoreTests {
     @Order(1)
     void createFirestoreGroup() {
         try {
-            testGroup = createTestGroup();
-            testGroup = firestoreUtil.createGroup(testGroup);
+            testGroup = firestoreUtil.createGroup(getTestGroupEmail());
             assertNotNull(testGroup.getGroupUUID(), "The returned ID should not be null.");
             assertFalse(testGroup.getGroupUUID().isEmpty(), "The returned ID should not be empty.");
         } catch (Exception e) {
@@ -40,7 +39,7 @@ public class FirestoreTests {
     void createActiveFile() {
         try {
 
-            Group createdGroup = firestoreUtil.createGroup(createTestGroup());
+            Group createdGroup = firestoreUtil.createGroup(getTestGroupEmail());
             ActiveFile testFile = new ActiveFile(createdGroup, "testfile.txt", FileScanStatus.PENDING);
             ActiveFile createdFile = firestoreUtil.createActiveFile(testFile);
             assertNotNull(createdFile.getFileUUID(), "The returned ID should not be null.");
@@ -54,7 +53,7 @@ public class FirestoreTests {
     @Order(3)
     void deleteActiveFile() {
         try {
-            Group createdGroup = firestoreUtil.createGroup(createTestGroup());
+            Group createdGroup = firestoreUtil.createGroup(getTestGroupEmail());
             ActiveFile testFile = new ActiveFile(createdGroup, "testfile.txt", FileScanStatus.PENDING);
             ActiveFile createdFile = firestoreUtil.createActiveFile(testFile);
             firestoreUtil.createActiveFile(createdFile);  // Ensure the file exists
@@ -70,7 +69,7 @@ public class FirestoreTests {
     void deleteFirestoreGroup() {
         try {
             createFirestoreGroup();
-            firestoreUtil.createGroup(testGroup);  // Ensure the group exists
+            firestoreUtil.createGroup(testGroup.getUserEmail());  // Ensure the group exists
             firestoreUtil.deleteGroup(testGroup.getGroupUUID());
             assertNull(firestoreUtil.readGroupByUUID(testGroup.getGroupUUID()), "Group should not exist after deletion.");
         } catch (Exception e) {
@@ -82,8 +81,7 @@ public class FirestoreTests {
     @Order(5)
     void createMultipleActiveFiles() {
         try {
-            Group newGroup = createTestGroup();
-            newGroup = firestoreUtil.createGroup(newGroup);
+            Group newGroup = firestoreUtil.createGroup(getTestGroupEmail());
 
             ActiveFile file1 = createTestActiveFile(newGroup);
             ActiveFile file2 = new ActiveFile(newGroup, "file2.txt", FileScanStatus.PENDING);
@@ -99,8 +97,8 @@ public class FirestoreTests {
         }
     }
 
-    private Group createTestGroup() {
-        return new Group("test@heig-vd.ch", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), 0);
+    private String getTestGroupEmail() {
+        return "test@heig-vd.ch";
     }
 
     private ActiveFile createTestActiveFile(Group group) {
