@@ -4,18 +4,20 @@ FROM python:3.11-slim
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the Python script and other necessary files
-COPY ./app/ /app/
+# Copy only the requirements file to leverage Docker cache
+COPY ./app/requirements.txt /app/requirements.txt
 
-# Install Python dependencies
-COPY ./app/requirements.txt .
+# Install Python dependencies first (cached layer)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install necessary system packages
-RUN apt-get update && apt-get install -y ntp ca-certificates
+# Install necessary system packages (e.g., ca-certificates)
+RUN apt-get update && apt-get install -y ca-certificates
+
+# Copy the rest of the application files
+COPY ./app/ /app/
 
 # Expose the port that the application will run on
-EXPOSE 5000
+EXPOSE 8080
 
 # Define the entry point to run the Python script
 ENTRYPOINT ["python", "main.py"]

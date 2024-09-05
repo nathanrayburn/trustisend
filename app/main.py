@@ -36,11 +36,6 @@ class FileScanStatus(Enum):
 # Open and read the configuration.json file
 with open('configuration.json') as config_file:
     data = json.load(config_file)
-    # print type from firestore credentials
-    logging.error(json.load(open(data['firestore']['credentials']))['type'])
-    logging.error(json.load(open(data['storage']['credentials']))['type'])
-    #read only the first 2 characters from the api-key file
-    logging.error(open(data['antivirus']['api-key']).read(2))
 # Create Firestore client with its specific credentials
 db = firestore.Client.from_service_account_json(data['firestore']['credentials'], project=data['projectID'],
                                                 database=data['firestore']['databaseID'])
@@ -382,4 +377,4 @@ if __name__ == '__main__':
     
 
     # Start the Flask application
-    serve(app, host="0.0.0.0", port=5000)
+    serve(app, host="0.0.0.0", port=8080)
