@@ -1,15 +1,15 @@
 {
   "projectID": "trustisend-433213",
   "firestore": {
-    "credentials": "/firestore-mnt/firestore",
+    "credentials": "firestore.json",
     "databaseID": "trustisend"
   },
     "storage": {
-        "credentials": "/gc-storage-mnt/storage",
+        "credentials": "gc-storage-key.json",
         "bucket": "spring-boot-gcp-bucket-test"
     },
   "antivirus": {
-    "api-key": "/api-mnt/api",
+    "api-key": "api.json",
     "file-scan-limit": 4
   }
 }
