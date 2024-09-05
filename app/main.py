@@ -1,4 +1,5 @@
 import os
+import threading
 import google.cloud.firestore as firestore
 import google.cloud.storage as storage
 from datetime import datetime, timedelta, timezone
@@ -8,7 +9,7 @@ import schedule
 import time
 import subprocess
 import sys
-import flask
+from flask import Flask
 from waitress import serve
 
 app = Flask(__name__)
@@ -187,15 +188,15 @@ def schedule_cleanup():
     and track download activity once a day.
     """
     # Schedule the delete_inactive_groups function to run once a day at midnight
-    schedule.every().day.at("00:00").do(delete_inactive_groups)
+    schedule.every().day.at("00:03").do(delete_inactive_groups)
 
     # Schedule the track_all_groups function to run once a day (e.g., at 1:00 AM)
-    schedule.every().day.at("23:59").do(track_all_groups)
+    schedule.every().day.at("00:02").do(track_all_groups)
     
     # Keep the scheduler running indefinitely
     while True:
         schedule.run_pending()
-        time.sleep(60)  # Sleep for 1 minute between checks
+        time.sleep(1)  # Sleep for 1 minute between checks
 
 
 def run_tests():
@@ -213,6 +214,8 @@ if __name__ == '__main__':
     run_tests()
     # Start the cleanup and tracking scheduler
     print("Starting cleanup and download tracking scheduler...")
-    schedule_cleanup()
+    scheduler_thread = threading.Thread(target=schedule_cleanup)
+    scheduler_thread.daemon = True  # Daemonize thread to ensure it exits when main program exits
+    scheduler_thread.start()
     # Start the Flask application
     serve(app, host="0.0.0.0", port=8080)
