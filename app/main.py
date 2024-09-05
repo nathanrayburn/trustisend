@@ -45,9 +45,16 @@ bucketName = data['storage']['bucket']
 
 def getActiveFilesFromFirestore():
     activeFiles_ref = db.collection("files").where("scanStatus", "in", [FileScanStatus.PENDING.value])
-    docs = activeFiles_ref.stream()
+    # add the files with error status to the list
+    errorFiles_ref = db.collection("files").where("scanStatus", "==", FileScanStatus.ERROR.value)
+    active = activeFiles_ref.stream()
+    error = errorFiles_ref.stream()
+    
     activeFiles = []
-    for doc in docs:
+    for doc in active:
+        activeFiles.append(
+            ActiveFile(doc.to_dict()['groupUUID'], doc.id, doc.to_dict()['path'], doc.to_dict()['scanStatus']))
+    for doc in error:
         activeFiles.append(
             ActiveFile(doc.to_dict()['groupUUID'], doc.id, doc.to_dict()['path'], doc.to_dict()['scanStatus']))
     return activeFiles
