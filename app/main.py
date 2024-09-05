@@ -37,10 +37,10 @@ class FileScanStatus(Enum):
 with open('configuration.json') as config_file:
     data = json.load(config_file)
     # print type from firestore credentials
-    print(json.load(open(data['firestore']['credentials']))['type'])
-    print(json.load(open(data['storage']['credentials']))['type'])
+    logging.error(json.load(open(data['firestore']['credentials']))['type'])
+    logging.error(json.load(open(data['storage']['credentials']))['type'])
     #read only the first 2 characters from the api-key file
-    print(open(data['antivirus']['api-key']).read(2))
+    logging.error(open(data['antivirus']['api-key']).read(2))
 # Create Firestore client with its specific credentials
 db = firestore.Client.from_service_account_json(data['firestore']['credentials'], project=data['projectID'],
                                                 database=data['firestore']['databaseID'])
