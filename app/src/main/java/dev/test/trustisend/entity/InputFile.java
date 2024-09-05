@@ -16,12 +16,10 @@ public class InputFile {
     @GeneratedValue
     private String uID;
     private String fileName;
-    private String fileUrl;
 
-    public InputFile(String uID, String fileName, String fileUrl) {
+    public InputFile(String uID, String fileName) {
         this.uID = uID;
         this.fileName = fileName;
-        this.fileUrl = fileUrl;
     }
 }
 

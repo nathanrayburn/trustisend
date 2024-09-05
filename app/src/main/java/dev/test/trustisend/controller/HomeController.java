@@ -239,7 +239,7 @@ public class  HomeController {
                              Model model) throws Exception {
         if (user != null || files.length > 0) {
             // Create group in Firestore
-            Group group = firestoreUtil.createGroup(new Group(user.getEmail(), LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), 0));
+            Group group = firestoreUtil.createGroup(user.getEmail());
             String uID = group.getGroupUUID();
 
             // Delegate file handling to the FileService using streaming

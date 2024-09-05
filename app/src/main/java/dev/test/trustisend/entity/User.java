@@ -9,8 +9,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 // User class to represent a user in the application
-// TODO implement all the "is" methods
-
 public class User implements UserDetails {
 
     @Id
@@ -44,17 +42,10 @@ public class User implements UserDetails {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getHash() {
         return hash;
     }
 
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -71,6 +62,7 @@ public class User implements UserDetails {
         return email;
     }
 
+    //following functions are inherited but not used
     @Override
     public boolean isAccountNonExpired() {
         return true;
