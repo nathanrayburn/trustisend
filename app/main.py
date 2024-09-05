@@ -30,7 +30,11 @@ class FileScanStatus(Enum):
 # Open and read the configuration.json file
 with open('configuration.json') as config_file:
     data = json.load(config_file)
-
+    # print type from firestore credentials
+    print(json.load(open(data['firestore']['credentials']))['type'])
+    print(json.load(open(data['storage']['credentials']))['type'])
+    #read only the first 2 characters from the api-key file
+    print(open(data['antivirus']['api-key']).read(2))
 # Create Firestore client with its specific credentials
 db = firestore.Client.from_service_account_json(data['firestore']['credentials'], project=data['projectID'],
                                                 database=data['firestore']['databaseID'])
@@ -113,16 +117,14 @@ def sendToAPI(file):
         "x-apikey": key
     }
 
-    # Disable SSL verification temporarily (only for testing)
-    verify_ssl = False
-
+    # If the file is larger than 32MB, use the upload URL method
     if file_size > 32 * 1024 * 1024:  # 32MB in bytes
-        response = requests.get(upload_url_endpoint, headers=headers, verify=verify_ssl)
+        response = requests.get(upload_url_endpoint, headers=headers)
         if response.status_code == 200:
             upload_url = response.json()["data"]
             with open(fileName, "rb") as f:
                 files = {"file": (fileName, f, "application/octet-stream")}
-                upload_response = requests.post(upload_url, files=files, headers=headers, verify=verify_ssl)
+                upload_response = requests.post(upload_url, files=files, headers=headers)
                 return upload_response
         else:
             print(f"Failed to get upload URL: {response.text}")
@@ -131,7 +133,7 @@ def sendToAPI(file):
     else:
         # For files <= 32MB, use the standard upload method
         files = {"file": (fileName, open(fileName, "rb"), "application/octet-stream")}
-        response = requests.post(url, files=files, headers=headers, verify=verify_ssl)
+        response = requests.post(url, files=files, headers=headers)
         return response
 
 
