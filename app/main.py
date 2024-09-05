@@ -13,8 +13,14 @@ import schedule
 from waitress import serve
 import threading  # Import threading
 import time  # Import time for the scheduler loop
+import certifi
+import urllib3
+from urllib3 import encode_multipart_formdata
 
 app = Flask(__name__)
+
+# Create a PoolManager with certifi's CA certificates
+http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 tempDirectory = "temp/"
 url = "https://www.virustotal.com/api/v3/files"
@@ -109,6 +115,7 @@ def readAPIKey():
 
 
 def sendToAPI(file):
+    urllib3.disable_warnings()
     fileName = tempDirectory + file.file_uuid + "." + getExtension(file.path)
     file_size = os.path.getsize(fileName)
     key = readAPIKey()
@@ -119,22 +126,35 @@ def sendToAPI(file):
 
     # If the file is larger than 32MB, use the upload URL method
     if file_size > 32 * 1024 * 1024:  # 32MB in bytes
-        response = requests.get(upload_url_endpoint, headers=headers)
-        if response.status_code == 200:
-            upload_url = response.json()["data"]
+        response = http.request("GET", upload_url_endpoint, headers=headers)
+        if response.status == 200:
+            upload_url = json.loads(response.data.decode("utf-8"))["data"]
             with open(fileName, "rb") as f:
-                files = {"file": (fileName, f, "application/octet-stream")}
-                upload_response = requests.post(upload_url, files=files, headers=headers)
+                fields = {
+                    'file': (fileName, f.read(), "application/octet-stream")
+                }
+                body, content_type = encode_multipart_formdata(fields)
+                upload_headers = headers.copy()
+                upload_headers["Content-Type"] = content_type
+                upload_response = http.request(
+                    "POST", upload_url, body=body, headers=upload_headers)
                 return upload_response
         else:
-            print(f"Failed to get upload URL: {response.text}")
+            print(f"Failed to get upload URL: {response.data.decode('utf-8')}")
             db.collection("files").document(file.file_uuid).update({"scanStatus": FileScanStatus.ERROR.value})
             return response
     else:
         # For files <= 32MB, use the standard upload method
-        files = {"file": (fileName, open(fileName, "rb"), "application/octet-stream")}
-        response = requests.post(url, files=files, headers=headers)
-        return response
+        with open(fileName, "rb") as f:
+            fields = {
+                'file': (fileName, f.read(), "application/octet-stream")
+            }
+            body, content_type = encode_multipart_formdata(fields)
+            upload_headers = headers.copy()
+            upload_headers["Content-Type"] = content_type
+            response = http.request(
+                "POST", url, body=body, headers=upload_headers)
+            return response
 
 
 # hashmap to track the analysis id of each file
@@ -195,9 +215,10 @@ def handleFile(file_uuid, data):
         "accept": "application/json",
         "x-apikey": key
     }
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        res = response.json()
+    
+    response = http.request("GET", url, headers=headers)
+    if response.status == 200:
+        res = json.loads(response.data.decode("utf-8"))
         if res['data']['attributes']['status'] == "completed":
             status = FileScanStatus.PENDING
 
@@ -218,7 +239,7 @@ def handleFile(file_uuid, data):
             print("File " + file_uuid + " is in progress")
     else:
         print("Error in follow up file analysis")
-        print(response.text)
+        print(response.data.decode("utf-8"))
         db.collection("files").document(file_uuid).update({"scanStatus": FileScanStatus.ERROR.value})
         return True  # Mark for removal since an error occurred
     return False  # Do not mark for removal
@@ -250,7 +271,7 @@ def scanNewFiles():
         for file in filesToScan:
             try:
                 res = sendToAPI(file)
-                if res.status_code == 200:
+                if res.status == 200:
                     associateFileToAnalysisID(file, res.json()['data'])
                     logging.debug(f"File {file.file_uuid} sent to API successfully.")
                 else:
@@ -292,7 +313,7 @@ def scanNewFiles():
         # Scan and update the scanStatus in Firestore
         for file in filesToScan:
             res = sendToAPI(file)
-            if res.status_code == 200:
+            if res.status == 200:
                 associateFileToAnalysisID(file, res.json()['data'])
             else:
                 db.collection("files").document(file.file_uuid).update({"scanStatus": FileScanStatus.ERROR.value})

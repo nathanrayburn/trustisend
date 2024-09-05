@@ -6,6 +6,7 @@ requests==2.31.0
 schedule==1.2.2
 waitress==3.0.0
 urllib3==2.2.2
+certifi==2024.8.30
 
 # Testing dependencies
 pytest==8.3.2          
