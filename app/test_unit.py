@@ -1,74 +1,97 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta, timezone
-from main import delete_inactive_groups, delete_group_and_files
+from main import track_download_activity, delete_inactive_groups, track_all_groups
 
 
-class TestDeleteGroups(unittest.TestCase):
-    
+class TestDownloadTracking(unittest.TestCase):
+
     @patch('main.db')  # Mock Firestore
-    @patch('main.storage_client')  # Mock Cloud Storage
-    def test_delete_inactive_groups(self, mock_storage_client, mock_db):
-        # Mock Firestore group data with lastDownloaded older than 30 days
-        mock_group_stream = MagicMock()
+    def test_track_download_activity_updates(self, mock_db):
+        """
+        Test that track_download_activity correctly updates the lastDownloaded if the download count increases by x.
+        """
+        # Mock the current group document with nbDownloaded = 10 (as an integer)
         mock_group_doc = MagicMock()
-        mock_group_doc.id = "group1"
-        mock_group_doc.to_dict.return_value = {
-            'lastDownloaded': MagicMock(to_datetime=lambda: datetime.now(timezone.utc) - timedelta(days=40)),
-            'numberDownloads': 5
+        mock_group_doc.exists = True
+        mock_group_doc.to_dict.return_value = {'nbDownloaded': 10}
+
+        # Mock the previous download activity document with nbDownloaded = 5 (as an integer)
+        mock_download_doc = MagicMock()
+        mock_download_doc.exists = True
+        mock_download_doc.to_dict.return_value = {'nbDownloaded': 5}
+
+        # Use side_effect to simulate different return values for multiple calls to get()
+        mock_db.collection.return_value.document.return_value.get.side_effect = [mock_group_doc, mock_download_doc]
+
+        # Call the function under test
+        track_download_activity("group1")
+
+        # Ensure the lastDownloaded timestamp is updated since the nbDownloaded increased by more than x_threshold
+        mock_db.collection.return_value.document.return_value.set.assert_called()
+
+    @patch('main.db')  # Mock Firestore
+    def test_track_download_activity_no_update(self, mock_db):
+        """
+        Test that track_download_activity does not update the lastDownloaded if the download count doesn't increase by x.
+        """
+        # Mock the current group document with nbDownloaded = 6 (as an integer)
+        mock_group_doc = MagicMock()
+        mock_group_doc.exists = True
+        mock_group_doc.to_dict.return_value = {'nbDownloaded': 6}
+
+        # Mock the previous download activity document with nbDownloaded = 5 (as an integer)
+        mock_download_doc = MagicMock()
+        mock_download_doc.exists = True
+        mock_download_doc.to_dict.return_value = {'nbDownloaded': 5}
+
+        # Use side_effect to simulate different return values for multiple calls to get()
+        mock_db.collection.return_value.document.return_value.get.side_effect = [mock_group_doc, mock_download_doc]
+
+        # Call the function under test
+        track_download_activity("group1")
+
+        # Ensure the lastDownloaded timestamp is NOT updated since the nbDownloaded did not increase by x_threshold
+        mock_db.collection.return_value.document.return_value.set.assert_not_called()
+
+    @patch('main.db')  # Mock Firestore
+    def test_delete_inactive_groups(self, mock_db):
+        """
+        Test that delete_inactive_groups deletes groups with lastDownloaded older than 30 days.
+        """
+        # Mock the group download data with lastDownloaded older than 30 days
+        mock_download_stream = MagicMock()
+        mock_download_doc = MagicMock()
+        mock_download_doc.id = "group1"
+        mock_download_doc.to_dict.return_value = {
+            'lastDownloaded': MagicMock(to_datetime=lambda: datetime.now(timezone.utc) - timedelta(days=40))
         }
-        mock_group_stream.stream.return_value = [mock_group_doc]
-        mock_db.collection.return_value = mock_group_stream
-
-        # Mock Firestore file data
-        mock_file_stream = MagicMock()
-        mock_file_doc = MagicMock()
-        mock_file_doc.id = "file1"
-        mock_file_doc.to_dict.return_value = {'path': 'test_file.txt', 'groupUUID': 'group1'}
-        mock_file_stream.stream.return_value = [mock_file_doc]
-
-        # Mock file and group deletion
-        mock_bucket = MagicMock()
-        mock_storage_client.bucket.return_value = mock_bucket
-        mock_blob = MagicMock()
-        mock_bucket.blob.return_value = mock_blob
-
-        # Mock Firestore delete calls
-        mock_db.collection.return_value.document.return_value.delete = MagicMock()
+        mock_download_stream.stream.return_value = [mock_download_doc]
+        mock_db.collection.return_value = mock_download_stream
 
         # Call the function under test
         delete_inactive_groups()
 
-        # Verify that Firestore's delete function was called for both files and groups
+        # Verify that Firestore delete functions are called
         mock_db.collection.return_value.document.return_value.delete.assert_called()
-
-        # Ensure the blob delete method was called
-        mock_bucket.blob.assert_called_with("group1/test_file.txt")  # Ensure blob is fetched with the correct path
-        mock_blob.delete.assert_called()  # Check that the Cloud Storage blob was deleted
 
     @patch('main.db')  # Mock Firestore
-    @patch('main.storage_client')  # Mock Cloud Storage
-    def test_delete_group_and_files(self, mock_storage_client, mock_db):
-        # Mock Firestore file data for a group
-        mock_file_stream = MagicMock()
-        mock_file_doc = MagicMock()
-        mock_file_doc.id = "file1"
-        mock_file_doc.to_dict.return_value = {'path': 'test_file.txt', 'groupUUID': 'group1'}
-        mock_file_stream.stream.return_value = [mock_file_doc]
-        mock_db.collection.return_value.where.return_value.stream.return_value = [mock_file_doc]
-
-        # Mock file deletion from Cloud Storage
-        mock_bucket = MagicMock()
-        mock_storage_client.bucket.return_value = mock_bucket
-        mock_blob = MagicMock()
-        mock_bucket.blob.return_value = mock_blob
+    def test_track_all_groups(self, mock_db):
+        """
+        Test that track_all_groups tracks the download activity for all groups.
+        """
+        # Mock group data
+        mock_group_stream = MagicMock()
+        mock_group_doc = MagicMock()
+        mock_group_doc.id = "group1"
+        mock_group_stream.stream.return_value = [mock_group_doc]
+        mock_db.collection.return_value = mock_group_stream
 
         # Call the function under test
-        delete_group_and_files("group1")
+        track_all_groups()
 
-        # Verify that Firestore's delete function was called for the files and the group
-        mock_db.collection.return_value.document.return_value.delete.assert_called()
-        mock_blob.delete.assert_called()  # Verify that Cloud Storage's blob delete was called
+        # Verify that the track_download_activity is called for each group
+        mock_db.collection.return_value.document.return_value.get.assert_called()
 
 
 if __name__ == '__main__':

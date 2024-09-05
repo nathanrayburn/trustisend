@@ -6,6 +6,8 @@ import logging
 import json
 import schedule
 import time
+import subprocess
+import sys
 
 # Load configuration from the configuration.json file
 with open('configuration.json') as config_file:
@@ -14,6 +16,7 @@ with open('configuration.json') as config_file:
 # Configuration values
 bucket_name = config['storage']['bucket']
 thirty_days = timedelta(days=30)
+x_threshold = 5  # Update lastDownloaded only when nbDownloaded increases by 5
 
 # Initialize Firestore and Cloud Storage clients using the paths from configuration.json
 db = firestore.Client.from_service_account_json(config['firestore']['credentials'], 
@@ -21,6 +24,47 @@ db = firestore.Client.from_service_account_json(config['firestore']['credentials
                                                 database=config['firestore']['databaseID'])
 
 storage_client = storage.Client.from_service_account_json(config['storage']['credentials'])
+
+
+def track_download_activity(group_uuid):
+    """
+    Tracks download activity by updating the lastDownloaded timestamp only if the nbDownloaded has increased by x.
+    """
+    try:
+        # Retrieve current nbDownloaded from the groups collection
+        group_ref = db.collection("groups").document(group_uuid)
+        group_doc = group_ref.get()
+        if not group_doc.exists:
+            logging.error(f"Group {group_uuid} not found.")
+            return
+        group_data = group_doc.to_dict()
+        current_nb_downloaded = group_data.get('nbDownloaded', 0)
+
+        # Retrieve the previous nbDownloaded and lastDownloaded from the groupDownloads collection
+        download_ref = db.collection("groupDownloads").document(group_uuid)
+        download_doc = download_ref.get()
+
+        if download_doc.exists:
+            download_data = download_doc.to_dict()
+            last_nb_downloaded = download_data.get('nbDownloaded', 0)
+        else:
+            # If no previous record exists, initialize it
+            last_nb_downloaded = 0
+
+        # Update the lastDownloaded timestamp only if the nbDownloaded has increased by at least x
+        if current_nb_downloaded - last_nb_downloaded >= x_threshold:
+            download_ref.set({
+                'lastDownloaded': datetime.now(timezone.utc),
+                'nbDownloaded': current_nb_downloaded  # Update the nbDownloaded for future comparison
+            }, merge=True)  # Merge so that it updates or creates the document
+            print(f"Tracked download activity for group {group_uuid}, updated lastDownloaded.")
+        else:
+            print(f"Tracked download activity for group {group_uuid}, but no need to update lastDownloaded.")
+
+    except Exception as e:
+        logging.error(f"Error tracking download activity for group {group_uuid}: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 def delete_group_and_files(group_uuid):
@@ -60,6 +104,13 @@ def delete_group_and_files(group_uuid):
         except Exception as e:
             logging.error(f"Error deleting Firestore document for group {group_uuid}: {e}")
 
+        # Delete the group from groupDownloads
+        try:
+            db.collection("groupDownloads").document(group_uuid).delete()
+            print(f"Deleted Firestore document for download activity of group: {group_uuid}")
+        except Exception as e:
+            logging.error(f"Error deleting group download activity: {e}")
+
     except Exception as e:
         logging.error(f"An error occurred while deleting group and files: {e}")
         import traceback
@@ -68,31 +119,31 @@ def delete_group_and_files(group_uuid):
 
 def delete_inactive_groups():
     """
-    Function to check each group and delete it along with its associated files if it hasn't been downloaded for more than 30 days.
+    Function to check each group in groupDownloads and delete it along with its associated files
+    if the lastDownloaded timestamp is older than 30 days.
     """
     try:
         # Get the current time
         now = datetime.now(timezone.utc)
 
-        # Define the cutoff date for groups not downloaded in the last 30 days
+        # Define the cutoff date for inactivity (30 days ago)
         cutoff_date = now - thirty_days
 
-        # Query Firestore for all groups
-        all_groups_ref = db.collection("groups")
-        groups = all_groups_ref.stream()
+        # Query Firestore for all groups' download activities
+        download_ref = db.collection("groupDownloads")
+        download_activities = download_ref.stream()
 
-        for group_doc in groups:
-            group_data = group_doc.to_dict()
+        for download_doc in download_activities:
+            download_data = download_doc.to_dict()
 
-            # Check if the 'lastDownloaded' field exists in the group document
-            if 'lastDownloaded' in group_data:
-                last_downloaded = group_data['lastDownloaded']
-                last_downloaded_datetime = last_downloaded.to_datetime()
+            # Check if the 'lastDownloaded' field exists in the download document
+            if 'lastDownloaded' in download_data:
+                last_downloaded = download_data['lastDownloaded'].to_datetime()
 
-                # If the group hasn't been downloaded for more than 30 days, delete the group and its files
-                if last_downloaded_datetime < cutoff_date:
-                    group_uuid = group_doc.id
-                    print(f"Group {group_uuid} has not been downloaded for 30 days, deleting...")
+                # If the lastDownloaded timestamp is older than 30 days, delete the group and its files
+                if last_downloaded < cutoff_date:
+                    group_uuid = download_doc.id
+                    print(f"Group {group_uuid} has been inactive for 30 days, deleting...")
                     delete_group_and_files(group_uuid)
 
     except Exception as e:
@@ -101,14 +152,56 @@ def delete_inactive_groups():
         traceback.print_exc()
 
 
+def track_all_groups():
+    """
+    Tracks download activity for all groups in the Firestore database.
+    This function is scheduled to run once a day.
+    """
+    try:
+        # Query Firestore for all groups
+        all_groups_ref = db.collection("groups")
+        groups = all_groups_ref.stream()
+
+        for group_doc in groups:
+            group_uuid = group_doc.id
+            track_download_activity(group_uuid)
+
+    except Exception as e:
+        logging.error(f"An error occurred while tracking all groups: {e}")
+        import traceback
+        traceback.print_exc()
+
+
 def schedule_cleanup():
     """
-    Function to schedule the deletion of inactive groups and their associated files every day at midnight.
+    Function to schedule the deletion of inactive groups and their associated files every day at midnight,
+    and track download activity once a day.
     """
     # Schedule the delete_inactive_groups function to run once a day at midnight
     schedule.every().day.at("00:00").do(delete_inactive_groups)
+
+    # Schedule the track_all_groups function to run once a day (e.g., at 1:00 AM)
+    schedule.every().day.at("23:59").do(track_all_groups)
     
     # Keep the scheduler running indefinitely
     while True:
         schedule.run_pending()
         time.sleep(60)  # Sleep for 1 minute between checks
+
+
+def run_tests():
+    """
+    Function to run the unit tests before executing the main application.
+    """
+    result = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", ".", "-p", "test_unit.py"])
+    if result.returncode != 0:
+        print("Unit tests failed. Exiting...")
+        sys.exit(result.returncode)
+
+
+if __name__ == '__main__':
+    # Run the tests before proceeding
+    run_tests()
+    # Start the cleanup and tracking scheduler
+    print("Starting cleanup and download tracking scheduler...")
+    schedule_cleanup()
