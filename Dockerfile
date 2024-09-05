@@ -26,5 +26,5 @@ COPY --from=build /app/target/*.jar ./app.jar
 # Expose the default port used by Spring Boot
 EXPOSE 8080 8000
 
-# Define the entry point for the container
-ENTRYPOINT ["java", "-jar", "./app.jar"]
+# Define the entry point for the container with memory settings
+ENTRYPOINT ["java", "-Xms512m", "-Xmx2048m", "-jar", "./app.jar"]
