@@ -151,10 +151,10 @@
         <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 bg-white lg:bg-transparent text-black p-4 lg:p-0 z-20" id="nav-content">
             <ul class="list-reset lg:flex justify-end flex-1 items-center">
                 <li class="mr-3">
-                    <a class="inline-block py-2 px-4 text-black font-bold no-underline" href="">Upload page</a>
+                    <span class="inline-block py-2 px-4 text-black font-bold no-underline">Upload Page</span>
                 </li>
                 <li class="mr-3">
-                    <a class="inline-block text-red-500 font-bold no-underline hover:text-red-700 py-2 px-4" href="/signout">Sign Out</a>
+                    <a class="inline-block text-red-500 font-bold no-underline hover:text-red-700 py-2 px-4" href="/perform_logout">Sign Out</a>
                 </li>
             </ul>
             <button id="navAction" class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full mt-4 lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
@@ -170,6 +170,7 @@
 
 <!-- Upload Section -->
 <div class="upload-container">
+
     <!-- Form to handle file uploads -->
     <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
         <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
@@ -178,7 +179,6 @@
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                 </svg>
                 <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
             </div>
             <input id="dropzone-file" name="files" type="file" class="hidden" multiple />
         </label>
