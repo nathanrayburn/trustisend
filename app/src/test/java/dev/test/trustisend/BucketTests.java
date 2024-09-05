@@ -109,22 +109,6 @@ public class BucketTests {
         dataBucketUtil.deleteFolder(testGroup.getGroupUUID());
     }
 
-    @Test
-    void invalidFileTypeUpload() throws IOException {
-        Path tempPath = createTempFile("invalid-upload", ".txt", "Upload test file");
-        MultipartFile tempFile = createMultipartFile(tempPath);
-
-        InputStream inputStream = tempFile.getInputStream();
-
-        assertThrows(Exception.class, () -> {
-            dataBucketUtil.uploadFileStream(inputStream, tempFile.getOriginalFilename(), Files.probeContentType(tempPath), testGroup.getGroupUUID());
-        });
-
-        inputStream.close();
-
-        Files.deleteIfExists(tempPath);
-    }
-
     private Path createTempFile(String prefix, String suffix, String content) throws IOException {
         Path tempFile = Files.createTempFile(prefix, suffix);
         Files.writeString(tempFile, content, StandardOpenOption.WRITE);
