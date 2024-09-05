@@ -4,6 +4,9 @@ from enum import Enum
 import google.cloud.firestore as firestore
 import google.cloud.storage as storage
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.poolmanager import PoolManager
+import ssl
 from activefile import ActiveFile
 import json
 import logging
@@ -27,9 +30,22 @@ class FileScanStatus(Enum):
     ERROR = "ERROR"
 
 
+# SSL Adapter class to enforce TLS 1.2 or higher
+class SSLAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args, **kwargs):
+        context = ssl.create_default_context()
+        context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1  # Disable TLS 1.0 and 1.1
+        kwargs['ssl_context'] = context
+        return super().init_poolmanager(*args, **kwargs)
+
+# Create a session and mount the SSLAdapter
+session = requests.Session()
+session.mount('https://', SSLAdapter())
+
 # Open and read the configuration.json file
 with open('configuration.json') as config_file:
     data = json.load(config_file)
+
 # Create Firestore client with its specific credentials
 db = firestore.Client.from_service_account_json(data['firestore']['credentials'], project=data['projectID'],
                                                 database=data['firestore']['databaseID'])
@@ -118,12 +134,12 @@ def sendToAPI(file):
 
     # If the file is larger than 32MB, use the upload URL method
     if file_size > 32 * 1024 * 1024:  # 32MB in bytes
-        response = requests.get(upload_url_endpoint, headers=headers)
+        response = session.get(upload_url_endpoint, headers=headers)
         if response.status_code == 200:
             upload_url = response.json()["data"]
             with open(fileName, "rb") as f:
                 files = {"file": (fileName, f, "application/octet-stream")}
-                upload_response = requests.post(upload_url, files=files, headers=headers)
+                upload_response = session.post(upload_url, files=files, headers=headers)
                 return upload_response
         else:
             print(f"Failed to get upload URL: {response.text}")
@@ -133,7 +149,7 @@ def sendToAPI(file):
         # For files <= 32MB, use the standard upload method
         with open(fileName, "rb") as f:
             files = {"file": (fileName, f, "application/octet-stream")}
-            response = requests.post(url, files=files, headers=headers)
+            response = session.post(url, files=files, headers=headers)
             return response
 
 
@@ -184,7 +200,7 @@ def handleFile(file_uuid, data):
         "accept": "application/json",
         "x-apikey": key
     }
-    response = requests.get(url, headers=headers)
+    response = session.get(url, headers=headers)
     if response.status_code == 200:
         res = response.json()
         if res['data']['attributes']['status'] == "completed":
