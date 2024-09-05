@@ -24,6 +24,8 @@
             margin-bottom: 10px;
             display: none;
         }
+
+
     </style>
 </head>
 <body class="leading-normal tracking-normal text-white background h-screen" style="font-family: 'Source Sans Pro', sans-serif;">
@@ -189,11 +191,10 @@
                     </span>
                 </label>
             </div>
-
-            <div id="error-message" class="error-message">You must agree to the Terms and Policy to sign up.</div>
+            <div id="error-message" class="flex items-center error-message">You must agree to the Terms and Policy to sign up.</div>
 
             <div class="flex items-center justify-between">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-3">
+                <button type="submit" id="sign-up-btn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-3">
                     Sign Up
                 </button>
             </div>
@@ -263,19 +264,23 @@
 </script>
 
 <script>
-    const signUpBtn = document.getElementById('sign-up-btn');
+    // Sélection des éléments nécessaires
+    const form = document.querySelector('form');
     const termsCheckbox = document.getElementById('terms');
     const errorMessage = document.getElementById('error-message');
 
-    signUpBtn.addEventListener('click', () => {
+    // Intercepter la soumission du formulaire
+    form.addEventListener('submit', (event) => {
+        // Vérifier si la case à cocher est cochée
         if (!termsCheckbox.checked) {
-            errorMessage.style.display = 'block';
+            event.preventDefault(); // Empêcher la soumission du formulaire
+            errorMessage.style.display = 'block'; // Afficher le message d'erreur
         } else {
-            errorMessage.style.display = 'none';
-            // Redirection vers la page /home
-            window.location.href = '/home';
+            errorMessage.style.display = 'none'; // Cacher le message d'erreur si tout est correct
         }
     });
+
+
 
 </script>
 <script>
@@ -436,13 +441,6 @@
     });
 </script>
 
-
-<script>
-    // Script pour inverser les couleurs
-    document.getElementById('invert-dark-mode-toggle').addEventListener('click', function() {
-        document.documentElement.style.filter = document.documentElement.style.filter ? '' : 'invert(100%)';
-    });
-</script>
 
 
 <script>
