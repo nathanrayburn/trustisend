@@ -2,10 +2,7 @@ package dev.test.trustisend.util;
 
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.*;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -225,6 +222,40 @@ public class DataBucketUtil {
             throw new BadRequestException("error while deleting");
         }
         throw new BadRequestException("error while deleting");
+    }
+    /**
+     * Uploads a file to Google Cloud Storage using an InputStream.
+     *
+     * @param fileStream the InputStream of the file to be uploaded
+     * @param fileName the name of the file to be stored in the bucket
+     * @param contentType the MIME type of the file
+     * @param uID the unique identifier for the user's directory
+     * @return a FileDto containing information about the uploaded file
+     */
+    public FileDto uploadFileStream(InputStream fileStream, String fileName, String contentType, String uID) {
+        try (InputStream stream = fileStream) {
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+            GoogleCredentials credentials = GoogleCredentials.fromStream(new ByteArrayInputStream(credentialsJson.getBytes()));
+            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId).setCredentials(credentials).build();
+
+            Storage storage = options.getService();
+            Bucket bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
+
+            // Create a BlobInfo object for the file
+            BlobInfo blobInfo = BlobInfo.newBuilder(gcpBucketId, uID + "/" + fileName)
+                    .setContentType(contentType)
+                    .build();
+
+            // Upload the file directly from the InputStream
+            Blob blob = storage.create(blobInfo, stream);
+
+            if (blob != null) {
+                return new FileDto(fileName, blob.getMediaLink());
+            }
+        } catch (Exception e) {
+            throw new GCPFileUploadException("An error occurred while storing data to GCS: " + e.getMessage());
+        }
+        throw new GCPFileUploadException("An error occurred while storing data to GCS");
     }
 
     //@TODO test
