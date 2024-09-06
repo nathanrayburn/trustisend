@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Download Folder - TrustiSend</title>
+    <link th:href="@{/css/main.css}" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet" />
+    <style>
+        .background {
+            background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+        }
+        .table-container {
+            margin-top: 20px;
+            background-color: #ffffff; /* Fond blanc similaire à celui utilisé sur les autres pages */
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombre douce pour une apparence moderne */
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #333; /* Texte sombre pour une meilleure lisibilité */
+            border-radius: 10px;
+            overflow: hidden;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .table th {
+            background-color: #f7f7f7; /* Fond clair pour l'en-tête */
+            color: #555; /* Texte en gris pour les titres */
+            text-transform: uppercase;
+            font-size: 14px;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0; /* Légère séparation pour l'en-tête */
+        }
+
+        .table td {
+            padding: 12px 15px;
+            background-color: #ffffff; /* Fond blanc pour le contenu du tableau */
+            border-bottom: 1px solid #e0e0e0; /* Ligne de séparation subtile */
+            transition: background-color 0.3s ease; /* Effet de transition pour le survol */
+        }
+
+        .table tr:hover td {
+            background-color: #f1f5f9; /* Fond légèrement gris au survol */
+        }
+
+        .table td a {
+            color: #d53369; /* Couleur des liens pour correspondre à l'identité visuelle */
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .table td a:hover {
+            text-decoration: underline;
+        }
+
+        .download-btn {
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #d53369;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .download-btn:hover {
+            background-color: #b8285b;
+        }
+        .status-icon {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body class="leading-normal tracking-normal text-white background h-screen" style="font-family: 'Source Sans Pro', sans-serif;">
+<!-- Nav -->
+<nav id="header" class="fixed w-full z-30 top-0 text-white">
+    <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
+        <div class="pl-4 flex items-center">
+            <a class="toggleColour text-white no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/#">
+                <!-- Icone TrustiSend -->
+                <svg class="h-8 fill-current inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.005 512.005">
+                    <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" transform="matrix(1,0,0,1,0,0)" />
+                    <path class="plane-take-off" d="M510.7 189.151C505.271 168.95 484.565 156.956 464.365 162.385L330.156 198.367 155.924 35.878 107.19 49.008 211.729 230.183 86.232 263.767 36.614 224.754 0 234.603 45.957 314.27 65.274 347.727 105.802 336.869 240.011 300.886 349.726 271.469 483.935 235.486C504.134 230.057 516.129 209.352 510.7 189.151Z" />
+                </svg>
+                TrustiSend
+            </a>
+        </div>
+
+        <!-- Conteneur vidéo au milieu de la nav-barre -->
+        <div id="video-container" class="video-container">
+            <video id="scroll-video" muted preload>
+                <source src="/images/output-bg.webm" type="video/webm">
+                Votre navigateur ne supporte pas le format vidéo WebM.
+            </video>
+        </div>
+
+        <div class="block lg:hidden pr-4">
+            <button id="nav-toggle" class="flex items-center p-1 text-pink-800 hover:text-gray-900 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                <svg class="fill-current h-6 w-6" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <title>Menu</title>
+                    <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Les autres éléments de la barre de navigation -->
+        <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 bg-white lg:bg-transparent text-black p-4 lg:p-0 z-20" id="nav-content">
+            <ul class="list-reset lg:flex justify-end flex-1 items-center">
+                <li class="mr-3">
+                    <span class="inline-block py-2 px-4 text-black font-bold no-underline">Link Page</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <hr class="border-b border-gray-100 opacity-25 my-0 py-0" />
+</nav>
+
+<!-- Folder Contents Section -->
+<div class="container mx-auto mt-24">
+    <div class="table-container">
+        <h2 class="text-2xl text-white mb-4" th:text="'Folder: ' + ${folderName}">Folder: Folder Name</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>File Name</th>
+                <th>Timestamp</th>
+                <th>Virus Check</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Thymeleaf Loop to Display File Information -->
+            <tr th:each="file : ${files}">
+                <td th:text="${file.path}">File Name</td>
+                <td class="file-timestamp" th:data-timestamp="${file.timestamp}" th:text="${file.timestamp}">Timestamp</td>
+                <td class="status-cell" th:data-status="${file.scanStatus}">
+                    <!-- Placeholder for status image -->
+                    <img src="" alt="Status" class="status-icon">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <!-- Conteneur pour centrer le bouton Download All -->
+        <div class="flex justify-center mt-4">
+            <!-- Set the UID dynamically from the folderName -->
+            <button class="download-btn" onclick="downloadAllFiles()" th:data-uid="${folderName}">Download All</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+    const registerVideo = (videoSelector) => {
+        const video = document.querySelector(videoSelector);
+
+        const scrollVideo = () => {
+            if (video.duration) {
+                const rawPercentScrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+                const percentScrolled = Math.min(Math.max(rawPercentScrolled, 0), 1);
+                video.currentTime = video.duration * percentScrolled;
+            }
+            requestAnimationFrame(scrollVideo);
+        };
+
+        requestAnimationFrame(scrollVideo);
+    };
+
+    // Enregistre la vidéo dans la nav-bar
+    registerVideo("#scroll-video");
+</script>
+
+<script>
+    var scrollpos = window.scrollY;
+    var header = document.getElementById("header");
+    var navcontent = document.getElementById("nav-content");
+    var toToggle = document.querySelectorAll(".toggleColour");
+
+    document.addEventListener("scroll", function () {
+        scrollpos = window.scrollY;
+
+        if (scrollpos > 10) {
+            header.classList.add("bg-white");
+            header.classList.add("shadow");
+            for (var i = 0; i < toToggle.length; i++) {
+                toToggle[i].classList.add("text-gray-800");
+                toToggle[i].classList.remove("text-white");
+            }
+            navcontent.classList.remove("bg-gray-100");
+            navcontent.classList.add("bg-white");
+        } else {
+            header.classList.remove("bg-white");
+            header.classList.remove("shadow");
+            for (var i = 0; i < toToggle.length; i++) {
+                toToggle[i].classList.add("text-white");
+                toToggle[i].classList.remove("text-gray-800");
+            }
+            navcontent.classList.remove("bg-white");
+            navcontent.classList.add("bg-gray-100");
+        }
+    });
+</script>
+
+<script>
+    // Function to format the timestamp into 'YYYY-MM-DD HH:mm:ss'
+    function formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    // Find all cells with the 'file-timestamp' class and format their timestamps
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.file-timestamp').forEach(cell => {
+            const timestamp = cell.getAttribute('data-timestamp');
+            if (timestamp && timestamp !== 'N/A') {
+                // Format the timestamp and update the cell content
+                cell.textContent = formatTimestamp(timestamp);
+            }
+        });
+    });
+    // Function to trigger the download of all files
+    function downloadAllFiles() {
+        // Retrieve the UID from the button's data attribute
+        const uid = document.querySelector('.download-btn').getAttribute('data-uid');
+
+        // Get the current base URL dynamically
+        const baseUrl = window.location.origin; // This will automatically use the current domain and protocol
+
+        // Define the URL for the API call dynamically
+        const url = `${baseUrl}/link?uid=${uid}`;
+
+        // Use fetch to make a POST request to the download endpoint
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob(); // Expecting a blob (binary large object) as a response
+            })
+            .then(blob => {
+                // Create a link element, use it to download the blob, and remove it
+                const downloadUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = `${uid}_folder.zip`; // The name of the downloaded file
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(downloadUrl); // Clean up the URL object
+            })
+            .catch(error => {
+                console.error('There was a problem with the download request:', error);
+                alert('An error occurred while trying to download the folder. Please try again.');
+            });
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to update the status image based on the file scan status
+        document.querySelectorAll('.status-cell').forEach(cell => {
+            const status = cell.getAttribute('data-status');
+            const img = cell.querySelector('.status-icon');
+
+            // Set the image source based on the status
+            switch (status) {
+                case 'PENDING':
+                    img.src = '/images/status-pending.gif';
+                    img.alt = 'Pending';
+                    break;
+                case 'CLEAN':
+                    img.src = '/images/status-clean.png';
+                    img.alt = 'Clean';
+                    break;
+                case 'INFECTED':
+                    img.src = '/images/status-infected.png';
+                    img.alt = 'Infected';
+                    break;
+                default:
+                    img.src = '/images/status-error.png';
+                    img.alt = 'Error';
+                    break;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

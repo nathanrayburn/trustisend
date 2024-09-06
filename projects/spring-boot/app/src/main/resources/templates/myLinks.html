@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>My Links - TrustiSend</title>
+    <link th:href="@{/css/main.css}" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet" />
+    <style>
+        .background {
+            background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+        }
+        .table-container {
+            margin-top: 20px;
+            background-color: #ffffff; /* Fond blanc pour un style plus moderne */
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombre douce pour un effet de profondeur */
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #333; /* Texte en gris foncé pour la lisibilité */
+            border-radius: 10px;
+            overflow: hidden;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .table th {
+            background-color: #f7f7f7; /* Fond clair pour l'en-tête */
+            color: #555; /* Texte en gris */
+            text-transform: uppercase;
+            font-size: 14px;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0; /* Séparation subtile entre l'en-tête et le contenu */
+        }
+
+        .table td {
+            padding: 12px 15px;
+            background-color: #ffffff; /* Garder le fond blanc pour un style épuré */
+            border-bottom: 1px solid #e0e0e0; /* Lignes de séparation légères */
+            transition: background-color 0.3s ease; /* Effet de transition pour le survol */
+        }
+
+        .table tr:hover td {
+            background-color: #f1f5f9; /* Fond légèrement gris au survol */
+        }
+
+        .table td a {
+            color: #d53369; /* Couleur vive pour les liens */
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .table td a:hover {
+            text-decoration: underline;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+        /* Modal styling for better display */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #2d3748;
+            padding: 30px;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 90%;
+            color: #e2e8f0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #daae51;
+        }
+
+        .modal-content ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .modal-content li {
+            padding: 8px;
+            border-bottom: 1px solid #40596f;
+            font-size: 16px;
+        }
+
+        .modal-content li:last-child {
+            border-bottom: none;
+        }
+
+        .modal-content button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #d53369;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .modal-content button:hover {
+            background-color: #b8285b;
+        }
+    </style>
+</head>
+<body class="leading-normal tracking-normal text-white background h-screen" style="font-family: 'Source Sans Pro', sans-serif;">
+<!-- Nav -->
+<nav id="header" class="fixed w-full z-30 top-0 text-white">
+    <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
+        <div class="pl-4 flex items-center">
+            <a class="toggleColour text-white no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/#">
+                <!-- Icone TrustiSend -->
+                <svg class="h-8 fill-current inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.005 512.005">
+                    <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" transform="matrix(1,0,0,1,0,0)" />
+                    <path class="plane-take-off" d="M510.7 189.151C505.271 168.95 484.565 156.956 464.365 162.385L330.156 198.367 155.924 35.878 107.19 49.008 211.729 230.183 86.232 263.767 36.614 224.754 0 234.603 45.957 314.27 65.274 347.727 105.802 336.869 240.011 300.886 349.726 271.469 483.935 235.486C504.134 230.057 516.129 209.352 510.7 189.151Z" />
+                </svg>
+                TrustiSend
+            </a>
+        </div>
+
+        <!-- Conteneur vidéo au milieu de la nav-barre -->
+        <div id="video-container" class="video-container">
+            <video id="scroll-video" muted preload>
+                <source src="/images/output-bg.webm" type="video/webm">
+                Votre navigateur ne supporte pas le format vidéo WebM.
+            </video>
+        </div>
+
+        <div class="block lg:hidden pr-4">
+            <button id="nav-toggle" class="flex items-center p-1 text-pink-800 hover:text-gray-900 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                <svg class="fill-current h-6 w-6" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <title>Menu</title>
+                    <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Les autres éléments de la barre de navigation -->
+        <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 bg-white lg:bg-transparent text-black p-4 lg:p-0 z-20" id="nav-content">
+            <ul class="list-reset lg:flex justify-end flex-1 items-center">
+                <li class="mr-3">
+                    <span class="inline-block py-2 px-4 text-black font-bold no-underline">My Links Page</span>
+
+                </li>
+                <li class="mr-3">
+                    <a class="inline-block text-red-500 font-bold no-underline hover:text-red-700 py-2 px-4" href="/perform_logout">Sign Out</a>
+                </li>
+            </ul>
+            <button id="navAction" class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full mt-4 lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                Username
+            </button>
+        </div>
+    </div>
+    <hr class="border-b border-gray-100 opacity-25 my-0 py-0" />
+</nav>
+
+<!-- Element caché pour passer l'email à JavaScript -->
+<div id="emailHolder" th:data-email="${email}" style="display: none;"></div>
+
+<!-- My Files Section -->
+<div class="container mx-auto mt-24">
+    <div class="table-container">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Directory UUID</th>
+                <th>Upload Date</th>
+                <th>Download Count</th>
+                <th>Links</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Thymeleaf Loop to Display Group Information -->
+            <tr th:each="groupEntry : ${groupFilesMap}">
+                <td style="display: flex; align-items: center;"> <!-- Flex container to align items -->
+                    <span th:text="${groupEntry.key}" style="margin-right: 8px;">Directory UUID</span>
+                    <!-- Eye icon button to view folder contents -->
+                    <button class="view-folder-btn" th:data-uuid="${groupEntry.key}" style="border: none; background: transparent; cursor: pointer;">
+                        <img src="/images/white-eye.png" alt="View" class="icon">
+                    </button>
+                </td>
+                <!-- Add a class to target this cell in JavaScript -->
+                <td class="upload-date" th:data-timestamp="${#lists.isEmpty(groupEntry.value) ? 'N/A' : groupEntry.value.get(0).timestamp}">
+                    <span th:text="${#lists.isEmpty(groupEntry.value) ? 'N/A' : groupEntry.value.get(0).timestamp}">Upload Date</span>
+                </td>
+                <td th:text="${#lists.isEmpty(groupEntry.value) ? 0 : groupEntry.value.get(0).numberDownloads}">Download Count</td>
+                <td>
+                    <a th:href="@{/link/{uid}(uid=${groupEntry.key})}">
+                        <img src="/images/link-zelda.png" alt="Link" class="icon">
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal to Display Folder Contents -->
+<div id="folderContentsModal" class="modal">
+    <div class="modal-content">
+        <h3 id="folderIdDisplay">Folder Contents</h3>
+        <ul id="folderContentsList">
+            <!-- File list will be populated here dynamically -->
+        </ul>
+        <button id="closeModalButton" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded mt-4">Close</button>
+    </div>
+</div>
+
+
+<!-- Scripts -->
+<script>
+    // Récupère l'email depuis l'attribut data-email de l'élément caché
+    const email = document.getElementById('emailHolder').getAttribute('data-email');
+    // Extrait le username avant le symbole @
+    const username = email.match(/^[^@]+/)[0];
+    // Affiche le username dans le bouton de la nav-bar
+    document.getElementById('navAction').textContent = username;
+</script>
+
+<script>
+    const registerVideo = (videoSelector) => {
+        const video = document.querySelector(videoSelector);
+
+        const scrollVideo = () => {
+            if (video.duration) {
+                const rawPercentScrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+                const percentScrolled = Math.min(Math.max(rawPercentScrolled, 0), 1);
+                video.currentTime = video.duration * percentScrolled;
+            }
+            requestAnimationFrame(scrollVideo);
+        };
+
+        requestAnimationFrame(scrollVideo);
+    };
+
+    // Enregistre la vidéo dans la nav-bar
+    registerVideo("#scroll-video");
+</script>
+
+<script>
+    var scrollpos = window.scrollY;
+    var header = document.getElementById("header");
+    var navcontent = document.getElementById("nav-content");
+    var toToggle = document.querySelectorAll(".toggleColour");
+
+    document.addEventListener("scroll", function () {
+        scrollpos = window.scrollY;
+
+        if (scrollpos > 10) {
+            header.classList.add("bg-white");
+            header.classList.add("shadow");
+            for (var i = 0; i < toToggle.length; i++) {
+                toToggle[i].classList.add("text-gray-800");
+                toToggle[i].classList.remove("text-white");
+            }
+            navcontent.classList.remove("bg-gray-100");
+            navcontent.classList.add("bg-white");
+        } else {
+            header.classList.remove("bg-white");
+            header.classList.remove("shadow");
+            for (var i = 0; i < toToggle.length; i++) {
+                toToggle[i].classList.add("text-white");
+                toToggle[i].classList.remove("text-gray-800");
+            }
+            navcontent.classList.remove("bg-white");
+            navcontent.classList.add("bg-gray-100");
+        }
+    });
+</script>
+
+<script>
+    // Function to increase the download count when the download link is clicked
+    function increaseDownloadCount(link) {
+        const downloadCountCell = link.closest('tr').querySelector('.download-count');
+        let currentCount = parseInt(downloadCountCell.textContent, 10);
+        downloadCountCell.textContent = currentCount + 1;
+    }
+</script>
+
+<script>
+    // Fetch the modal and its elements
+    const folderContentsModal = document.getElementById('folderContentsModal');
+    const folderContentsList = document.getElementById('folderContentsList');
+    const closeModalButton = document.getElementById('closeModalButton');
+
+    // Function to show the modal
+    function showModal() {
+        folderContentsModal.style.display = 'flex';
+    }
+
+    // Function to close the modal
+    function closeModal() {
+        folderContentsModal.style.display = 'none';
+    }
+
+    // Close the modal when clicking outside the content box
+    folderContentsModal.addEventListener('click', (event) => {
+        if (event.target === folderContentsModal) {
+            closeModal();
+        }
+    });
+
+    // Event listener for the close button
+    closeModalButton.addEventListener('click', closeModal);
+
+    // Event listener for the view button to fetch folder contents
+    document.querySelectorAll('.view-folder-btn').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const folderUUID = event.currentTarget.getAttribute('data-uuid');
+
+            try {
+                // Fetch the folder contents from the backend
+                const response = await fetch(`/viewFolderContents?uid=${folderUUID}`);
+
+                // Check if response is okay
+                if (response.ok) {
+                    const files = await response.json();
+                    console.log('Files fetched:', files); // Debugging: Log the fetched files
+
+                    // Set folder ID in the modal header
+                    document.getElementById('folderIdDisplay').textContent = `Folder ID: ${folderUUID}`;
+
+                    // Check if files array is empty
+                    if (files.length === 0) {
+                        folderContentsList.innerHTML = '<li>No files found in this folder.</li>';
+                    } else {
+                        // Populate the list with fetched files
+                        folderContentsList.innerHTML = ''; // Clear previous contents
+                        files.forEach(file => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = file.path || 'Unnamed File'; // Use the 'path' property to display file names
+                            folderContentsList.appendChild(listItem);
+                        });
+                    }
+
+                    // Show the modal
+                    showModal();
+                } else {
+                    console.error('Failed to fetch folder contents:', response.status, response.statusText);
+                    alert('Failed to fetch folder contents.');
+                }
+            } catch (error) {
+                console.error('Error fetching folder contents:', error);
+                alert('An error occurred while fetching folder contents.');
+            }
+        });
+    });
+
+</script>
+
+<script>
+    // Function to format the timestamp into 'YYYY-MM-DD HH:mm:ss'
+    function formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    // Find all cells with the 'upload-date' class and format their timestamps
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.upload-date').forEach(cell => {
+            const timestamp = cell.getAttribute('data-timestamp');
+            if (timestamp && timestamp !== 'N/A') {
+                // Format the timestamp and update the cell content
+                cell.textContent = formatTimestamp(timestamp);
+            }
+        });
+    });
+</script>
+
+
+
+
+</body>
+</html>

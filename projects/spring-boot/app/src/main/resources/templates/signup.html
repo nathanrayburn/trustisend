@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Sign Up - TrustiSend</title>
+    <link th:href="@{/css/main.css}" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet" />
+    <style>
+        .background {
+            background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+        }
+
+        .password-hints-left {
+            top: 0;
+            left: -300px;
+            width: 250px;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.875rem;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+
+    </style>
+</head>
+<body class="leading-normal tracking-normal text-white background h-screen" style="font-family: 'Source Sans Pro', sans-serif;">
+<!-- Nav  -->
+<nav id="header" class="fixed w-full z-30 top-0 text-white">
+    <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
+        <div class="pl-4 flex items-center">
+            <a class="toggleColour text-white no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/">
+                <!-- Icone TrustiSend -->
+                <svg class="h-8 fill-current inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.005 512.005">
+                    <rect fill="#2a2a31" x="16.539" y="425.626" width="479.767" height="50.502" transform="matrix(1,0,0,1,0,0)" />
+                    <path class="plane-take-off" d=" M 510.7 189.151 C 505.271 168.95 484.565 156.956 464.365 162.385 L 330.156 198.367 L 155.924 35.878 L 107.19 49.008 L 211.729 230.183 L 86.232 263.767 L 36.614 224.754 L 0 234.603 L 45.957 314.27 L 65.274 347.727 L 105.802 336.869 L 240.011 300.886 L 349.726 271.469 L 483.935 235.486 C 504.134 230.057 516.129 209.352 510.7 189.151 Z" />
+                </svg>
+                TrustiSend
+            </a>
+        </div>
+
+        <!-- Conteneur vidéo au milieu de la nav-barre -->
+        <div id="video-container" class="video-container">
+            <video id="scroll-video" muted preload>
+                <source src="/images/output-bg.webm" type="video/webm">
+                Votre navigateur ne supporte pas le format vidéo WebM.
+            </video>
+        </div>
+
+        <div class="block lg:hidden pr-4">
+            <button id="nav-toggle" class="flex items-center p-1 text-pink-800 hover:text-gray-900 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                <svg class="fill-current h-6 w-6" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <title>Menu</title>
+                    <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Les autres éléments de la barre de navigation -->
+        <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 bg-white lg:bg-transparent text-black p-4 lg:p-0 z-20" id="nav-content">
+            <ul class="list-reset lg:flex justify-end flex-1 items-center">
+                <li class="mr-3">
+                    <span class="inline-block py-2 px-4 text-black font-bold no-underline">Sign Up Page</span>
+                </li>
+            </ul>
+            <button id="navAction" class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full mt-4 lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out" onclick="window.location.href='/login'">
+                Login
+            </button>
+        </div>
+    </div>
+    <hr class="border-b border-gray-100 opacity-25 my-0 py-0" />
+</nav>
+
+
+<!-- Sign Up Form -->
+<div class="flex items-center justify-center h-full">
+    <div class="w-full max-w-md">
+        <form action="/perform_signup" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <h2 class="text-center text-gray-700 text-2xl mb-6">Sign Up</h2>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                    Email
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="email" id="email" type="email" placeholder="Email">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                    Password
+                </label>
+                <div class="relative">
+                    <input type="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="password" placeholder="Password">
+                    <div id="password-hints" class="hidden absolute z-10 bg-white shadow-md rounded-lg p-4 password-hints-left">
+                        <h4 class="text-sm font-semibold text-gray-800">Your password must contain:</h4>
+                        <ul class="space-y-1 text-sm text-gray-500">
+                            <li id="min-length" class="flex items-center gap-x-2">
+                                <span id="min-length-check" class="hidden text-teal-500">
+                                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </span>
+                                <span id="min-length-uncheck" class="text-red-500">
+                                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 6 6 18"></path>
+                                        <path d="m6 6 12 12"></path>
+                                    </svg>
+                                </span>
+                                Minimum number of characters is 6.
+                            </li>
+                            <li id="lowercase" class="flex items-center gap-x-2">
+                                    <span id="lowercase-check" class="hidden text-teal-500">
+                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </span>
+                                <span id="lowercase-uncheck" class="text-red-500">
+                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M18 6 6 18"></path>
+                                            <path d="m6 6 12 12"></path>
+                                        </svg>
+                                    </span>
+                                Should contain lowercase.
+                            </li>
+                            <li id="uppercase" class="flex items-center gap-x-2">
+                                    <span id="uppercase-check" class="hidden text-teal-500">
+                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </span>
+                                <span id="uppercase-uncheck" class="text-red-500">
+                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M18 6 6 18"></path>
+                                            <path d="m6 6 12 12"></path>
+                                        </svg>
+                                    </span>
+                                Should contain uppercase.
+                            </li>
+                            <li id="numbers" class="flex items-center gap-x-2">
+                                    <span id="numbers-check" class="hidden text-teal-500">
+                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </span>
+                                <span id="numbers-uncheck" class="text-red-500">
+                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M18 6 6 18"></path>
+                                            <path d="m6 6 12 12"></path>
+                                        </svg>
+                                    </span>
+                                Should contain numbers.
+                            </li>
+                            <li id="special-characters" class="flex items-center gap-x-2">
+                                    <span id="special-characters-check" class="hidden text-teal-500">
+                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </span>
+                                <span id="special-characters-uncheck" class="text-red-500">
+                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M18 6 6 18"></path>
+                                            <path d="m6 6 12 12"></path>
+                                        </svg>
+                                    </span>
+                                Should contain special characters.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="re-password">
+                    Re-type Password
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="re-password" id="re-password" type="password" placeholder="Re-type Password">
+            </div>
+            <div class="text-center text-gray-600 text-sm mb-4">
+                <label class="block">
+                    <input id="terms" class="mr-2 leading-tight" type="checkbox">
+                    <span class="text-sm">
+                        I agree to the
+                        <a href="https://www.termsfeed.com/live/e86b25de-50be-4c1b-b5ee-c65080b2bd5f" class="text-blue-500 hover:text-blue-800" target="_blank" rel="noopener noreferrer">
+                            Terms of Use
+                        </a>
+                        and
+                        <a href="https://www.privacypolicies.com/live/701346aa-136e-4a6e-bca3-deea2d36515c" class="text-blue-500 hover:text-blue-800" target="_blank" rel="noopener noreferrer">
+                            Privacy Policy
+                        </a>.
+                    </span>
+                </label>
+            </div>
+            <div id="error-message" class="flex items-center error-message">You must agree to the Terms and Policy to sign up.</div>
+
+            <div class="flex items-center justify-between">
+                <button type="submit" id="sign-up-btn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-3">
+                    Sign Up
+                </button>
+            </div>
+
+            <div class="text-center text-gray-600 text-sm mb-4">
+                <a href="/login" class="text-blue-500 hover:text-blue-800">Have an account? Login</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const passwordInput = document.getElementById('password');
+    const hintsContainer = document.getElementById('password-hints');
+    const rules = {
+        minLength: document.getElementById('min-length'),
+        lowercase: document.getElementById('lowercase'),
+        uppercase: document.getElementById('uppercase'),
+        numbers: document.getElementById('numbers'),
+        specialCharacters: document.getElementById('special-characters')
+    };
+    const checks = {
+        minLength: document.getElementById('min-length-check'),
+        lowercase: document.getElementById('lowercase-check'),
+        uppercase: document.getElementById('uppercase-check'),
+        numbers: document.getElementById('numbers-check'),
+        specialCharacters: document.getElementById('special-characters-check')
+    };
+    const unchecks = {
+        minLength: document.getElementById('min-length-uncheck'),
+        lowercase: document.getElementById('lowercase-uncheck'),
+        uppercase: document.getElementById('uppercase-uncheck'),
+        numbers: document.getElementById('numbers-uncheck'),
+        specialCharacters: document.getElementById('special-characters-uncheck')
+    };
+
+    passwordInput.addEventListener('focus', () => {
+        hintsContainer.classList.remove('hidden');
+    });
+
+    passwordInput.addEventListener('blur', () => {
+        hintsContainer.classList.add('hidden');
+    });
+
+    passwordInput.addEventListener('input', () => {
+        const value = passwordInput.value;
+        checkRule('minLength', value.length >= 6);
+        checkRule('lowercase', /[a-z]/.test(value));
+        checkRule('uppercase', /[A-Z]/.test(value));
+        checkRule('numbers', /\d/.test(value));
+        checkRule('specialCharacters', /[!@#$%^&*(),.?":{}|<>]/.test(value));
+    });
+
+    function checkRule(rule, isValid) {
+        if (isValid) {
+            checks[rule].classList.remove('hidden');
+            unchecks[rule].classList.add('hidden');
+            rules[rule].classList.add('text-teal-500');
+            rules[rule].classList.remove('text-red-500');
+        } else {
+            checks[rule].classList.add('hidden');
+            unchecks[rule].classList.remove('hidden');
+            rules[rule].classList.remove('text-teal-500');
+            rules[rule].classList.add('text-red-500');
+        }
+    }
+</script>
+
+<script>
+    // Sélection des éléments nécessaires
+    const form = document.querySelector('form');
+    const termsCheckbox = document.getElementById('terms');
+    const errorMessage = document.getElementById('error-message');
+
+    // Intercepter la soumission du formulaire
+    form.addEventListener('submit', (event) => {
+        // Vérifier si la case à cocher est cochée
+        if (!termsCheckbox.checked) {
+            event.preventDefault(); // Empêcher la soumission du formulaire
+            errorMessage.style.display = 'block'; // Afficher le message d'erreur
+        } else {
+            errorMessage.style.display = 'none'; // Cacher le message d'erreur si tout est correct
+        }
+    });
+
+
+
+</script>
+<script>
+    var scrollpos = window.scrollY;
+    var header = document.getElementById("header");
+    var navcontent = document.getElementById("nav-content");
+    var navaction = document.getElementById("navAction");
+    var brandname = document.getElementById("brandname");
+    var toToggle = document.querySelectorAll(".toggleColour");
+
+    document.addEventListener("scroll", function () {
+        /*Apply classes for slide in bar*/
+        scrollpos = window.scrollY;
+
+        if (scrollpos > 10) {
+            header.classList.add("bg-white");
+            navaction.classList.remove("bg-white");
+            navaction.classList.add("gradient");
+            navaction.classList.remove("text-gray-800");
+            navaction.classList.add("text-white");
+            //Use to switch toggleColour colours
+            for (var i = 0; i < toToggle.length; i++) {
+                toToggle[i].classList.add("text-gray-800");
+                toToggle[i].classList.remove("text-white");
+            }
+            header.classList.add("shadow");
+            navcontent.classList.remove("bg-gray-100");
+            navcontent.classList.add("bg-white");
+        } else {
+            header.classList.remove("bg-white");
+            navaction.classList.remove("gradient");
+            navaction.classList.add("bg-white");
+            navaction.classList.remove("text-white");
+            navaction.classList.add("text-gray-800");
+            //Use to switch toggleColour colours
+            for (var i = 0; i < toToggle.length; i++) {
+                toToggle[i].classList.add("text-white");
+                toToggle[i].classList.remove("text-gray-800");
+            }
+
+            header.classList.remove("shadow");
+            navcontent.classList.remove("bg-white");
+            navcontent.classList.add("bg-gray-100");
+        }
+    });
+</script>
+<script>
+    /*Toggle dropdown list*/
+    /*https://gist.github.com/slavapas/593e8e50cf4cc16ac972afcbad4f70c8*/
+
+    var navMenuDiv = document.getElementById("nav-content");
+    var navMenu = document.getElementById("nav-toggle");
+
+    document.onclick = check;
+    function check(e) {
+        var target = (e && e.target) || (event && event.srcElement);
+
+        //Nav Menu
+        if (!checkParent(target, navMenuDiv)) {
+            // click NOT on the menu
+            if (checkParent(target, navMenu)) {
+                // click on the link
+                if (navMenuDiv.classList.contains("hidden")) {
+                    navMenuDiv.classList.remove("hidden");
+                } else {
+                    navMenuDiv.classList.add("hidden");
+                }
+            } else {
+                // click both outside link and outside menu, hide menu
+                navMenuDiv.classList.add("hidden");
+            }
+        }
+    }
+    function checkParent(t, elm) {
+        while (t.parentNode) {
+            if (t == elm) {
+                return true;
+            }
+            t = t.parentNode;
+        }
+        return false;
+    }
+</script>
+
+<script>
+    const callback = (entries) => {
+        entries.forEach((entry) => {
+            const target = entry.target;
+
+            // Calcule le pourcentage d'intersection (0 à 1) pour dynamiser l'animation
+            const progress = Math.min(Math.max(entry.intersectionRatio, 0), 1);
+
+            if (entry.isIntersecting) {
+                // Applique les transformations en fonction du pourcentage d'intersection pour une animation dynamique
+                if (target.classList.contains('fade-left')) {
+                    target.style.transform = `translateX(${(1 - progress) * -100}%)`;
+                    target.style.opacity = progress;
+                } else if (target.classList.contains('fade-right')) {
+                    target.style.transform = `translateX(${(1 - progress) * 100}%)`;
+                    target.style.opacity = progress;
+                } else {
+                    target.style.opacity = progress;
+                    target.style.transform = `translateY(${(1 - progress) * 20}px)`;
+                }
+            } else {
+                // Réinitialise les styles lorsque l'élément sort du champ de vision
+                target.style.opacity = 0;
+                target.style.transform = '';
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(callback, {
+        threshold: Array.from({ length: 101 }, (_, i) => i / 100), // Définir plusieurs seuils pour une animation fluide
+    });
+
+    // Sélectionner tous les éléments avec la classe `js-show-on-scroll`
+    const targets = document.querySelectorAll('.js-show-on-scroll.fade-target');
+    targets.forEach((target) => {
+        // Ajouter une opacité initiale pour que les éléments soient invisibles avant l'animation
+        target.style.opacity = 0;
+        observer.observe(target);
+    });
+</script>
+
+
+
+
+<script>
+    document.querySelector('.trigger-hover').addEventListener('mouseover', function() {
+        // Animer le changement de couleur de Trust
+        this.classList.add('color-animate');
+
+        // Attendre que le changement de couleur de "Trust" soit visible
+        setTimeout(() => {
+            // Animer "WHAT" au centre de l'écran
+            const whatElement = document.getElementById('what-popup');
+            whatElement.classList.remove('hidden');
+            whatElement.classList.add('animate');
+
+            // Attendre que l'animation de "WHAT" se termine avant de continuer
+            setTimeout(() => {
+                // Afficher et animer "I" après un court délai
+                const iElement = document.querySelector('.falling-text.delay-2');
+                const sendElement = document.querySelector('.falling-text.delay-3');
+
+                // Afficher et animer "I"
+                iElement.classList.remove('hidden');
+                iElement.classList.add('animate');
+
+                // Afficher et animer "Send" après un délai supplémentaire
+                setTimeout(() => {
+                    sendElement.classList.remove('hidden');
+                    sendElement.classList.add('animate');
+                }, 400); // Ajustez le délai pour que Send tombe après I
+            }, 1200); // Temps de l'animation de "WHAT" (1.2 secondes)
+        }, 400); // Délai pour voir la couleur verte de Trust avant l'apparition de WHAT
+    });
+</script>
+
+
+
+<script>
+    const registerVideo = (videoSelector) => {
+        const video = document.querySelector(videoSelector);
+
+        const scrollVideo = () => {
+            if (video.duration) {
+                const rawPercentScrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+                const percentScrolled = Math.min(Math.max(rawPercentScrolled, 0), 1);
+                video.currentTime = video.duration * percentScrolled;
+            }
+            requestAnimationFrame(scrollVideo);
+        };
+
+        requestAnimationFrame(scrollVideo);
+    };
+
+    // Enregistre la vidéo dans la nav-bar
+    registerVideo("#scroll-video");
+
+</script>
+</body>
+</html>

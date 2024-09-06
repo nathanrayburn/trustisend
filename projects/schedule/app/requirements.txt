@@ -1,0 +1,11 @@
+# code dependencies
+flask==3.0.2
+google-cloud-firestore==2.18.0
+google-cloud-storage==2.18.2
+schedule==1.2.2
+urllib3==2.2.2
+certifi==2024.8.30
+waitress==3.0.0
+
+# Testing dependencies
+mock==5.1.0
