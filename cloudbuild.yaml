@@ -6,13 +6,13 @@ steps:
       - '-c'
       - |
         echo "Fetching credentials from Secret Manager..."
-        gcloud secrets versions access latest --secret="credentials" > /tmp/gcloud-credentials.json
+        gcloud secrets versions access latest --secret="credentials" > /workspace/tmp/gcloud-credentials.json
 
   # Step 2: Use a Maven image with Java 21 to run the tests
   - name: 'maven:3.9.4-eclipse-temurin-21'  # Maven image with Java 21
     dir: '/workspace/app'  # Change to the /app directory
     env:
-      - 'GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-credentials.json'
+      - 'GOOGLE_APPLICATION_CREDENTIALS=/workspace/tmp/gcloud-credentials.json'
     args: ['mvn', 'clean', 'test']
 
   # Step 3: Clean up the temp file (optional but recommended)
@@ -22,7 +22,7 @@ steps:
       - '-c'
       - |
         echo "Cleaning up credentials file..."
-        rm /tmp/gcloud-credentials.json
+        rm /workspace/tmp/gcloud-credentials.json
 
   # Step 4: Build the Docker image after tests have passed
   - name: 'gcr.io/cloud-builders/docker'
