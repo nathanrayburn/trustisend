@@ -8,9 +8,7 @@ WORKDIR /app
 COPY ./app/pom.xml ./pom.xml
 COPY ./app/src ./src
 
-# Run tests and package the application
-RUN mvn clean test
-
+# package the application
 RUN mvn clean package
 
 # Step 2: Use the official Java 21 runtime image to run the Spring Boot app

@@ -1,5 +1,9 @@
 steps:
-  # Step 0: Build the Docker image and tag it with the commit SHA
+  # Step 0: Set up secrets for testing
+  - name: 'gcr.io/cloud-builders/mvn'
+    args: ['clean', 'test']
+    secretEnv: ['GOOGLE_APPLICATION_CREDENTIALS']
+  # Step 1: Build the Docker image with the test results
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -7,13 +11,13 @@ steps:
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/dev:$COMMIT_SHA'
       - '.'
 
-  # Step 1: Push the Docker image to Artifact Registry
+  # Step 2: Push the Docker image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
     args:
       - push
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/dev:$COMMIT_SHA'
 
-  # Step 2: Deploy the application to Cloud Run using the built image
+  # Step 3: Deploy the application to Cloud Run
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: 'gcloud'
     args:
@@ -43,7 +47,7 @@ steps:
 images:
   - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/dev:$COMMIT_SHA'
 
-options:
-  logging: CLOUD_LOGGING_ONLY
-
-timeout: 1200s
+availableSecrets:
+  secretManager:
+    - versionName: projects/579596661856/secrets/credentials/versions/1
+      env: 'GOOGLE_APPLICATION_CREDENTIALS'
