@@ -17,15 +17,11 @@ FROM eclipse-temurin:21-jre-alpine
 # Set the working directory inside the container
 WORKDIR /app
 
-
-# Copy the keys folder to the root directory (/)
-COPY ./app/src/main/resources/keys ./keys
-
 # Copy the jar file generated during the build to the runtime image
 COPY --from=build /app/target/*.jar ./app.jar
 
 # Copy the keys folder to the root directory (/)
-COPY ./app/src/main/resources/keys /keys
+COPY ./keys /keys
 
 # Expose the default port used by Spring Boot
 EXPOSE 8080 8000
