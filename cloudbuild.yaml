@@ -26,6 +26,7 @@ steps:
 
   # Step 4: Build the Docker image after tests have passed
   - name: 'gcr.io/cloud-builders/docker'
+    dir: '/workspace'  # Return to the /workspace directory
     args:
       - build
       - '-t'
