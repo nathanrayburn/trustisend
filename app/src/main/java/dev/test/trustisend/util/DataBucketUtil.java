@@ -22,14 +22,11 @@ public class DataBucketUtil {
     @Value("${gcp.credentials.path}")
     private String gcpConfigFile;
 
-    @Value("${gcp.project.id}")
+    @Value("${project.id}")
     private String gcpProjectId;
 
     @Value("${gcp.bucket.id}")
     private String gcpBucketId;
-
-    @Value("${gcp.dir.name}")
-    private String gcpDirectoryName;
 
     /**
      * dowload a file from gcloud

@@ -18,7 +18,7 @@ public class FirestoreConfig {
     @Value("${firebase.credentials.path}")
     private String firebaseCredentialsPath;
 
-    @Value("${firebase.project.id}")
+    @Value("${project.id}")
     private String projectId;
 
     @Value("${firebase.database.id}")
