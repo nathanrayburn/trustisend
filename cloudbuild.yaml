@@ -61,5 +61,6 @@ steps:
       - '--set-env-vars'
       - 'GOOGLE_APPLICATION_CREDENTIALS=/cred-mnt/cred'
 
-images:
-  - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/dev:$COMMIT_SHA'
+options:
+  logging: CLOUD_LOGGING_ONLY  # Use Cloud Logging only
+timeout: 1200s
