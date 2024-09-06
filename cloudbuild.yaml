@@ -1,25 +1,44 @@
 steps:
-  # Step 0: Run tests with secret environment variable
-  - name: 'gcr.io/cloud-builders/mvn'
-    args: ['clean', 'test']
-    secretEnv: ['GOOGLE_APPLICATION_CREDENTIALS']
+  # Step 1: Fetch the secret from Secret Manager and save it to a temp file
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Fetching credentials from Secret Manager..."
+        gcloud secrets versions access latest --secret="credentials" > /tmp/gcloud-credentials.json
 
-  # Step 1: Build the Docker image
-  - name: gcr.io/cloud-builders/docker
+  # Step 2: Run Maven tests with the GOOGLE_APPLICATION_CREDENTIALS pointing to the temp file
+  - name: 'gcr.io/cloud-builders/mvn'
+    env:
+      - 'GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-credentials.json'
+    args: ['clean', 'test']
+
+  # Step 3: Clean up the temp file (optional but recommended)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Cleaning up credentials file..."
+        rm /tmp/gcloud-credentials.json
+
+  # Step 4: Build the Docker image after tests have passed
+  - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
       - '-t'
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/dev:$COMMIT_SHA'
       - '.'
 
-  # Step 2: Push the Docker image to Artifact Registry
-  - name: gcr.io/cloud-builders/docker
+  # Step 5: Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
     args:
       - push
       - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/dev:$COMMIT_SHA'
 
-  # Step 3: Deploy the application to Cloud Run
-  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  # Step 6: Deploy the application to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
       - run
@@ -37,17 +56,10 @@ steps:
       - '2Gi'  # Set the memory limit to 2GiB
       - '--timeout'
       - '900s'  # Increase the timeout to 15 minutes
-      # Mount Firestore and Cloud Storage secrets
       - '--update-secrets'
       - '/cred-mnt/cred=projects/579596661856/secrets/credentials:latest'
-
-      # Set environment variable to point to the Firestore credentials secret
       - '--set-env-vars'
       - 'GOOGLE_APPLICATION_CREDENTIALS=/cred-mnt/cred'
 
 images:
   - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/dev:$COMMIT_SHA'
-
-secrets:
-  - secretEnv:
-      GOOGLE_APPLICATION_CREDENTIALS: projects/579596661856/secrets/credentials/versions/latest
