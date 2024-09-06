@@ -20,7 +20,6 @@ WORKDIR /app
 # Copy the jar file generated during the build to the runtime image
 COPY --from=build /app/target/*.jar ./app.jar
 
-# Copy the keys folder to the root directory (/)
 # COPY ./keys ./keys
 
 # Expose the default port used by Spring Boot
