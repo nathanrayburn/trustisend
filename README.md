@@ -68,14 +68,14 @@
 
 1. Rechercher "Credentials" dans Google Cloud Console.
 2. Créer des credentials :
-   - **Service Account Name** : `storage`
+   - **Service Account Name** : `trustisend`
    - Ajouter le rôle : **Storage Admin**
-3. Répéter l'opération pour Firestore :
-   - **Service Account Name** : `firestore`
    - Ajouter le rôle : **Firestore Service Agent**
-4. Télécharger les clés pour chaque Service Account :
-   - Aller dans "Keys" de chaque Service Account.
+3. Télécharger les clés pour le Service Account :
+   - Aller dans "Keys" du Service Account.
    - Ajouter une clé JSON et la télécharger.
+
+Note : Dans la page credentials, normalement un e-mail avec le nom du compte devrait s'afficher. Il faut le cliquer dessus pour accèder au compte.
 
 #### Récupérer l'ID du projet
 
@@ -86,6 +86,8 @@
 
 #### Configuration des variables d'environnement
 
+A compléter glisser la clef.json dans /keys.
+
 ```bash
 # Chemin pour le fichier application.properties
 A compléter
@@ -93,15 +95,10 @@ A compléter
 
 ```yaml
 spring.application.name=trustisend
+project.id= # set project ID
+gcp.bucket.id= # set the name of the bucket we created
+firebase.database.id= # set the name of the Firestore database
 
-project.id= # set project ID 
-firebase.credentials.path= # set path to credentials
-firebase.database.id= # set database name
-
-gcp.credentials.path= # set path to credentials
-gcp.bucket.id= # set bucket name
-
-# Ne rien modifier ici
 logging.level.org.springframework.security=TRACE
 spring.servlet.multipart.max-file-size=100MB
 spring.servlet.multipart.max-request-size=5GB
@@ -111,6 +108,36 @@ server.tomcat.max-http-form-post-size=5GB
 spring.servlet.multipart.enabled=false 
 logging.level.org.springframework.web.multipart=DEBUG
 spring.resources.enabled=true
+```
+```Dockerfile
+FROM maven:3.9.4-eclipse-temurin-21 AS build
+
+WORKDIR /app
+
+COPY ./app/pom.xml ./pom.xml
+COPY ./app/src ./src
+
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar ./app.jar
+
+COPY ./keys ./keys # uncomment this line
+
+EXPOSE 8080 8000
+
+ENTRYPOINT ["java", \
+  "-XX:+UseContainerSupport", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-XshowSettings:vm", \
+  "-XX:+ExitOnOutOfMemoryError", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", \
+  "./app.jar"]
+
 ```
 
 ### Configuration de l'image Docker et Build
