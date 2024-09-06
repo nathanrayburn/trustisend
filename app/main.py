@@ -206,7 +206,7 @@ def handleFile(file_uuid, data):
             status = FileScanStatus.PENDING
             for key, value in res['data']['attributes']['stats'].items():
                 status = isExpectedResults(key, value)
-                if status == FileScanStatus.INFECTED or status == FileScanStatus.ERROR:
+                if status == FileScanStatus.INFECTED:
                     db.collection("files").document(file_uuid).update({"scanStatus": status.value})
                     return True
 
@@ -289,7 +289,7 @@ def safe_execution(task_function):
 
 # Schedule the scanNewFiles function to run every 2 minute using the safe_execution wrapper
 schedule.every(60).seconds.do(safe_execution(scanNewFiles))
-schedule.every(20).seconds.do(safe_execution(followUpFileAnalysis))
+schedule.every(10).seconds.do(safe_execution(followUpFileAnalysis))
 
 def run_scheduler():
     while True:
