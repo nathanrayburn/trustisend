@@ -21,7 +21,7 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar ./app.jar
 
 # Copy the keys folder to the root directory (/)
-COPY ./keys /keys
+COPY ./keys ./keys
 
 # Expose the default port used by Spring Boot
 EXPOSE 8080 8000
