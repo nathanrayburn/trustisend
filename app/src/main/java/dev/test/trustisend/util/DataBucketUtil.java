@@ -36,7 +36,7 @@ public class DataBucketUtil {
      */
     public File downloadFile(String uID, String fileName){
         try{
-            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"))));
 
             GoogleCredentials credentials = GoogleCredentials.fromStream(
                     new ByteArrayInputStream(credentialsJson.getBytes())

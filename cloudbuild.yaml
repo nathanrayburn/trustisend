@@ -32,10 +32,13 @@ steps:
       - '2Gi'  # Set the memory limit to 2GiB
       - '--timeout'
       - '900s'  # Increase the timeout to 15 minutes
+      # Mount Firestore and Cloud Storage secrets
       - '--update-secrets'
-      - '/firestore-mnt/firestore=projects/579596661856/secrets/firestore:latest'
-      - '--update-secrets'
-      - '/gc-storage-mnt/storage=projects/579596661856/secrets/gc-storage-key:latest'
+      - '/cred-mnt/cred=projects/579596661856/secrets/credentials:latest'
+
+      # Set environment variable to point to the Firestore credentials secret
+      - '--set-env-vars'
+      - 'GOOGLE_APPLICATION_CREDENTIALS=/cred-mnt/cred'
 
 images:
   - 'europe-west1-docker.pkg.dev/trustisend-433213/trustisend-gcr/dev:$COMMIT_SHA'

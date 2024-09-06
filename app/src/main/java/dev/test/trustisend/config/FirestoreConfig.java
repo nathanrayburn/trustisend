@@ -15,9 +15,6 @@ import java.nio.file.Paths;
 @Configuration
 public class FirestoreConfig {
 
-    @Value("${firebase.credentials.path}")
-    private String firebaseCredentialsPath;
-
     @Value("${project.id}")
     private String projectId;
 
@@ -27,7 +24,7 @@ public class FirestoreConfig {
     @Bean
     public Firestore firestore() throws IOException {
 
-        String credentialsJson = new String(Files.readAllBytes(Paths.get(firebaseCredentialsPath)));
+        String credentialsJson = new String(Files.readAllBytes(Paths.get(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"))));
         GoogleCredentials credentials = GoogleCredentials.fromStream(
                 new ByteArrayInputStream(credentialsJson.getBytes())
         );
