@@ -33,15 +33,107 @@
 
 ## Installation et Configuration
 
-1. **Cloner le dépôt** :
+### Prerequisites 
 
-2. **Configurer les variables d'environnement** :
+Docker
+
+### Configuration Cloud pour run en local le projet spring boot
+
+#### Creation d'un compte et projet sur Cloud Console
+[link to Cloud Console](https://console.cloud.google.com/welcome?)
+
+1. Créer un nouveau projet
+2. Selectionne le nouveau projet
+   
+#### Configuration Firestore 
+
+1. Rechercher Firestore dans la console google
+2. Créer une base de données
+3. Dans Configure your database
+   1. Database ID -> trustisend ( name of choice )
+   2. Location type -> Region -> europe-west-1
+   3. Laisser le reste par défaut
+4. Create Database
 
 
-3. **Installer les dépendances** :
+#### Configuration Cloud Storage
 
+1. Rechercher Cloud Storage dans la console google
+2. Create Bucket
+3. Bucket name -> storage-trustisend (name of choice again)
+4. Choose where to store your data
+   1. Region -> europe-west-1
+5. Leave the rest by default
+6. Create Bucket
+7. Public access will be prevented -> Enforce public access prevention on this bucket
 
-4. **Lancer le projet en local** :
+#### Credentials
+
+1. Rechercher Credentials dans la console google
+2. Create credentials
+3. Service Account
+4. Service account name -> storage
+5. Create and continue
+6. Add Role ->  Storage Admin
+7. Done
+8. Create credentials
+9. Service Account 
+10. Service account name -> firestore
+11. Create and continue
+12. Add Role -> Firestore Service Agent
+13. Done
+
+ Sur la page de Credentials normalement il y a les Service accounts qui sont présent. Sur les deux comptes, il faut créer et télécharger les clefs.
+
+15. Cliquer sur le compte
+16. Keys
+17. Add Key
+18. Create new key
+19. Json -> Create
+
+(PS : If you lose the page, you can go to IAM Roles to grand access to roles to the Serice account that was just created. )
+
+#### Get Project ID
+
+Go to the main welcome page, select at the top of screen the project. 
+
+![alt text](image.png)
+
+#### Cloner ou fork le dépôt 
+
+#### Configuration variables d'environnement
+
+We have set the keys in the resources folder, but it didn't change much since we used the absolute path. We couldn't find the execution path for a relative path.
+
+```bash
+/app/src/main/resources/application.properties
+```
+
+```yaml
+
+spring.application.name=trustisend
+
+project.id= # set project ID 
+firebase.credentials.path= # set path to credentials
+firebase.database.id= # set database name
+
+gcp.credentials.path= # set path to credentials
+gcp.bucket.id= # set bucket name
+
+# don't need to touch anything
+logging.level.org.springframework.security=TRACE
+spring.servlet.multipart.max-file-size=100MB
+spring.servlet.multipart.max-request-size=5GB
+server.tomcat.connection-timeout=60000
+server.tomcat.max-swallow-size=5GB
+server.tomcat.max-http-form-post-size=5GB
+spring.servlet.multipart.enabled=false 
+logging.level.org.springframework.web.multipart=DEBUG
+spring.resources.enabled=true
+
+```
+
+### Configuration Cloud pour run en local le projet spring boot
 
 
 ## Contribuer
