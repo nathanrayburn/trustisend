@@ -8,13 +8,12 @@ steps:
         echo "Fetching credentials from Secret Manager..."
         gcloud secrets versions access latest --secret="credentials" > /tmp/gcloud-credentials.json
 
-  # Step 2: Run Maven tests with the GOOGLE_APPLICATION_CREDENTIALS pointing to the temp file
-  # Set the working directory to /app
-  - name: 'gcr.io/cloud-builders/mvn'
+  # Step 2: Use a Maven image with Java 21 to run the tests
+  - name: 'maven:3.9.4-eclipse-temurin-21'  # Maven image with Java 21
     dir: '/workspace/app'  # Change to the /app directory
     env:
       - 'GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-credentials.json'
-    args: ['clean', 'test']
+    args: ['mvn', 'clean', 'test']
 
   # Step 3: Clean up the temp file (optional but recommended)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
