@@ -23,7 +23,7 @@ COPY --from=build /app/target/*.jar ./app.jar
 # COPY ./keys ./keys
 
 # Expose the default port used by Spring Boot
-EXPOSE 8080 8000
+EXPOSE 8080
 
 # JVM Memory Optimization for Spring Boot
 # -XX:+UseContainerSupport: Ensures that JVM optimizes memory usage based on container limits.
