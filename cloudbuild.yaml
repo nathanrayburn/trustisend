@@ -1,4 +1,14 @@
 steps:
+  # Step 0: List the directory structure using the tree command
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Displaying workspace structure..."
+        apt-get update && apt-get install -y tree  # Install the tree command
+        tree  # Display the directory structure
+
   # Step 1: Fetch the secret from Secret Manager and save it to a temp file
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
