@@ -82,14 +82,17 @@ Note : Dans la page credentials, normalement un e-mail avec le nom du compte dev
 1. Accéder à la page d'accueil principale.
 2. Sélectionner le projet en haut de l'écran.
 
-#### Cloner ou fork le dépôt
+### Cloner ou fork le dépôt
 
-#### Configuration des variables d'environnement
+### Configuration des variables d'environnement project spring boot
 
-A compléter glisser la clef.json dans /keys.
+Il faut glisser la clef dans /keys pour le projet 
 
 ```bash
-/app/src/main/resources/application.properties
+/spring-boot/keys/your-credential-key.json
+```
+```bash
+/spring-boot/app/src/main/resources/application.properties
 ```
 
 ```yaml
@@ -124,7 +127,7 @@ WORKDIR /app
 
 COPY --from=build /app/target/*.jar ./app.jar
 
-COPY ./keys ./keys # uncomment this line
+COPY ./keys ./keys # uncomment this line if its commented
 
 EXPOSE 8080
 
@@ -139,7 +142,23 @@ ENTRYPOINT ["java", \
 
 ```
 
+### Configuration des variables d'environnement project Antivirus ( av )
+
+Il faut copier la clef dans /app.
+
+```bash
+/app/your-credential-key.json
+```
+
+### Configuration des variables d'environnement project Antivirus ( av )
+
+```bash
+/app/your-credential-key.json
+```
+
 ### Configuration de l'image Docker et Build
+
+
 
 ## Contribution
 
