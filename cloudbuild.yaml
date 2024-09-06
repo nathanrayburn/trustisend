@@ -8,6 +8,7 @@ steps:
         echo "Displaying workspace structure..."
         apt-get update && apt-get install -y tree  # Install the tree command
         tree  # Display the directory structure
+        pwd
         cd /app/
         echo "Fetching credentials from Secret Manager..."
         gcloud secrets versions access latest --secret="credentials" > /tmp/gcloud-credentials.json
