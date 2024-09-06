@@ -29,6 +29,8 @@
 - `/docs` : Documentation du projet, incluant schémas d'architecture, cdc, et mockups.
 - `/resources` : Fichiers de configuration et ressources statiques.
 - `/tests` : Tests unitaires et d'intégration pour garantir la qualité du code.
+- `/projects` : Contient les projets sur les trois branches, av, scheduler et main. Rassembler pour run en local.
+- [Lien pour notre site web](https://dev-579596661856.europe-west1.run.app/)
 
 ## Installation et Configuration
 
@@ -77,14 +79,31 @@
 
 Note : Dans la page credentials, normalement un e-mail avec le nom du compte devrait s'afficher. Il faut le cliquer dessus pour accèder au compte.
 
-#### Récupérer l'ID du projet
+#### Récupérer Google Cloud Project ID
 
 1. Accéder à la page d'accueil principale.
 2. Sélectionner le projet en haut de l'écran.
+   
+![alt text](image-1.png)
 
 ### Cloner ou fork le dépôt
 
 ### Configuration des variables d'environnement project spring boot
+
+L'arbre se situe dans projects.
+
+```bash
+Projects
+├── av
+│   ├── app
+│   └── Dockerfile
+├── schedule
+│   ├── app
+│   └── Dockerfile
+└── spring-boot
+   ├── app
+   └── keys
+```
 
 Il faut glisser la clef dans /keys pour le projet 
 
@@ -94,7 +113,6 @@ Il faut glisser la clef dans /keys pour le projet
 ```bash
 /spring-boot/app/src/main/resources/application.properties
 ```
-
 ```yaml
 spring.application.name=trustisend
 project.id= # set project ID
@@ -110,6 +128,9 @@ server.tomcat.max-http-form-post-size=5GB
 spring.servlet.multipart.enabled=false 
 logging.level.org.springframework.web.multipart=DEBUG
 spring.resources.enabled=true
+```
+```bash
+/spring-boot/Dockerfile
 ```
 ```Dockerfile
 FROM maven:3.9.4-eclipse-temurin-21 AS build
@@ -193,7 +214,13 @@ C'est normal qu'il y a deux lieu pour les credentials, c'est parce que dans notr
 
 ### Configuration de l'image Docker et Build
 
+```bash
+docker compose build
+```
 
+```bash
+docker compose up
+```
 
 ## Contribution
 
