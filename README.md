@@ -145,15 +145,50 @@ ENTRYPOINT ["java", \
 ### Configuration des variables d'environnement project Antivirus ( av )
 
 Il faut copier la clef dans /app.
-
+C'est normal qu'il y a deux lieu pour les credentials, c'est parce que dans notre projet à la base on utilisait deux comptes différents, ça fonctionne aussi utiliser le même compte comme on a donné les permissions.
 ```bash
 /app/your-credential-key.json
+```
+```json
+{
+  "projectID": "project-id", 
+  "firestore": {
+    "credentials": "your-credential-key.json",
+    "databaseID": "firestore-database-name"
+  },
+    "storage": {
+        "credentials": "your-credential-key.json",
+        "bucket": "bucket-name"
+    },
+  "antivirus": {
+    "api-key": "virtus-total-api-key",
+    "file-scan-limit": 4
+  }
+}
 ```
 
 ### Configuration des variables d'environnement project Antivirus ( av )
 
 ```bash
 /app/your-credential-key.json
+```
+
+```json
+{
+  "projectID": "project-id", 
+  "firestore": {
+    "credentials": "your-credential-key.json",
+    "databaseID": "firestore-database-name"
+  },
+    "storage": {
+        "credentials": "your-credential-key.json",
+        "bucket": "bucket-name"
+    },
+  "antivirus": {
+    "api-key": "virtus-total-api-key",
+    "file-scan-limit": 4
+  }
+}
 ```
 
 ### Configuration de l'image Docker et Build
