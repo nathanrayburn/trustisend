@@ -9,7 +9,9 @@ steps:
         gcloud secrets versions access latest --secret="credentials" > /tmp/gcloud-credentials.json
 
   # Step 2: Run Maven tests with the GOOGLE_APPLICATION_CREDENTIALS pointing to the temp file
+  # Set the working directory to /app
   - name: 'gcr.io/cloud-builders/mvn'
+    dir: '/app'  # Change to the /app directory
     env:
       - 'GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-credentials.json'
     args: ['clean', 'test']
