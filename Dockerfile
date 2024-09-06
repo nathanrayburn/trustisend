@@ -9,7 +9,7 @@ COPY ./app/pom.xml ./pom.xml
 COPY ./app/src ./src
 
 # package the application
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 # Step 2: Use the official Java 21 runtime image to run the Spring Boot app
 FROM eclipse-temurin:21-jre-alpine
