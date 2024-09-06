@@ -34,7 +34,6 @@ class FileScanStatus(Enum):
 class SSLAdapter(HTTPAdapter):
     def init_poolmanager(self, *args, **kwargs):
         context = ssl.create_default_context()
-        context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1  # Disable TLS 1.0 and 1.1
         kwargs['ssl_context'] = context
         return super().init_poolmanager(*args, **kwargs)
 
