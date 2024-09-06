@@ -19,9 +19,6 @@ import dev.test.trustisend.exception.GCPFileUploadException;
 @Component
 public class DataBucketUtil {
 
-    @Value("${gcp.credentials.path}")
-    private String gcpConfigFile;
-
     @Value("${project.id}")
     private String gcpProjectId;
 
@@ -93,7 +90,7 @@ public class DataBucketUtil {
 
         try {
             //get credentials and bucket
-            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"))));
             GoogleCredentials credentials = GoogleCredentials.fromStream(
                     new ByteArrayInputStream(credentialsJson.getBytes())
             );
@@ -139,7 +136,7 @@ public class DataBucketUtil {
     public boolean deleteFile(String uID, String fileName){
         try{
             //get credentials and bucket
-            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"))));
             GoogleCredentials credentials = GoogleCredentials.fromStream(
                     new ByteArrayInputStream(credentialsJson.getBytes())
             );
@@ -179,7 +176,7 @@ public class DataBucketUtil {
     public String uploadFileStream(InputStream fileStream, String fileName, String contentType, String uID) {
         try (InputStream stream = fileStream) {
             //get credentials
-            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"))));
             GoogleCredentials credentials = GoogleCredentials.fromStream(new ByteArrayInputStream(credentialsJson.getBytes()));
             StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId).setCredentials(credentials).build();
             Storage storage = options.getService();
@@ -209,7 +206,7 @@ public class DataBucketUtil {
     public boolean deleteFolder(String uID){
         try{
             //get credentials and bucket
-            String credentialsJson = new String(Files.readAllBytes(Paths.get(gcpConfigFile)));
+            String credentialsJson = new String(Files.readAllBytes(Paths.get(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"))));
             GoogleCredentials credentials = GoogleCredentials.fromStream(
                     new ByteArrayInputStream(credentialsJson.getBytes())
             );
