@@ -89,8 +89,7 @@ Note : Dans la page credentials, normalement un e-mail avec le nom du compte dev
 A compléter glisser la clef.json dans /keys.
 
 ```bash
-# Chemin pour le fichier application.properties
-A compléter
+/app/src/main/resources/application.properties
 ```
 
 ```yaml
@@ -127,7 +126,7 @@ COPY --from=build /app/target/*.jar ./app.jar
 
 COPY ./keys ./keys # uncomment this line
 
-EXPOSE 8080 8000
+EXPOSE 8080
 
 ENTRYPOINT ["java", \
   "-XX:+UseContainerSupport", \
